@@ -1,0 +1,155 @@
+# Hope International School — Website
+
+A bilingual (English + Burmese) website for an international school. The site
+is **fully static** — `npm run build` produces a plain `out/` folder that runs
+on any hosting (cPanel, shared hosting, GitHub Pages, Netlify, Vercel free
+tier, …). No Node.js server is required on the host.
+
+Editable content (news, events, gallery photos, hero/about text) is stored in
+a free **Supabase** cloud project and loaded by the site. Changes made in the
+admin portal appear on the public site immediately — no rebuild or re-upload.
+
+## Features
+
+- 🌐 **Bilingual**: `/en/...` and `/my/...` routes, language switcher, Noto
+  Sans Myanmar font for correct Burmese rendering everywhere.
+- 📄 **Pages**: Home, About, Academics, Admissions (steps, requirements, fees,
+  inquiry form), News & Events.
+- 🗞️ **News & Events**: managed from the admin portal (English + Burmese
+  fields), with an article reader modal.
+- 🖼️ **Photo gallery**: upload photos from the admin portal (auto-resized).
+- ✍️ **Editable site text**: hero, welcome and about intro editable from the
+  portal.
+- 🔐 **Admin portal** at `/admin` (Supabase Auth login, staff accounts).
+- 📦 **Static export**: works on any hosting; Supabase is optional — without
+  it the site shows sample content.
+
+## Tech stack
+
+Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · next-intl ·
+Supabase (@supabase/supabase-js)
+
+## Development
+
+Prerequisites: Node.js 20+ and npm.
+
+```bash
+npm install
+npm run dev        # http://localhost:3000
+```
+
+## Building the static site
+
+```bash
+npm run build      # outputs the static site to ./out
+```
+
+To preview the production build locally:
+
+```bash
+npx serve out     # or: python -m http.server 8080 -d out
+```
+
+## Supabase setup (free)
+
+The site shows sample content until you connect Supabase. Steps:
+
+1. Create a free project at <https://supabase.com> (no credit card needed).
+2. In **SQL Editor**, paste the contents of `supabase/schema.sql` and run it.
+   This creates the `news`, `events`, `site_content` and `gallery` tables,
+   the public `images` storage bucket, row-level security, and seed text.
+3. In **Authentication → Users**, click **Add user** → **Create new user**
+   and create each staff account (email + password).
+4. In **Project Settings → API**, copy the **Project URL** and the **anon
+   public** key.
+5. Create a file named `.env.local` in the project root (see
+   `.env.local.example`):
+
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR-ANON-KEY
+   ```
+
+6. Rebuild: `npm run build`.
+
+> Security note: only the anon (public) key is used by the site. Row-level
+> security means visitors can read content but only signed-in staff can
+> create or edit it.
+
+## Deploying to cPanel / shared hosting
+
+1. Run `npm run build` (on your computer).
+2. Upload the **contents** of the `out/` folder to your hosting's web root
+   (usually `public_html/`) with the File Manager or an FTP client.
+3. Done — no server configuration needed.
+
+Deploying again after code changes: rebuild and re-upload `out/`. Content
+changes made in the admin portal do **not** require re-uploading.
+
+> On cPanel, ensure the folder `out/admin/` is uploaded (the portal lives at
+> `https://your-school.com/admin`).
+
+## Using the admin portal
+
+1. Open `https://your-school.com/admin` and sign in with a staff account
+   created in Supabase.
+2. **News** — add/edit/delete posts (title + body in English and Burmese,
+   optional cover photo). New posts appear on the Home page and News page
+   immediately.
+3. **Events** — add/edit/delete upcoming events (date, time, location,
+   description). Events are shown on the News page and Home page.
+4. **Site Text** — edit the hero banner, welcome text and About intro in both
+   languages. Click **Save All Changes** to publish.
+5. **Gallery** — upload photos (auto-resized to 1600px JPEG) with bilingual
+   captions. Shown on the About page.
+
+## Inquiry form
+
+The admissions form opens the visitor's email app with a pre-filled message
+to `admissions@hopeinternationalschool.com` — no backend needed, works everywhere.
+
+For automatic delivery to your inbox (or a form database), replace it with a
+free form service such as:
+
+- **FormSubmit** — add `https://formsubmit.co/ajax/your@email.com` as the form
+  action; see <https://formsubmit.co> for the one-line setup.
+- **Formspree** — create a free form at <https://formspree.io> and point the
+  form's `action` to its endpoint.
+
+The form lives in `components/InquiryForm.tsx`.
+
+## Customization
+
+- **School name / contact details**: edit `messages/en.json` and
+  `messages/my.json` (footer contact, address, phone, email) and
+  `components/Header.tsx` / `components/Footer.tsx`.
+- **Colors**: edit the `@theme` block in `app/globals.css`
+  (`--color-brand`, `--color-accent`, …).
+- **Fees, curriculum, admission steps**: static text in
+  `messages/en.json` / `messages/my.json`.
+
+## Project structure
+
+```
+app/
+  [locale]/          public pages (en + my)
+  admin/             admin portal (staff login + editors)
+  page.tsx           root redirect (language detection)
+components/
+  admin/             portal editor components
+  Header, Footer, ...
+i18n/                next-intl routing + request config
+lib/                 supabase client, db helpers, uploads, types
+messages/            en.json + my.json (all UI copy)
+supabase/schema.sql  one-click Supabase setup
+```
+
+## Troubleshooting
+
+- **Burmese looks broken on Windows/Android** — the Noto Sans Myanmar font is
+  bundled at build time; hard-refresh (Ctrl+F5) after deploying.
+- **News/events not loading** — check the browser console for Supabase
+  errors, confirm the SQL ran, and that `.env.local` was set *before* the
+  build (env vars are baked in at build time).
+- **Login fails** — the staff user must exist under Supabase
+  Authentication → Users, and email/password must match.

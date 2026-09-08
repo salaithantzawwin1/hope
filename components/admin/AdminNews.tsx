@@ -1,0 +1,228 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { getSupabase } from "@/lib/supabase";
+import { uploadImage } from "@/lib/upload";
+import type { NewsItem } from "@/lib/types";
+import { Button, Card, Field, Notice, TextArea, TextInput } from "./ui";
+
+interface FormState {
+  id: string | null;
+  title_en: string;
+  title_my: string;
+  body_en: string;
+  body_my: string;
+  image_url: string;
+  published_at: string;
+}
+
+const EMPTY: FormState = {
+  id: null,
+  title_en: "",
+  title_my: "",
+  body_en: "",
+  body_my: "",
+  image_url: "",
+  published_at: new Date().toISOString().slice(0, 10),
+};
+
+export default function AdminNews() {
+  const [items, setItems] = useState<NewsItem[]>([]);
+  const [form, setForm] = useState<FormState>(EMPTY);
+  const [editing, setEditing] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const supabase = getSupabase();
+
+  const load = async (): Promise<NewsItem[]> => {
+    if (!supabase) return [];
+    const { data, error } = await supabase
+      .from("news")
+      .select("*")
+      .order("published_at", { ascending: false });
+    if (error) return [];
+    return (data ?? []) as NewsItem[];
+  };
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const items = await load();
+      if (active) setItems(items);
+    })();
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const startEdit = (item?: NewsItem) => {
+    setForm(
+      item
+        ? {
+            id: item.id,
+            title_en: item.title_en,
+            title_my: item.title_my,
+            body_en: item.body_en,
+            body_my: item.body_my,
+            image_url: item.image_url ?? "",
+            published_at: item.published_at.slice(0, 10),
+          }
+        : EMPTY,
+    );
+    setImageFile(null);
+    setEditing(true);
+    setError("");
+  };
+
+  const save = async () => {
+    if (!supabase) return;
+    setBusy(true);
+    setError("");
+    try {
+      let imageUrl = form.image_url;
+      if (imageFile) {
+        setUploading(true);
+        imageUrl = await uploadImage(imageFile, "news");
+      }
+      const payload = {
+        title_en: form.title_en.trim(),
+        title_my: form.title_my.trim(),
+        body_en: form.body_en.trim(),
+        body_my: form.body_my.trim(),
+        image_url: imageUrl || null,
+        published_at: form.published_at,
+      };
+      if (!payload.title_en) throw new Error("English title is required");
+
+      const { error } = form.id
+        ? await supabase.from("news").update(payload).eq("id", form.id)
+        : await supabase.from("news").insert(payload);
+      if (error) throw error;
+
+      setEditing(false);
+      setForm(EMPTY);
+      setImageFile(null);
+      setItems(await load());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to save");
+    } finally {
+      setUploading(false);
+      setBusy(false);
+    }
+  };
+
+  const remove = async (item: NewsItem) => {
+    if (!supabase) return;
+    if (!window.confirm(`Delete "${item.title_en}"?`)) return;
+    const { error } = await supabase.from("news").delete().eq("id", item.id);
+    if (!error) setItems(await load());
+  };
+
+  if (!supabase) return null;
+
+  return (
+    <div className="space-y-6">
+      {error && <Notice kind="error">{error}</Notice>}
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-slate-500">{items.length} post(s)</p>
+        <Button onClick={() => startEdit()}>+ New Post</Button>
+      </div>
+
+      {editing && (
+        <Card className="space-y-4 p-5">
+          <h3 className="font-bold text-slate-900">
+            {form.id ? "Edit Post" : "New Post"}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Title (English) *">
+              <TextInput
+                value={form.title_en}
+                onChange={(e) => setForm({ ...form, title_en: e.target.value })}
+              />
+            </Field>
+            <Field label="Title (မြန်မာ)">
+              <TextInput
+                value={form.title_my}
+                onChange={(e) => setForm({ ...form, title_my: e.target.value })}
+              />
+            </Field>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Body (English)">
+              <TextArea
+                rows={4}
+                value={form.body_en}
+                onChange={(e) => setForm({ ...form, body_en: e.target.value })}
+              />
+            </Field>
+            <Field label="Body (မြန်မာ)">
+              <TextArea
+                rows={4}
+                value={form.body_my}
+                onChange={(e) => setForm({ ...form, body_my: e.target.value })}
+              />
+            </Field>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Published date">
+              <TextInput
+                type="date"
+                value={form.published_at}
+                onChange={(e) => setForm({ ...form, published_at: e.target.value })}
+              />
+            </Field>
+            <Field label="Cover image" hint="JPEG/PNG — automatically resized. Optional.">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+                className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-slate-700"
+              />
+              {form.image_url && (
+                <span className="mt-1 block text-xs text-slate-400">
+                  Current: {form.image_url}
+                </span>
+              )}
+            </Field>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={save} disabled={busy || uploading}>
+              {uploading ? "Uploading…" : "Save"}
+            </Button>
+            <Button variant="secondary" onClick={() => setEditing(false)}>
+              Cancel
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      <div className="space-y-3">
+        {items.map((item) => (
+          <Card key={item.id} className="flex items-center justify-between gap-4 p-4">
+            <div className="min-w-0">
+              <p className="truncate font-semibold text-slate-900">
+                {item.title_en || "(no title)"}
+              </p>
+              <p className="text-xs text-slate-500">
+                {item.published_at.slice(0, 10)}
+              </p>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <Button variant="secondary" onClick={() => startEdit(item)}>
+                Edit
+              </Button>
+              <Button variant="danger" onClick={() => remove(item)}>
+                Delete
+              </Button>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}

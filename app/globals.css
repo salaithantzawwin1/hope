@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #1e3a8a;
+  --color-brand-dark: #172554;
+  --color-brand-light: #3b5bdb;
+  --color-accent: #f5b301;
+  --color-accent-dark: #d99e00;
+  --color-cream: #f8fafc;
+  --font-sans: var(--font-inter), var(--font-noto-myanmar), ui-sans-serif,
+    system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: #ffffff;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #f5b301;
+  color: #172554;
+}

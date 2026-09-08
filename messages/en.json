@@ -1,0 +1,198 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "academics": "Academics",
+    "admissions": "Admissions",
+    "news": "News & Events",
+    "admin": "Admin Login"
+  },
+  "common": {
+    "applyNow": "Apply Now",
+    "learnMore": "Learn More",
+    "viewAll": "View all",
+    "readMore": "Read more",
+    "close": "Close",
+    "loading": "Loading…",
+    "contactUs": "Contact Us"
+  },
+  "home": {
+    "heroBadge": "Hope International School",
+    "heroTitle": "Nurturing Global Citizens, One Student at a Time",
+    "heroSubtitle": "A world-class international education in Myanmar — from Early Years to High School, where students learn in English and Burmese, grow in confidence, and become caring leaders of tomorrow.",
+    "heroCta1": "Apply for Admission",
+    "heroCta2": "Explore Academics",
+    "stats": {
+      "students": "500+",
+      "studentsLabel": "Students",
+      "teachers": "40+",
+      "teachersLabel": "Qualified Teachers",
+      "years": "12",
+      "yearsLabel": "Years of Excellence",
+      "ratio": "1:15",
+      "ratioLabel": "Teacher–Student Ratio"
+    },
+    "welcomeTitle": "Welcome to Our School",
+    "welcomeText": "At Hope International School, we believe every child is unique. Our caring teachers, modern facilities and a balanced international curriculum help each student discover their strengths, think critically and act with kindness. We are proud to bring together the best of international education and Myanmar culture — so our students are ready for the world, wherever it takes them.",
+    "welcomeLink": "More about our school",
+    "programsTitle": "Our Programs",
+    "programsSubtitle": "A complete learning journey from age 2 to 18, built around international standards.",
+    "programs": [
+      {
+        "title": "Early Years",
+        "desc": "A warm, play-based start for ages 2–5 that builds curiosity, confidence and early language skills."
+      },
+      {
+        "title": "Primary School",
+        "desc": "Grades 1–5 with a strong foundation in literacy, numeracy, science and creative thinking."
+      },
+      {
+        "title": "Middle School",
+        "desc": "Grades 6–8 that deepen knowledge, develop study skills and encourage independent learning."
+      },
+      {
+        "title": "High School",
+        "desc": "Grades 9–12 preparing students for international exams and university admission worldwide."
+      }
+    ],
+    "newsTitle": "Latest News",
+    "newsSubtitle": "What is happening at our school.",
+    "eventsTitle": "Upcoming Events",
+    "eventsSubtitle": "Mark your calendar.",
+    "ctaTitle": "Ready to join our community?",
+    "ctaText": "We would love to meet you and your family. Book a campus tour or start your application today.",
+    "ctaButton": "Contact Admissions",
+    "ctaSecondary": "Apply Now"
+  },
+  "about": {
+    "title": "About Us",
+    "intro": "Hope International School is a vibrant learning community in Myanmar where international standards meet local values. Since our founding, we have grown into a school of over 500 students from Early Years to Grade 12, guided by a passionate team of local and international educators.",
+    "missionTitle": "Our Mission",
+    "missionText": "To nurture confident, compassionate and curious learners who think critically, communicate clearly and contribute positively to their community and the wider world.",
+    "visionTitle": "Our Vision",
+    "visionText": "To be the leading international school in Myanmar — a place where every student is known, valued and inspired to reach their full potential.",
+    "valuesTitle": "Our Core Values",
+    "values": [
+      { "title": "Respect", "desc": "We honour every person, culture and idea, and treat others with kindness and fairness." },
+      { "title": "Integrity", "desc": "We act honestly and take responsibility for our words and actions." },
+      { "title": "Excellence", "desc": "We set high standards, work hard and always try to improve." },
+      { "title": "Community", "desc": "We care for one another and work together — students, families and staff." }
+    ],
+    "factsTitle": "Our School at a Glance",
+    "facts": [
+      { "number": "500+", "label": "Students" },
+      { "number": "40+", "label": "Qualified Teachers" },
+      { "number": "12", "label": "Years of Excellence" },
+      { "number": "1:15", "label": "Teacher–Student Ratio" }
+    ],
+    "galleryTitle": "Life at Our School",
+    "gallerySubtitle": "Moments from our classrooms, playgrounds and celebrations."
+  },
+  "academics": {
+    "title": "Academics",
+    "intro": "Our curriculum blends international teaching standards with the best of Myanmar culture. Students learn to think deeply, ask questions and apply their knowledge to real life.",
+    "curriculumTitle": "International Curriculum",
+    "curriculumText": "Our programmes are built on internationally recognised standards and taught in English, with Myanmar language and culture as an integral part of every student's day.",
+    "curriculumPoints": [
+      "English-medium instruction from Early Years",
+      "Myanmar language, history and culture classes",
+      "Hands-on science, technology and arts programmes",
+      "Character education woven into daily learning",
+      "Small class sizes with individual attention"
+    ],
+    "levelsTitle": "Grade Levels",
+    "levels": [
+      { "name": "Early Years", "age": "Ages 2–5", "desc": "Play-based learning that builds curiosity, language and social skills." },
+      { "name": "Primary School", "age": "Grades 1–5", "desc": "Strong foundations in reading, writing, mathematics, science and creativity." },
+      { "name": "Middle School", "age": "Grades 6–8", "desc": "Deeper subject knowledge, research skills and growing independence." },
+      { "name": "High School", "age": "Grades 9–12", "desc": "Advanced studies preparing students for international examinations and universities." }
+    ],
+    "programsTitle": "Beyond the Classroom",
+    "programsSubtitle": "Learning continues outside lessons through clubs, sports and the arts.",
+    "programs": [
+      { "title": "Sports & Fitness", "desc": "Football, swimming, basketball and athletics for every age group." },
+      { "title": "Music & Arts", "desc": "Choir, drama, painting and traditional Myanmar performing arts." },
+      { "title": "STEAM Clubs", "desc": "Robotics, coding, science fairs and creative engineering projects." },
+      { "title": "Community Service", "desc": "Students learn leadership and compassion through service projects." }
+    ],
+    "ctaTitle": "Want to learn more about our curriculum?",
+    "ctaText": "Our admissions team is happy to share detailed programme information.",
+    "ctaButton": "Contact Admissions"
+  },
+  "admissions": {
+    "title": "Admissions",
+    "intro": "We welcome applications throughout the year. Our team will guide you through every step — from your first campus tour to your child's first day.",
+    "stepsTitle": "How to Apply",
+    "steps": [
+      { "title": "Visit or Contact Us", "desc": "Book a campus tour or get in touch with our admissions office." },
+      { "title": "Submit Application", "desc": "Complete the application form with your child's details and documents." },
+      { "title": "Assessment & Interview", "desc": "Your child joins a friendly assessment and a family interview with our team." },
+      { "title": "Offer of Place", "desc": "Successful applicants receive an offer letter and enrolment pack." },
+      { "title": "Enrolment", "desc": "Complete the paperwork, pay the fees, and welcome to Hope!" }
+    ],
+    "requirementsTitle": "Required Documents",
+    "requirements": [
+      "Completed application form",
+      "Copy of the child's birth certificate",
+      "Copy of the child's passport (photo page)",
+      "Recent school reports or transcripts (if applicable)",
+      "Two passport-sized photos",
+      "Immunisation / health records"
+    ],
+    "feesTitle": "Fees & Tuition",
+    "feesSubtitle": "Annual tuition fees per programme. Please contact the admissions office for the full fee schedule, including registration and other charges.",
+    "fees": [
+      { "level": "Early Years", "fee": "MMK 4,500,000" },
+      { "level": "Primary School", "fee": "MMK 6,000,000" },
+      { "level": "Middle School", "fee": "MMK 7,000,000" },
+      { "level": "High School", "fee": "MMK 8,500,000" }
+    ],
+    "feesTable": { "level": "Programme", "fee": "Annual Tuition" },
+    "feesNote": "* Fees shown are indicative annual tuition fees and may change. Contact the school for the latest schedule.",
+    "formTitle": "Send Us an Inquiry",
+    "formSubtitle": "Fill in the form and our admissions team will get back to you within two working days.",
+    "form": {
+      "name": "Parent / Guardian Name",
+      "namePlaceholder": "Your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "phone": "Phone Number",
+      "phonePlaceholder": "+95 9 123 456 789",
+      "grade": "Grade Interested In",
+      "gradePlaceholder": "e.g. Grade 1",
+      "message": "Message",
+      "messagePlaceholder": "Tell us a little about your child and how we can help…",
+      "submit": "Send Inquiry",
+      "sending": "Sending…",
+      "successTitle": "Thank you!",
+      "successText": "Your email app should have opened with your inquiry. If not, please email us directly at admissions@hopeinternationalschool.com",
+      "errorTitle": "Please check the form",
+      "errorText": "Make sure your name, email and message are filled in correctly.",
+      "validationName": "Please enter your name",
+      "validationEmail": "Please enter a valid email address",
+      "validationMessage": "Please write a short message"
+    }
+  },
+  "news": {
+    "title": "News & Events",
+    "subtitle": "Stay up to date with school life — announcements, celebrations and everything in between.",
+    "newsTitle": "Latest News",
+    "eventsTitle": "Upcoming Events",
+    "noNews": "No news posts yet. Check back soon!",
+    "noEvents": "No upcoming events right now. Check back soon!"
+  },
+  "gallery": {
+    "title": "Photo Gallery"
+  },
+  "footer": {
+    "tagline": "Nurturing global citizens — an international education in the heart of Myanmar.",
+    "quickLinks": "Quick Links",
+    "contactTitle": "Contact",
+    "address": "No. 123, University Avenue Road, Kamayut Township, Yangon, Myanmar",
+    "phone": "+95 9 123 456 789",
+    "email": "info@hopeinternationalschool.com",
+    "hours": "Mon – Fri: 8:00 AM – 4:30 PM",
+    "rights": "All rights reserved.",
+    "adminLink": "Staff Login"
+  }
+}
