@@ -11,6 +11,7 @@ export default function Footer() {
     { href: "/academics", label: nav("academics") },
     { href: "/admissions", label: nav("admissions") },
     { href: "/news", label: nav("news") },
+    { href: "/downloads", label: nav("downloads") },
   ];
 
   return (

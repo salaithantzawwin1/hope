@@ -40,7 +40,7 @@ export default function EventsList({ events }: { events: EventItem[] }) {
                 {month}
               </span>
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h4 className="font-semibold leading-snug text-slate-900">
                 {title}
               </h4>
@@ -52,6 +52,23 @@ export default function EventsList({ events }: { events: EventItem[] }) {
                 <p className="mt-0.5 text-sm text-slate-500">📍 {location}</p>
               )}
             </div>
+            {event.image_url && (
+              <a
+                href={event.image_url}
+                target="_blank"
+                rel="noreferrer"
+                className="shrink-0 overflow-hidden rounded-lg border border-slate-200 shadow-sm transition-transform hover:scale-105"
+                aria-label={title}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={event.image_url}
+                  alt={title}
+                  loading="lazy"
+                  className="h-20 w-16 object-cover"
+                />
+              </a>
+            )}
           </li>
         );
       })}

@@ -60,6 +60,7 @@ export const FALLBACK_EVENTS: EventItem[] = [
       "Prospective families are invited to tour our campus, meet teachers and learn about our programmes.",
     description_my:
       "လျှောက်ထားလိုသော မိသားစုများကို ကျောင်းဝင်း လေ့လာရန်၊ ဆရာများနှင့် တွေ့ဆုံရန်နှင့် ကျွန်ုပ်တို့၏ အစီအစဉ်များအကြောင်း လေ့လာရန် ဖိတ်ခေါ်ပါသည်။",
+    image_url: "/Bunner/pamphlet01.jpg",
     created_at: daysFromNow(-1),
   },
   {
@@ -74,6 +75,7 @@ export const FALLBACK_EVENTS: EventItem[] = [
       "A day of friendly competition, team spirit and fun for all grade levels. Parents are welcome to cheer!",
     description_my:
       "အတန်းအဆင့်အားလုံးအတွက် ခင်မင်ရင်းနှီးသော ပြိုင်ပွဲ၊ အဖွဲ့လိုက် စိတ်ဓာတ်နှင့် ပျော်ရွှင်မှုများဖြင့် ပြည့်နှက်သော နေ့တစ်နေ့။ မိဘများ အားပေးရန် ကြိုဆိုပါသည်!",
+    image_url: null,
     created_at: daysFromNow(-1),
   },
   {
@@ -88,6 +90,7 @@ export const FALLBACK_EVENTS: EventItem[] = [
       "Celebrating the achievements of our graduating class of 2026. Families and friends welcome.",
     description_my:
       "၂၀၂၆ ဘွဲ့ရ အတန်းသားများ၏ အောင်မြင်မှုများကို ဂုဏ်ပြုကျင်းပခြင်း။ မိသားစုများနှင့် သူငယ်ချင်းများကို ကြိုဆိုပါသည်။",
+    image_url: null,
     created_at: daysFromNow(-1),
   },
 ];

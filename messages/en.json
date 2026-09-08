@@ -5,6 +5,7 @@
     "academics": "Academics",
     "admissions": "Admissions",
     "news": "News & Events",
+    "downloads": "Downloads",
     "admin": "Admin Login"
   },
   "common": {
@@ -59,6 +60,8 @@
     "newsSubtitle": "What is happening at our school.",
     "eventsTitle": "Upcoming Events",
     "eventsSubtitle": "Mark your calendar.",
+    "featuredEvent": "Featured Event",
+    "featuredCta": "View Full Flyer",
     "ctaTitle": "Ready to join our community?",
     "ctaText": "We would love to meet you and your family. Book a campus tour or start your application today.",
     "ctaButton": "Contact Admissions",
@@ -183,6 +186,19 @@
   },
   "gallery": {
     "title": "Photo Gallery"
+  },
+  "downloads": {
+    "title": "Downloads",
+    "subtitle": "Brochures, flyers and documents about Hope International School. New files go in public/docs/ and get listed here.",
+    "docs": [
+      {
+        "file": "/Bunner/pamphlet01.jpg",
+        "name": "Open House Flyer",
+        "desc": "Join us at our Open House on Saturday, 25 April 2026, 10:00 AM – 12:00 PM. Programme, schedule and contact details inside."
+      }
+    ],
+    "download": "Download",
+    "view": "View"
   },
   "footer": {
     "tagline": "Nurturing global citizens — an international education in the heart of Myanmar.",

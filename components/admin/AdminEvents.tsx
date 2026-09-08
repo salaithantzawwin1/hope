@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
+import { uploadImage } from "@/lib/upload";
 import type { EventItem } from "@/lib/types";
 import { Button, Card, Field, Notice, TextArea, TextInput } from "./ui";
 
@@ -15,6 +16,7 @@ interface FormState {
   location_my: string;
   description_en: string;
   description_my: string;
+  image_url: string;
 }
 
 const EMPTY: FormState = {
@@ -27,6 +29,7 @@ const EMPTY: FormState = {
   location_my: "",
   description_en: "",
   description_my: "",
+  image_url: "",
 };
 
 export default function AdminEvents() {
@@ -35,6 +38,8 @@ export default function AdminEvents() {
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const supabase = getSupabase();
 
@@ -73,9 +78,11 @@ export default function AdminEvents() {
             location_my: item.location_my ?? "",
             description_en: item.description_en ?? "",
             description_my: item.description_my ?? "",
+            image_url: item.image_url ?? "",
           }
         : EMPTY,
     );
+    setImageFile(null);
     setEditing(true);
     setError("");
   };
@@ -85,6 +92,11 @@ export default function AdminEvents() {
     setBusy(true);
     setError("");
     try {
+      let imageUrl = form.image_url;
+      if (imageFile) {
+        setUploading(true);
+        imageUrl = await uploadImage(imageFile, "events");
+      }
       const payload = {
         title_en: form.title_en.trim(),
         title_my: form.title_my.trim(),
@@ -94,6 +106,7 @@ export default function AdminEvents() {
         location_my: form.location_my.trim() || null,
         description_en: form.description_en.trim() || null,
         description_my: form.description_my.trim() || null,
+        image_url: imageUrl || null,
       };
       if (!payload.title_en || !payload.date)
         throw new Error("English title and date are required");
@@ -105,10 +118,12 @@ export default function AdminEvents() {
 
       setEditing(false);
       setForm(EMPTY);
+      setImageFile(null);
       setItems(await load());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save");
     } finally {
+      setUploading(false);
       setBusy(false);
     }
   };
@@ -193,9 +208,25 @@ export default function AdminEvents() {
               />
             </Field>
           </div>
+          <Field
+            label="Flyer / poster image"
+            hint="JPEG/PNG — automatically resized. Visitors click it to open full size. Optional."
+          >
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+              className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-slate-700"
+            />
+            {form.image_url && (
+              <span className="mt-1 block text-xs text-slate-400">
+                Current: {form.image_url}
+              </span>
+            )}
+          </Field>
           <div className="flex gap-2">
-            <Button onClick={save} disabled={busy}>
-              Save
+            <Button onClick={save} disabled={busy || uploading}>
+              {uploading ? "Uploading…" : "Save"}
             </Button>
             <Button variant="secondary" onClick={() => setEditing(false)}>
               Cancel
@@ -207,14 +238,24 @@ export default function AdminEvents() {
       <div className="space-y-3">
         {items.map((item) => (
           <Card key={item.id} className="flex items-center justify-between gap-4 p-4">
-            <div className="min-w-0">
-              <p className="truncate font-semibold text-slate-900">
-                {item.title_en || "(no title)"}
-              </p>
-              <p className="text-xs text-slate-500">
-                {item.date}
-                {item.time ? ` · ${item.time}` : ""}
-              </p>
+            <div className="flex min-w-0 items-center gap-3">
+              {item.image_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={item.image_url}
+                  alt=""
+                  className="h-10 w-8 shrink-0 rounded border border-slate-200 object-cover"
+                />
+              )}
+              <div className="min-w-0">
+                <p className="truncate font-semibold text-slate-900">
+                  {item.title_en || "(no title)"}
+                </p>
+                <p className="text-xs text-slate-500">
+                  {item.date}
+                  {item.time ? ` · ${item.time}` : ""}
+                </p>
+              </div>
             </div>
             <div className="flex shrink-0 gap-2">
               <Button variant="secondary" onClick={() => startEdit(item)}>

@@ -26,8 +26,12 @@ create table if not exists public.events (
   location_my text,
   description_en text,
   description_my text,
+  image_url text,
   created_at timestamptz not null default now()
 );
+
+-- For databases created before this column existed, run once:
+-- alter table public.events add column if not exists image_url text;
 
 -- ---------- Editable site text ----------
 create table if not exists public.site_content (

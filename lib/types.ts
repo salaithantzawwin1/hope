@@ -21,6 +21,8 @@ export interface EventItem {
   location_my: string | null;
   description_en: string | null;
   description_my: string | null;
+  /** Optional event flyer/poster image (portrait works best). */
+  image_url: string | null;
   created_at: string;
 }
 

@@ -32,7 +32,10 @@ function resizeImage(file: File): Promise<Blob> {
 }
 
 /** Upload an image to the public "images" bucket and return its public URL. */
-export async function uploadImage(file: File, folder: "news" | "gallery"): Promise<string> {
+export async function uploadImage(
+  file: File,
+  folder: "news" | "gallery" | "events",
+): Promise<string> {
   const supabase = getSupabase();
   if (!supabase) throw new Error("Supabase is not configured");
 

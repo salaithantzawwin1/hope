@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import SiteText from "@/components/SiteText";
 import NewsEventsHome from "@/components/NewsEventsHome";
+import FeaturedEvent from "@/components/FeaturedEvent";
 
 export default async function HomePage({
   params,
@@ -100,6 +101,9 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+
+      {/* Featured event (first upcoming event with a flyer) */}
+      <FeaturedEvent />
 
       {/* Welcome */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
