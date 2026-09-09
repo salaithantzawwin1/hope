@@ -16,11 +16,13 @@ export default function Header() {
   // locale-aware Link, which would prepend the current locale again).
   const otherHref = `/${otherLocale}${pathname}`;
 
+  // Admissions is not in the list: the prominent blue Admissions button on
+  // the right (and the mobile menu CTA) already link there, so repeating it
+  // in the nav only crowds the row — especially in Burmese.
   const links = [
     { href: "/", label: t("home") },
     { href: "/about", label: t("about") },
     { href: "/academics", label: t("academics") },
-    { href: "/admissions", label: t("admissions") },
     { href: "/news", label: t("news") },
     { href: "/downloads", label: t("downloads") },
     { href: "/register", label: t("register") },
