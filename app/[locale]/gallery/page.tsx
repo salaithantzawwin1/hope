@@ -32,7 +32,7 @@ export default async function GalleryPage({
       </PageHeader>
 
       {/* Albums (each photo album renders as its own titled section) */}
-      <section className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-12 sm:px-6">
+      <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
         <Gallery />
       </section>
     </>

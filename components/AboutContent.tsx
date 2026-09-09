@@ -74,7 +74,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
   return (
     <>
       {/* Mission & vision */}
-      <section className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-12 sm:px-6">
+      <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="rounded-3xl border-t-4 border-accent bg-cream p-8">
             <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
 
       {/* Values */}
       <section className="bg-cream">
-        <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-12 sm:px-6">
+        <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
           <h2 className="text-3xl font-bold text-slate-900">
             {pick(values.title_en, values.title_my)}
           </h2>
@@ -130,7 +130,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
 
       {/* Facts */}
       <section className="bg-brand text-white">
-        <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-14 sm:px-6">
+        <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-14 sm:px-6">
           <h2 className="text-center text-2xl font-bold sm:text-3xl">
             {pick(facts.title_en, facts.title_my)}
           </h2>

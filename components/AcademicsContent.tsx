@@ -67,7 +67,7 @@ export default function AcademicsContent({ fallback }: { fallback: AcademicsData
   return (
     <>
       {/* Curriculum */}
-      <section className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-12 sm:px-6">
+      <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
@@ -119,7 +119,7 @@ export default function AcademicsContent({ fallback }: { fallback: AcademicsData
 
       {/* Beyond the classroom */}
       <section className="bg-cream">
-        <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-12 sm:px-6">
+        <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
           <div className="max-w-2xl">
             <h2 className="text-3xl font-bold text-slate-900">
               {pick(data.programs.title_en, data.programs.title_my)}

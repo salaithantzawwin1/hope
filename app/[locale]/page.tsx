@@ -38,7 +38,7 @@ export default async function HomePage({
           aria-hidden
           className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-accent/20 blur-3xl"
         />
-        <div className="relative mx-auto max-w-6xl xl:max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
+        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-20 sm:px-6 sm:py-28">
           <div className="max-w-3xl">
             <SiteText
               k="home_hero_badge"
@@ -115,7 +115,7 @@ export default async function HomePage({
       <FeaturedEvent />
 
       {/* Welcome */}
-      <section className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
+      <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-16 sm:px-6 sm:py-24">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div>
             <SiteText

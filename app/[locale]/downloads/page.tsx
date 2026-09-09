@@ -35,7 +35,7 @@ export default async function DownloadsPage({
       </PageHeader>
 
       {/* Documents */}
-      <section className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-12 sm:px-6">
+      <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {docs.map((doc) => (
             <div

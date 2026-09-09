@@ -82,7 +82,7 @@ export function HomePrograms({ fallback }: { fallback: HomePrograms }) {
 
   return (
     <section className="bg-cream">
-      <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-16 sm:px-6 sm:py-20">
         <div className="max-w-2xl">
           <h2 className="text-3xl font-bold text-slate-900">
             {pick(data.title_en, data.title_my)}
@@ -130,7 +130,7 @@ export function HomeCta({ fallback }: { fallback: HomeCta }) {
         aria-hidden
         className="pointer-events-none absolute -left-24 top-0 h-48 w-48 rounded-full bg-accent/20 blur-3xl"
       />
-      <div className="relative mx-auto flex max-w-6xl xl:max-w-7xl flex-col items-start justify-between gap-5 px-4 py-10 sm:px-6 md:flex-row md:items-center">
+      <div className="relative mx-auto flex max-w-7xl 2xl:max-w-[1440px] flex-col items-start justify-between gap-5 px-4 py-10 sm:px-6 md:flex-row md:items-center">
         <div className="max-w-xl">
           <h2 className="text-xl font-bold sm:text-2xl">
             {pick(data.title_en, data.title_my)}
