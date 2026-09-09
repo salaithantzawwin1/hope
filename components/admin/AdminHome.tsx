@@ -15,7 +15,7 @@ import type {
   HomeStats,
 } from "@/lib/types";
 import { LangRow } from "./bilingual";
-import { Button, Card, Notice } from "./ui";
+import { Button, Card, Notice, SubTabs } from "./ui";
 
 const STATS_KEY = "home_stats";
 const PROGRAMS_KEY = "home_programs";
@@ -30,8 +30,17 @@ function parseJson<T>(raw: string | undefined | null): T | null {
   }
 }
 
+type HomeSection = "stats" | "programs" | "cta";
+
+const HOME_SECTIONS: { id: HomeSection; label: string }[] = [
+  { id: "stats", label: "Hero Stats" },
+  { id: "programs", label: "Programs" },
+  { id: "cta", label: "CTA Banner" },
+];
+
 export default function AdminHome() {
   const supabase = getSupabase();
+  const [section, setSection] = useState<HomeSection>("stats");
   const [stats, setStats] = useState<HomeStats>(FALLBACK_HOME_STATS);
   const [programs, setPrograms] = useState<HomePrograms>(
     FALLBACK_HOME_PROGRAMS,
@@ -119,7 +128,13 @@ export default function AdminHome() {
         and welcome text are edited from the Site Text tab.
       </p>
 
-      {/* Hero stats */}
+      <SubTabs
+        tabs={HOME_SECTIONS}
+        active={section}
+        onChange={(id) => setSection(id as HomeSection)}
+      />
+
+      {section === "stats" && (
       <Card className="space-y-4 p-5">
         <div>
           <p className="text-sm font-bold text-slate-900">Hero Stats</p>
@@ -180,8 +195,9 @@ export default function AdminHome() {
           + Add stat
         </Button>
       </Card>
+      )}
 
-      {/* Programs */}
+      {section === "programs" && (
       <Card className="space-y-4 p-5">
         <div>
           <p className="text-sm font-bold text-slate-900">Programs</p>
@@ -258,8 +274,9 @@ export default function AdminHome() {
           + Add program
         </Button>
       </Card>
+      )}
 
-      {/* CTA banner */}
+      {section === "cta" && (
       <Card className="space-y-4 p-5">
         <div>
           <p className="text-sm font-bold text-slate-900">CTA Banner</p>
@@ -298,6 +315,7 @@ export default function AdminHome() {
           onMy={(v) => setCta({ ...cta, secondary_my: v })}
         />
       </Card>
+      )}
 
       <Button onClick={saveAll} disabled={busy}>
         {busy ? "Saving…" : "Save All Changes"}

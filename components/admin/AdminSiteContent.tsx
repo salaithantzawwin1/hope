@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { FALLBACK_SITE_CONTENT } from "@/lib/fallback-data";
-import { Button, Card, Field, Notice, TextArea } from "./ui";
+import { Button, Card, Field, Notice, SubTabs, TextArea } from "./ui";
 
 const LABELS: Record<string, string> = {
   home_hero_badge: "Home — hero badge",
@@ -21,7 +21,16 @@ interface Row {
   value_my: string;
 }
 
+type SiteGroup = "home" | "about" | "academics";
+
+const SITE_GROUPS: { id: SiteGroup; label: string; prefix: string }[] = [
+  { id: "home", label: "Home", prefix: "home_" },
+  { id: "about", label: "About", prefix: "about_" },
+  { id: "academics", label: "Academics", prefix: "academics_" },
+];
+
 export default function AdminSiteContent() {
+  const [group, setGroup] = useState<SiteGroup>("home");
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -92,8 +101,16 @@ export default function AdminSiteContent() {
         fall back to English. Save to publish immediately.
       </p>
 
+      <SubTabs
+        tabs={SITE_GROUPS.map(({ id, label }) => ({ id, label }))}
+        active={group}
+        onChange={(id) => setGroup(id as SiteGroup)}
+      />
+
       <div className="space-y-4">
-        {rows.map((row) => (
+        {rows
+          .filter((r) => r.key.startsWith(SITE_GROUPS.find((g) => g.id === group)?.prefix ?? ""))
+          .map((row) => (
           <Card key={row.key} className="space-y-3 p-5">
             <p className="text-sm font-bold text-slate-900">
               {LABELS[row.key] ?? row.key}
@@ -127,7 +144,7 @@ export default function AdminSiteContent() {
               </Field>
             </div>
           </Card>
-        ))}
+          ))}
       </div>
 
       <Button onClick={saveAll} disabled={busy}>

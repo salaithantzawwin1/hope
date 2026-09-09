@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { uploadImage } from "@/lib/upload";
 import type { GalleryImage } from "@/lib/types";
-import { Button, Card, Field, Notice, Select, TextInput } from "./ui";
+import { Button, Card, Field, Notice, Select, SubTabs, TextInput } from "./ui";
 
 /** Writable album fields for the album-level editor. */
 interface AlbumEdit {
@@ -50,7 +50,16 @@ function FilePreview({ file, onRemove }: { file: File; onRemove: () => void }) {
   );
 }
 
+type GallerySection = "upload" | "albums" | "photos";
+
+const GALLERY_SECTIONS: { id: GallerySection; label: string }[] = [
+  { id: "upload", label: "Upload Photos" },
+  { id: "albums", label: "Edit Albums" },
+  { id: "photos", label: "Manage Photos" },
+];
+
 export default function AdminGallery() {
+  const [section, setSection] = useState<GallerySection>("upload");
   const [items, setItems] = useState<GalleryImage[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [captionEn, setCaptionEn] = useState("");
@@ -321,6 +330,13 @@ export default function AdminGallery() {
     <div className="space-y-6">
       {error && <Notice kind="error">{error}</Notice>}
 
+      <SubTabs
+        tabs={GALLERY_SECTIONS}
+        active={section}
+        onChange={(id) => setSection(id as GallerySection)}
+      />
+
+      {section === "upload" && (
       <Card className="space-y-4 p-5">
         <h3 className="font-bold text-slate-900">Upload Photos</h3>
         <input
@@ -399,9 +415,14 @@ export default function AdminGallery() {
           {uploading ? "Uploading…" : "Upload"}
         </Button>
       </Card>
+      )}
 
-      {/* Album-level editor: rename or describe an album in one go. */}
-      {albumGroups.length > 0 && (
+      {section === "albums" && (
+        albumGroups.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-sm text-slate-500">
+          No albums yet — upload photos with an album name to create one.
+        </p>
+        ) : (
         <Card className="space-y-4 p-5">
           <div>
             <h3 className="font-bold text-slate-900">Edit Albums</h3>
@@ -473,9 +494,11 @@ export default function AdminGallery() {
             );
           })}
         </Card>
+        )
       )}
 
-      {/* Filter / search */}
+      {section === "photos" && (
+      <>
       <Card className="space-y-3 p-5">
         <div className="flex flex-wrap items-end gap-3">
           <div className="w-52">
@@ -666,6 +689,8 @@ export default function AdminGallery() {
         <p className="rounded-xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-sm text-slate-500">
           No photos match this filter.
         </p>
+      )}
+      </>
       )}
     </div>
   );

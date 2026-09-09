@@ -15,7 +15,7 @@ import type {
   AcademicsPrograms,
 } from "@/lib/types";
 import { LangRow, PointsEditor } from "./bilingual";
-import { Button, Card, Notice } from "./ui";
+import { Button, Card, Notice, SubTabs } from "./ui";
 
 const CURRICULUM_KEY = "academics_curriculum";
 const LEVELS_KEY = "academics_levels";
@@ -30,8 +30,17 @@ function parseJson<T>(raw: string | undefined | null): T | null {
   }
 }
 
+type AcademicsSection = "curriculum" | "levels" | "programs";
+
+const ACADEMICS_SECTIONS: { id: AcademicsSection; label: string }[] = [
+  { id: "curriculum", label: "International Curriculum" },
+  { id: "levels", label: "Grade Levels" },
+  { id: "programs", label: "Beyond the Classroom" },
+];
+
 export default function AdminAcademics() {
   const supabase = getSupabase();
+  const [section, setSection] = useState<AcademicsSection>("curriculum");
   const [curriculum, setCurriculum] = useState<AcademicsCurriculum>(
     FALLBACK_ACADEMICS_CURRICULUM,
   );
@@ -120,7 +129,13 @@ export default function AdminAcademics() {
         empty to fall back to English. Save to publish immediately.
       </p>
 
-      {/* Curriculum */}
+      <SubTabs
+        tabs={ACADEMICS_SECTIONS}
+        active={section}
+        onChange={(id) => setSection(id as AcademicsSection)}
+      />
+
+      {section === "curriculum" && (
       <Card className="space-y-4 p-5">
         <div>
           <p className="text-sm font-bold text-slate-900">International Curriculum</p>
@@ -154,8 +169,9 @@ export default function AdminAcademics() {
           onChange={(pts) => setCurriculum({ ...curriculum, points_my: pts })}
         />
       </Card>
+      )}
 
-      {/* Grade levels */}
+      {section === "levels" && (
       <Card className="space-y-4 p-5">
         <div>
           <p className="text-sm font-bold text-slate-900">Grade Levels</p>
@@ -238,8 +254,9 @@ export default function AdminAcademics() {
           + Add level
         </Button>
       </Card>
+      )}
 
-      {/* Beyond the classroom */}
+      {section === "programs" && (
       <Card className="space-y-4 p-5">
         <div>
           <p className="text-sm font-bold text-slate-900">Beyond the Classroom</p>
@@ -316,6 +333,7 @@ export default function AdminAcademics() {
           + Add programme
         </Button>
       </Card>
+      )}
 
       <Button onClick={saveAll} disabled={busy}>
         {busy ? "Saving…" : "Save All Changes"}

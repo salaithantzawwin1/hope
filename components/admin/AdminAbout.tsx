@@ -18,7 +18,7 @@ import type {
   AboutValues,
 } from "@/lib/types";
 import { LangRow } from "./bilingual";
-import { Button, Card, Field, Notice, TextInput } from "./ui";
+import { Button, Card, Field, Notice, SubTabs, TextInput } from "./ui";
 
 const MISSION_VISION_KEY = "about_mission_vision";
 const VALUES_KEY = "about_values";
@@ -34,8 +34,18 @@ function parseJson<T>(raw: string | undefined | null): T | null {
   }
 }
 
+type AboutSection = "mission" | "values" | "sections" | "facts";
+
+const ABOUT_SECTIONS: { id: AboutSection; label: string }[] = [
+  { id: "mission", label: "Mission & Vision" },
+  { id: "values", label: "Core Values" },
+  { id: "sections", label: "Additional Sections" },
+  { id: "facts", label: "School Facts" },
+];
+
 export default function AdminAbout() {
   const supabase = getSupabase();
+  const [section, setSection] = useState<AboutSection>("mission");
   const [missionVision, setMissionVision] = useState<AboutMissionVision>(
     FALLBACK_ABOUT_MISSION_VISION,
   );
@@ -143,7 +153,13 @@ export default function AdminAbout() {
         to fall back to English. Save to publish immediately.
       </p>
 
-      {/* Mission & vision */}
+      <SubTabs
+        tabs={ABOUT_SECTIONS}
+        active={section}
+        onChange={(id) => setSection(id as AboutSection)}
+      />
+
+      {section === "mission" && (
       <Card className="space-y-4 p-5">
         <div>
           <p className="text-sm font-bold text-slate-900">Mission &amp; Vision</p>
@@ -182,8 +198,9 @@ export default function AdminAbout() {
           onMy={(v) => setMissionVision({ ...missionVision, vision_text_my: v })}
         />
       </Card>
+      )}
 
-      {/* Core values */}
+      {section === "values" && (
       <Card className="space-y-4 p-5">
         <div>
           <p className="text-sm font-bold text-slate-900">Core Values</p>
@@ -250,8 +267,9 @@ export default function AdminAbout() {
           + Add value
         </Button>
       </Card>
+      )}
 
-      {/* Additional sections (two-card blocks like Mission & Vision) */}
+      {section === "sections" && (
       <Card className="space-y-4 p-5">
         <div>
           <p className="text-sm font-bold text-slate-900">Additional Sections</p>
@@ -375,8 +393,9 @@ export default function AdminAbout() {
           + Add section
         </Button>
       </Card>
+      )}
 
-      {/* School facts */}
+      {section === "facts" && (
       <Card className="space-y-4 p-5">
         <div>
           <p className="text-sm font-bold text-slate-900">School Facts</p>
@@ -444,6 +463,7 @@ export default function AdminAbout() {
           + Add stat
         </Button>
       </Card>
+      )}
 
       <Button onClick={saveAll} disabled={busy}>
         {busy ? "Saving…" : "Save All Changes"}

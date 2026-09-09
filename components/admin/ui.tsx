@@ -71,6 +71,35 @@ export function Card({ children, className = "" }: { children: React.ReactNode; 
   );
 }
 
+export function SubTabs({
+  tabs,
+  active,
+  onChange,
+}: {
+  tabs: { id: string; label: string }[];
+  active: string;
+  onChange: (id: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {tabs.map((t) => (
+        <button
+          key={t.id}
+          type="button"
+          onClick={() => onChange(t.id)}
+          className={`rounded-lg px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+            active === t.id
+              ? "bg-slate-900 text-white"
+              : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
+          }`}
+        >
+          {t.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function Notice({ kind, children }: { kind: "error" | "info"; children: React.ReactNode }) {
   const styles =
     kind === "error"
