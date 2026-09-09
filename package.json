@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "deploy": "next build && wrangler deploy",
-    "preview": "next build && wrangler dev"
+    "deploy": "next build && npx wrangler deploy",
+    "preview": "next build && npx wrangler dev"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",
@@ -19,7 +19,6 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "wrangler": "^4.130.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
