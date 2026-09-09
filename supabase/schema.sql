@@ -55,6 +55,18 @@ insert into storage.buckets (id, name, public)
 values ('images', 'images', true)
 on conflict (id) do nothing;
 
+-- Policies for storage.objects (uploads into the images bucket). Without
+-- these, signed-in staff get "new row violates row-level security policy"
+-- when uploading photos.
+create policy "Public read images" on storage.objects
+  for select using (bucket_id = 'images');
+create policy "Staff upload images" on storage.objects
+  for insert with check (bucket_id = 'images' and auth.role() = 'authenticated');
+create policy "Staff update images" on storage.objects
+  for update using (bucket_id = 'images' and auth.role() = 'authenticated');
+create policy "Staff delete images" on storage.objects
+  for delete using (bucket_id = 'images' and auth.role() = 'authenticated');
+
 -- ============================================================
 -- Row Level Security
 -- Visitors can read; only signed-in staff can write.

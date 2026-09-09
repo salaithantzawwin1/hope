@@ -6,6 +6,30 @@ import { uploadImage } from "@/lib/upload";
 import type { GalleryImage } from "@/lib/types";
 import { Button, Card, Field, Notice, TextInput } from "./ui";
 
+/** Local thumbnail of a chosen file, so staff review photos before upload. */
+function FilePreview({ file, onRemove }: { file: File; onRemove: () => void }) {
+  const [url, setUrl] = useState("");
+  useEffect(() => {
+    const url = URL.createObjectURL(file);
+    setUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+  return (
+    <div className="relative overflow-hidden rounded-lg border border-slate-200">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={url} alt="" className="aspect-square w-full object-cover" />
+      <button
+        type="button"
+        onClick={onRemove}
+        title="Remove from selection"
+        className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs font-bold text-white hover:bg-black/85"
+      >
+        ✕
+      </button>
+    </div>
+  );
+}
+
 export default function AdminGallery() {
   const [items, setItems] = useState<GalleryImage[]>([]);
   const [files, setFiles] = useState<File[]>([]);
@@ -90,9 +114,23 @@ export default function AdminGallery() {
           className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-slate-700"
         />
         {files.length > 0 && (
-          <p className="text-xs text-slate-500">
-            {files.length} image(s) selected — will be resized automatically.
-          </p>
+          <div>
+            <p className="text-xs text-slate-500">
+              {files.length} image(s) selected — previewed below, only uploaded
+              when you click Upload (auto-resized to 1600px JPEG).
+            </p>
+            <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
+              {files.map((file, i) => (
+                <FilePreview
+                  key={`${file.name}-${i}`}
+                  file={file}
+                  onRemove={() =>
+                    setFiles(files.filter((_, j) => j !== i))
+                  }
+                />
+              ))}
+            </div>
+          </div>
         )}
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Caption (English)">
