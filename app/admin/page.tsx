@@ -8,7 +8,6 @@ import AdminGallery from "@/components/admin/AdminGallery";
 import AdminNews from "@/components/admin/AdminNews";
 import AdminSiteContent from "@/components/admin/AdminSiteContent";
 import { Button, Notice } from "@/components/admin/ui";
-import "../globals.css";
 
 type Tab = "news" | "events" | "site" | "gallery";
 
