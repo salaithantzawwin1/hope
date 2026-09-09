@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import AboutContent from "@/components/AboutContent";
+import PageHeader from "@/components/PageHeader";
 import SiteText from "@/components/SiteText";
 
 export async function generateMetadata({
@@ -27,19 +28,16 @@ export default async function AboutPage({
 
   return (
     <>
-      {/* Header */}
-      <section className="bg-brand-dark text-white">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
-          <h1 className="text-2xl font-bold sm:text-3xl">{t("title")}</h1>
-          <SiteText
-            k="about_intro"
-            en={t("intro")}
-            my={t("intro")}
-            as="p"
-            className="mt-2 max-w-3xl text-base leading-relaxed text-slate-200"
-          />
-        </div>
-      </section>
+      {/* Page header */}
+      <PageHeader title={t("title")}>
+        <SiteText
+          k="about_intro"
+          en={t("intro")}
+          my={t("intro")}
+          as="p"
+          className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-200"
+        />
+      </PageHeader>
 
       {/* Mission & vision, values, facts (editable) */}
       <AboutContent

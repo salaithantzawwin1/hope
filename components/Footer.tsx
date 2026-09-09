@@ -51,8 +51,8 @@ export default function Footer() {
 
   return (
     <footer className="mt-auto bg-brand-dark text-slate-400">
-      <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+      <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
           {/* Brand */}
           <div className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
