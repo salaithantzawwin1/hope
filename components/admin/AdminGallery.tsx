@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { uploadImage } from "@/lib/upload";
 import type { GalleryImage } from "@/lib/types";
-import { Button, Card, Field, Notice, TextInput } from "./ui";
+import { Button, Card, Field, Notice, Select, TextInput } from "./ui";
+
+/** Small input style for the per-photo edit fields. */
+const inputSm =
+  "w-full min-w-0 rounded border border-slate-300 px-2 py-1 text-xs focus:border-brand focus:outline-none";
 
 /** Local thumbnail of a chosen file, so staff review photos before upload. */
 function FilePreview({ file, onRemove }: { file: File; onRemove: () => void }) {
@@ -47,6 +51,11 @@ export default function AdminGallery() {
   const [albumMy, setAlbumMy] = useState("");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [savedId, setSavedId] = useState<string | null>(null);
+
+  // Filter / search
+  const [filterAlbum, setFilterAlbum] = useState("");
+  const [search, setSearch] = useState("");
 
   const supabase = getSupabase();
 
@@ -105,11 +114,13 @@ export default function AdminGallery() {
     }
   };
 
-  const saveAlbum = async (item: GalleryImage) => {
+  const savePhoto = async (item: GalleryImage) => {
     if (!supabase) return;
     const { error } = await supabase
       .from("gallery")
       .update({
+        caption_en: item.caption_en?.trim() || null,
+        caption_my: item.caption_my?.trim() || null,
         album_en: item.album_en?.trim() || null,
         album_my: item.album_my?.trim() || null,
       })
@@ -118,6 +129,7 @@ export default function AdminGallery() {
       setError(error.message);
     } else {
       setError("");
+      setSavedId(item.id);
       setItems(await load());
     }
   };
@@ -128,6 +140,35 @@ export default function AdminGallery() {
     const { error } = await supabase.from("gallery").delete().eq("id", item.id);
     if (!error) setItems(await load());
   };
+
+  // Unique albums for the filter dropdown (from the loaded photos).
+  const albumOptions = Array.from(
+    new Map(
+      items
+        .map((i) => ({
+          key: `${i.album_en ?? ""}\u0000${i.album_my ?? ""}`,
+          label:
+            [i.album_en, i.album_my].filter((v) => v && v.trim()).join(" / ") ||
+            "Uncategorized",
+        }))
+        .filter((o) => o.key !== "\u0000")
+        .map((o) => [o.key, o.label] as const),
+    ).values(),
+  );
+
+  const filtered = items.filter((item) => {
+    const albumKey = `${item.album_en ?? ""}\u0000${item.album_my ?? ""}`;
+    if (filterAlbum && albumKey !== filterAlbum) return false;
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      const haystack = [item.caption_en, item.caption_my, item.album_en, item.album_my]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  });
 
   if (!supabase) return null;
 
@@ -155,9 +196,7 @@ export default function AdminGallery() {
                 <FilePreview
                   key={`${file.name}-${i}`}
                   file={file}
-                  onRemove={() =>
-                    setFiles(files.filter((_, j) => j !== i))
-                  }
+                  onRemove={() => setFiles(files.filter((_, j) => j !== i))}
                 />
               ))}
             </div>
@@ -200,8 +239,41 @@ export default function AdminGallery() {
         </Button>
       </Card>
 
+      {/* Filter / search */}
+      <Card className="space-y-3 p-5">
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="w-52">
+            <Field label="Album">
+              <Select
+                value={filterAlbum}
+                onChange={(e) => setFilterAlbum(e.target.value)}
+              >
+                <option value="">All albums</option>
+                {albumOptions.map(([key, label]) => (
+                  <option key={key} value={key}>
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </div>
+          <div className="min-w-[200px] flex-1">
+            <Field label="Search">
+              <TextInput
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search captions or albums…"
+              />
+            </Field>
+          </div>
+          <p className="pb-2 text-xs text-slate-500">
+            {filtered.length} of {items.length} photo(s)
+          </p>
+        </div>
+      </Card>
+
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        {items.map((item) => (
+        {filtered.map((item) => (
           <figure key={item.id} className="overflow-hidden rounded-xl border border-slate-200">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -222,7 +294,33 @@ export default function AdminGallery() {
                   Delete
                 </button>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="grid grid-cols-2 gap-1.5">
+                <input
+                  value={item.caption_en ?? ""}
+                  onChange={(e) =>
+                    setItems(
+                      items.map((i) =>
+                        i.id === item.id ? { ...i, caption_en: e.target.value } : i,
+                      ),
+                    )
+                  }
+                  placeholder="Caption (EN)"
+                  className={inputSm}
+                />
+                <input
+                  value={item.caption_my ?? ""}
+                  onChange={(e) =>
+                    setItems(
+                      items.map((i) =>
+                        i.id === item.id ? { ...i, caption_my: e.target.value } : i,
+                      ),
+                    )
+                  }
+                  placeholder="Caption (MY)"
+                  className={inputSm}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
                 <input
                   value={item.album_en ?? ""}
                   onChange={(e) =>
@@ -233,7 +331,7 @@ export default function AdminGallery() {
                     )
                   }
                   placeholder="Album (EN)"
-                  className="min-w-0 w-full rounded border border-slate-300 px-2 py-1 text-xs focus:border-brand focus:outline-none"
+                  className={inputSm}
                 />
                 <input
                   value={item.album_my ?? ""}
@@ -245,20 +343,26 @@ export default function AdminGallery() {
                     )
                   }
                   placeholder="Album (MY)"
-                  className="min-w-0 w-full rounded border border-slate-300 px-2 py-1 text-xs focus:border-brand focus:outline-none"
+                  className={inputSm}
                 />
-                <button
-                  type="button"
-                  onClick={() => saveAlbum(item)}
-                  className="shrink-0 rounded border border-brand px-2 py-1 text-xs font-semibold text-brand transition-colors hover:bg-brand hover:text-white"
-                >
-                  Save
-                </button>
               </div>
+              <button
+                type="button"
+                onClick={() => savePhoto(item)}
+                className="w-full rounded border border-brand px-2 py-1 text-xs font-semibold text-brand transition-colors hover:bg-brand hover:text-white"
+              >
+                {savedId === item.id ? "Saved ✓" : "Save changes"}
+              </button>
             </figcaption>
           </figure>
         ))}
       </div>
+
+      {filtered.length === 0 && (
+        <p className="rounded-xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-sm text-slate-500">
+          No photos match this filter.
+        </p>
+      )}
     </div>
   );
 }
