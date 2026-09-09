@@ -1,11 +1,13 @@
 "use client";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { formatDateShort, monthShort } from "@/lib/format";
 import { localized, type EventItem } from "@/lib/types";
 
 export default function EventsList({ events }: { events: EventItem[] }) {
   const locale = useLocale();
+  const t = useTranslations("nav");
 
   if (events.length === 0) {
     return (
@@ -51,6 +53,12 @@ export default function EventsList({ events }: { events: EventItem[] }) {
               {location && (
                 <p className="mt-0.5 text-sm text-slate-500">📍 {location}</p>
               )}
+              <Link
+                href={`/register?event=${event.id}`}
+                className="mt-2 inline-block rounded-lg border border-brand px-3 py-1.5 text-xs font-semibold text-brand transition-colors hover:bg-brand hover:text-white"
+              >
+                {t("register")}
+              </Link>
             </div>
             {event.image_url && (
               <a

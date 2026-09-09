@@ -120,8 +120,9 @@ Locally you can deploy or preview with `npm run deploy` / `npm run preview`
 7. **Academics** — edit the Academics page sections (curriculum title, intro
    text and bullet points, the grade-level cards, and the Beyond the
    Classroom programmes) in English and Burmese.
-8. **Gallery** — upload photos (auto-resized to 1600px JPEG) with bilingual
-   captions. Shown on the About page.
+8. **Gallery** — upload photos (previewed locally before publishing,
+   auto-resized to 1600px JPEG) with bilingual captions. Shown on the About
+   page.
 
 ## Inquiry form
 
@@ -140,11 +141,16 @@ The form lives in `components/InquiryForm.tsx`.
 
 ## Registration form
 
-The **Register** page (`/en/register`, `/my/register`) lets families register
-online for events and programmes (Open House, campus tours, …). The site is
-fully static, so submissions are sent to a free **Google Apps Script** web app
-which stores each entry in a **Google Sheet** and emails the list as an
-**Excel (.xlsx) file** to the school.
+Registration is **event-based**: every event card on the News & Events page
+(and the featured event on the home page) has a **Register** button that opens
+the Register page with that event preselected and locked
+(`/en/register?event=<event-id>`), showing the event's title, date and location
+above the form. The **Register** entry is intentionally **not** in the nav
+menu — visitors register *for an event*, not for a vague "register" page.
+
+The site is fully static, so submissions are sent to a free **Google Apps
+Script** web app which stores each entry in a **Google Sheet** and emails the
+list as an **Excel (.xlsx) file** to the school.
 
 ### One-time setup (≈5 minutes, free)
 
@@ -165,7 +171,7 @@ which stores each entry in a **Google Sheet** and emails the list as an
 ### What happens on each submission
 
 - A row is appended to the **Registrations** sheet (columns: time, parent,
-  email, phone, student, grade, event, notes).
+  email, phone, student, grade, event, **event id**, notes).
 - The whole sheet is emailed to `ADMIN_EMAIL` as **hope-registrations.xlsx**.
 - Staff can also email the file manually any time via the Sheet menu
   **Registrations → Send Excel to admin email**.

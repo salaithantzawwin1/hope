@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import RegistrationForm from "@/components/RegistrationForm";
+import RegisterPageContent from "@/components/RegisterPageContent";
 import { REGISTRATION_EMAIL } from "@/lib/registration";
 
 export async function generateMetadata({
@@ -64,7 +64,7 @@ export default async function RegisterPage({
       <section className="bg-cream">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <RegistrationForm />
+            <RegisterPageContent />
           </div>
 
           {/* Contact box */}

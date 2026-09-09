@@ -196,6 +196,7 @@
         "desc": "Our team contacts you to confirm your place and answer any questions."
       }
     ],
+    "registeringFor": "You are registering for",
     "questionsTitle": "Questions?",
     "questionsText": "Contact our office or give us a call — we are happy to help.",
     "formTitle": "Registration Form",
@@ -211,7 +212,9 @@
       "studentNamePlaceholder": "Full name of the student",
       "grade": "Grade / Level",
       "program": "Registering For",
-      "programPlaceholder": "e.g. Open House, Campus Tour, Early Years 2027",
+      "programPlaceholder": "Select an event…",
+      "general": "General inquiry — not an event",
+      "lockedNote": "You are registering for this event. To register for another event, go back to the events page.",
       "notes": "Notes (optional)",
       "notesPlaceholder": "Anything we should know?",
       "submit": "Submit Registration",
@@ -223,7 +226,8 @@
       "notConfigured": "Online registration is being set up. For now, please contact us by email or call the school.",
       "validationName": "Please enter the parent / guardian name",
       "validationEmail": "Please enter a valid email address",
-      "validationPhone": "Please enter a phone number"
+      "validationPhone": "Please enter a phone number",
+      "validationProgram": "Please choose what you are registering for"
     }
   },
   "news": {

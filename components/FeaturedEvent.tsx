@@ -92,7 +92,7 @@ export default function FeaturedEvent() {
             )}
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
-                href={`/register?event=${encodeURIComponent(title)}`}
+                href={`/register?event=${event.id}`}
                 className="inline-block rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
               >
                 {t("featuredRegister")}

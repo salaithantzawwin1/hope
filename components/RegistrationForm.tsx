@@ -2,7 +2,8 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { GRADE_LEVELS } from "@/lib/db";
+import { fetchEvents, GRADE_LEVELS } from "@/lib/db";
+import { localized, type EventItem } from "@/lib/types";
 import {
   REGISTRATION_EMAIL,
   submitRegistration,
@@ -13,7 +14,11 @@ type Errors = {
   parentName?: string;
   email?: string;
   phone?: string;
+  program?: string;
 };
+
+/** Select value for "not an event" submissions. */
+const GENERAL_OPTION = "__general";
 
 export default function RegistrationForm() {
   const t = useTranslations("register");
@@ -26,6 +31,8 @@ export default function RegistrationForm() {
   const [studentName, setStudentName] = useState("");
   const [grade, setGrade] = useState("");
   const [program, setProgram] = useState("");
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [lockedEvent, setLockedEvent] = useState(false);
   const [notes, setNotes] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<
@@ -35,12 +42,30 @@ export default function RegistrationForm() {
     "notConfigured" | "network" | "server" | null
   >(null);
 
-  // Prefill "Registering For" when arriving from an event page
-  // (e.g. /register?event=Open%20House).
+  // Load upcoming events for the "Registering For" dropdown, then
+  // preselect + lock the event when arriving from an event page
+  // (e.g. /register?event=<event-id>; older links use the title).
   useEffect(() => {
-    const ev = new URLSearchParams(window.location.search).get("event");
-    if (ev) setProgram(ev);
-  }, []);
+    let active = true;
+    fetchEvents().then((rows) => {
+      if (!active) return;
+      setEvents(rows);
+      const ev = new URLSearchParams(window.location.search).get("event");
+      if (!ev) return;
+      const match =
+        rows.find((e) => e.id === ev) ??
+        rows.find(
+          (e) => localized(e, locale, "title_en", "title_my") === ev,
+        );
+      if (match) {
+        setProgram(match.id);
+        setLockedEvent(true);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [locale]);
 
   const validate = (): Errors => {
     const next: Errors = {};
@@ -48,6 +73,7 @@ export default function RegistrationForm() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
       next.email = f("validationEmail");
     if (!phone.trim()) next.phone = f("validationPhone");
+    if (!program) next.program = f("validationProgram");
     return next;
   };
 
@@ -62,13 +88,20 @@ export default function RegistrationForm() {
     }
 
     setStatus("sending");
+    const selectedEvent = events.find((e) => e.id === program);
+    const programLabel = selectedEvent
+      ? localized(selectedEvent, locale, "title_en", "title_my")
+      : program === GENERAL_OPTION
+        ? f("general")
+        : "";
     const payload: RegistrationPayload = {
       parentName: parentName.trim(),
       email: email.trim(),
       phone: phone.trim(),
       studentName: studentName.trim(),
       grade,
-      program: program.trim(),
+      eventId: selectedEvent?.id ?? "",
+      program: programLabel,
       notes: notes.trim(),
       locale,
       submittedAt: new Date().toISOString(),
@@ -218,16 +251,29 @@ export default function RegistrationForm() {
               htmlFor="reg-program"
               className="mb-1.5 block text-sm font-medium text-slate-700"
             >
-              {f("program")}
+              {f("program")} *
             </label>
-            <input
+            <select
               id="reg-program"
-              type="text"
               value={program}
               onChange={(e) => setProgram(e.target.value)}
-              placeholder={f("programPlaceholder")}
-              className={inputClass()}
-            />
+              disabled={lockedEvent}
+              className={inputClass(errors.program)}
+            >
+              <option value="">{f("programPlaceholder")}</option>
+              {events.map((event) => (
+                <option key={event.id} value={event.id}>
+                  {localized(event, locale, "title_en", "title_my")}
+                </option>
+              ))}
+              <option value={GENERAL_OPTION}>{f("general")}</option>
+            </select>
+            {lockedEvent && (
+              <p className="mt-1 text-xs text-slate-500">🔒 {f("lockedNote")}</p>
+            )}
+            {errors.program && (
+              <p className="mt-1 text-xs text-red-600">{errors.program}</p>
+            )}
           </div>
         </div>
 

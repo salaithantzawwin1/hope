@@ -13,6 +13,8 @@ export type RegistrationPayload = {
   phone: string;
   studentName: string;
   grade: string;
+  /** Event id from the events table (empty for general inquiries). */
+  eventId: string;
   program: string;
   notes: string;
   locale: string;

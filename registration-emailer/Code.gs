@@ -44,6 +44,7 @@ var HEADERS = [
   "Student Name",
   "Grade / Level",
   "Registering For",
+  "Event ID",
   "Notes",
 ];
 
@@ -61,6 +62,7 @@ function doPost(e) {
     data.studentName || "",
     data.grade || "",
     data.program || "",
+    data.eventId || "",
     data.notes || "",
   ]);
 
