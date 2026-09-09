@@ -30,7 +30,7 @@ export default function NewsEventsHome() {
 
   return (
     <section className="bg-cream">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+      <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="grid gap-10 lg:grid-cols-5">
           {/* News */}
           <div className="lg:col-span-3">

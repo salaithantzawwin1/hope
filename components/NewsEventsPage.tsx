@@ -52,7 +52,7 @@ export default function NewsEventsPage() {
     : "";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+    <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-12 sm:px-6">
       <header className="max-w-2xl">
         <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
           {t("title")}

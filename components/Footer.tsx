@@ -51,7 +51,7 @@ export default function Footer() {
 
   return (
     <footer className="mt-auto bg-brand-dark text-slate-400">
-      <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
+      <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-3 sm:px-6">
         <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
           {/* Brand */}
           <div className="flex items-center gap-2">
@@ -119,7 +119,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-1 px-4 py-2 text-[10px] text-slate-500 sm:flex-row sm:px-6">
+        <div className="mx-auto flex max-w-6xl xl:max-w-7xl flex-col items-center justify-between gap-1 px-4 py-2 text-[10px] text-slate-500 sm:flex-row sm:px-6">
           <p>
             © {new Date().getFullYear()} Hope International School.{" "}
             {t("rights")}
