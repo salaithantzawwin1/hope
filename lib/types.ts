@@ -40,6 +40,45 @@ export interface GalleryImage {
   created_at: string;
 }
 
+export interface AcademicsCurriculum {
+  title_en: string;
+  title_my: string;
+  text_en: string;
+  text_my: string;
+  points_en: string[];
+  points_my: string[];
+}
+
+export interface AcademicsLevel {
+  name_en: string;
+  name_my: string;
+  age_en: string;
+  age_my: string;
+  desc_en: string;
+  desc_my: string;
+}
+
+export interface AcademicsLevels {
+  title_en: string;
+  title_my: string;
+  levels: AcademicsLevel[];
+}
+
+export interface AcademicsProgram {
+  title_en: string;
+  title_my: string;
+  desc_en: string;
+  desc_my: string;
+}
+
+export interface AcademicsPrograms {
+  title_en: string;
+  title_my: string;
+  subtitle_en: string;
+  subtitle_my: string;
+  programs: AcademicsProgram[];
+}
+
 /** Pick the localized field from a bilingual record. */
 export function localized<T>(
   row: T,

@@ -1,4 +1,10 @@
-import type { EventItem, NewsItem } from "./types";
+import type {
+  AcademicsCurriculum,
+  AcademicsLevels,
+  AcademicsPrograms,
+  EventItem,
+  NewsItem,
+} from "./types";
 
 function daysFromNow(days: number): string {
   return new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 10);
@@ -129,4 +135,112 @@ export const FALLBACK_SITE_CONTENT: Record<string, { en: string; my: string }> =
     en: "Hope International School is a vibrant learning community in Myanmar where international standards meet local values. Since our founding, we have grown into a school of over 500 students from Early Years to Grade 12, guided by a passionate team of local and international educators.",
     my: "Hope အပြည်ပြည်ဆိုင်ရာကျောင်းသည် နိုင်ငံတကာ စံနှုန်းများနှင့် ဒေသဆိုင်ရာ တန်ဖိုးများ ပေါင်းစပ်ထားသော မြန်မာနိုင်ငံရှိ တက်ကြွသော သင်ယူမှု အသိုင်းအဝိုင်းတစ်ခုဖြစ်သည်။ စတင်တည်ထောင်ကတည်းက မူကြိုမှ တန်း ၁၂ အထိ ကျောင်းသား ၅၀၀ ကျော်ရှိသော ကျောင်းအဖြစ် ကြီးထွားလာခဲ့ပြီး ဒေသခံနှင့် နိုင်ငံတကာ ပညာရေးဆရာများ၏ စိတ်အားထက်သန်သော အဖွဲ့က လမ်းညွှန်ပေးလျက်ရှိသည်။",
   },
+  academics_intro: {
+    en: "Our curriculum blends international teaching standards with the best of Myanmar culture. Students learn to think deeply, ask questions and apply their knowledge to real life.",
+    my: "ကျွန်ုပ်တို့၏ သင်ရိုးညွှန်းတမ်းသည် နိုင်ငံတကာ သင်ကြားရေး စံနှုန်းများနှင့် မြန်မာ့ယဉ်ကျေးမှု၏ အကောင်းဆုံးအရာများကို ပေါင်းစပ်ထားသည်။ ကျောင်းသားများသည် နက်နက်ရှိုင်းရှိုင်း တွေးခေါ်တတ်ရန်၊ မေးခွန်းထုတ်တတ်ရန်နှင့် မိမိတို့၏ အသိပညာကို လက်တွေ့ဘဝတွင် အသုံးချတတ်ရန် သင်ယူကြသည်။",
+  },
+};
+
+/** Defaults for the Academics page sections, edited from the admin portal. */
+export const FALLBACK_ACADEMICS_CURRICULUM: AcademicsCurriculum = {
+  title_en: "International Curriculum",
+  title_my: "နိုင်ငံတကာ သင်ရိုးညွှန်းတမ်း",
+  text_en:
+    "Our programmes are built on internationally recognised standards and taught in English, with Myanmar language and culture as an integral part of every student's day.",
+  text_my:
+    "ကျွန်ုပ်တို့၏ အစီအစဉ်များသည် နိုင်ငံတကာ အသိအမှတ်ပြု စံနှုန်းများပေါ် အခြေခံပြီး အင်္ဂလိပ်ဘာသာဖြင့် သင်ကြားသည်။ မြန်မာဘာသာစကားနှင့် ယဉ်ကျေးမှုသည် ကျောင်းသားတိုင်း၏ နေ့စဉ်ဘဝ၏ အဓိကအပိုင်းတစ်ခု ဖြစ်သည်။",
+  points_en: [
+    "English-medium instruction from Early Years",
+    "Myanmar language, history and culture classes",
+    "Hands-on science, technology and arts programmes",
+    "Character education woven into daily learning",
+    "Small class sizes with individual attention",
+  ],
+  points_my: [
+    "မူကြိုမှစ၍ အင်္ဂလိပ်ဘာသာဖြင့် သင်ကြားခြင်း",
+    "မြန်မာစာ၊ မြန်မာ့သမိုင်းနှင့် ယဉ်ကျေးမှု သင်ခန်းစာများ",
+    "လက်တွေ့ကျသော သိပ္ပံ၊ နည်းပညာနှင့် အနုပညာ အစီအစဉ်များ",
+    "နေ့စဉ် သင်ယူမှုထဲ ထည့်သွင်းထားသော စရိုက်ပညာရေး",
+    "တစ်ဦးချင်း အာရုံစိုက်မှုရှိသော ကျောင်းသားဦးရေ နည်းသော အတန်းများ",
+  ],
+};
+
+export const FALLBACK_ACADEMICS_LEVELS: AcademicsLevels = {
+  title_en: "Grade Levels",
+  title_my: "အတန်းအဆင့်များ",
+  levels: [
+    {
+      name_en: "Early Years",
+      name_my: "မူကြိုပညာရေး",
+      age_en: "Ages 2–5",
+      age_my: "အသက် ၂–၅",
+      desc_en: "Play-based learning that builds curiosity, language and social skills.",
+      desc_my:
+        "စူးစမ်းလိုစိတ်၊ ဘာသာစကားနှင့် လူမှုရေးစွမ်းရည်များ တည်ဆောက်ပေးသော ကစားနည်းအခြေပြု သင်ယူမှု။",
+    },
+    {
+      name_en: "Primary School",
+      name_my: "မူလတန်း",
+      age_en: "Grades 1–5",
+      age_my: "တန်း ၁–၅",
+      desc_en: "Strong foundations in reading, writing, mathematics, science and creativity.",
+      desc_my:
+        "စာဖတ်၊ စာရေး၊ သင်္ချာ၊ သိပ္ပံနှင့် တီထွင်ဖန်တီးမှုတွင် ခိုင်မာသော အခြေခံအုတ်မြစ်။",
+    },
+    {
+      name_en: "Middle School",
+      name_my: "အလယ်တန်း",
+      age_en: "Grades 6–8",
+      age_my: "တန်း ၆–၈",
+      desc_en: "Deeper subject knowledge, research skills and growing independence.",
+      desc_my:
+        "ဘာသာရပ်ဆိုင်ရာ အသိပညာ နက်ရှိုင်းစေပြီး သုတေသနစွမ်းရည်နှင့် ကိုယ်တိုင်လုပ်ဆောင်နိုင်မှု တိုးပွားစေသည်။",
+    },
+    {
+      name_en: "High School",
+      name_my: "အထက်တန်း",
+      age_en: "Grades 9–12",
+      age_my: "တန်း ၉–၁၂",
+      desc_en: "Advanced studies preparing students for international examinations and universities.",
+      desc_my:
+        "နိုင်ငံတကာ စာမေးပွဲများနှင့် တက္ကသိုလ်များအတွက် ပြင်ဆင်ပေးသော အဆင့်မြင့် သင်ယူမှု။",
+    },
+  ],
+};
+
+export const FALLBACK_ACADEMICS_PROGRAMS: AcademicsPrograms = {
+  title_en: "Beyond the Classroom",
+  title_my: "စာသင်ခန်းအပြင်ဘက်မှ သင်ယူမှု",
+  subtitle_en: "Learning continues outside lessons through clubs, sports and the arts.",
+  subtitle_my:
+    "ကလပ်များ၊ အားကစားနှင့် အနုပညာများမှတစ်ဆင့် သင်ခန်းစာပြင်ပတွင်လည်း ဆက်လက် သင်ယူကြသည်။",
+  programs: [
+    {
+      title_en: "Sports & Fitness",
+      title_my: "အားကစားနှင့် ကာယလေ့ကျင့်ခန်း",
+      desc_en: "Football, swimming, basketball and athletics for every age group.",
+      desc_my: "အသက်အုပ်စုတိုင်းအတွက် ဘောလုံး၊ ရေကူး၊ ဘတ်စကက်ဘောနှင့် ပြေးခုန်ပစ်။",
+    },
+    {
+      title_en: "Music & Arts",
+      title_my: "ဂီတနှင့် အနုပညာ",
+      desc_en: "Choir, drama, painting and traditional Myanmar performing arts.",
+      desc_my:
+        "သံစုံတီးဝိုင်း၊ ပြဇာတ်၊ ပန်းချီနှင့် မြန်မာ့ရိုးရာ အနုပညာများ။",
+    },
+    {
+      title_en: "STEAM Clubs",
+      title_my: "STEAM ကလပ်များ",
+      desc_en: "Robotics, coding, science fairs and creative engineering projects.",
+      desc_my:
+        "စက်ရုပ်၊ ကုဒ်ရေးခြင်း၊ သိပ္ပံပြပွဲများနှင့် တီထွင်ဖန်တီးမှု အင်ဂျင်နီယာ ပရောဂျက်များ။",
+    },
+    {
+      title_en: "Community Service",
+      title_my: "လူမှုအကျိုးပြု လုပ်ငန်းများ",
+      desc_en: "Students learn leadership and compassion through service projects.",
+      desc_my:
+        "အကျိုးပြု ပရောဂျက်များမှတစ်ဆင့် ခေါင်းဆောင်မှုနှင့် ကရုဏာစိတ် သင်ယူကြသည်။",
+    },
+  ],
 };

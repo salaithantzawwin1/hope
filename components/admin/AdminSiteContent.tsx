@@ -12,6 +12,7 @@ const LABELS: Record<string, string> = {
   home_welcome_title: "Home — welcome title",
   home_welcome_text: "Home — welcome text",
   about_intro: "About — intro paragraph",
+  academics_intro: "Academics — intro paragraph",
 };
 
 interface Row {

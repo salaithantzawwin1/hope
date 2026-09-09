@@ -6,15 +6,17 @@ import { getSupabase } from "@/lib/supabase";
 import AdminEvents from "@/components/admin/AdminEvents";
 import AdminGallery from "@/components/admin/AdminGallery";
 import AdminNews from "@/components/admin/AdminNews";
+import AdminAcademics from "@/components/admin/AdminAcademics";
 import AdminSiteContent from "@/components/admin/AdminSiteContent";
 import { Button, Notice } from "@/components/admin/ui";
 
-type Tab = "news" | "events" | "site" | "gallery";
+type Tab = "news" | "events" | "site" | "academics" | "gallery";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "news", label: "News" },
   { id: "events", label: "Events" },
   { id: "site", label: "Site Text" },
+  { id: "academics", label: "Academics" },
   { id: "gallery", label: "Gallery" },
 ];
 
@@ -206,6 +208,7 @@ export default function AdminPage() {
         {tab === "news" && <AdminNews />}
         {tab === "events" && <AdminEvents />}
         {tab === "site" && <AdminSiteContent />}
+        {tab === "academics" && <AdminAcademics />}
         {tab === "gallery" && <AdminGallery />}
       </div>
     </div>
