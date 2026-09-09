@@ -245,7 +245,10 @@
     "photoCount": "{count, plural, =1 {1 photo} other {# photos}}",
     "backToAlbums": "All albums",
     "prev": "Previous photo",
-    "next": "Next photo"
+    "next": "Next photo",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "zoomReset": "Reset zoom"
   },
   "downloads": {
     "title": "Downloads",

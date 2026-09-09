@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { fetchGallery } from "@/lib/db";
 import { FALLBACK_GALLERY } from "@/lib/fallback-data";
@@ -76,6 +76,116 @@ export default function Gallery() {
   const [albums, setAlbums] = useState<AlbumGroup[]>([]);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<number | null>(null);
+
+  // Lightbox zoom / pan / swipe state.
+  const [zoom, setZoom] = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [swipeX, setSwipeX] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const touchRef = useRef<{
+    mode: "none" | "swipe" | "pan" | "pinch";
+    startX: number;
+    startY: number;
+    startPinch: number;
+    startZoom: number;
+    startOffset: { x: number; y: number };
+  }>({ mode: "none", startX: 0, startY: 0, startPinch: 0, startZoom: 1, startOffset: { x: 0, y: 0 } });
+
+  const clampZoom = (z: number) => Math.min(5, Math.max(1, z));
+  const resetView = () => {
+    setZoom(1);
+    setOffset({ x: 0, y: 0 });
+    setSwipeX(0);
+  };
+
+  // Reset the zoom/pan view whenever the lightbox opens or moves to another
+  // photo. Deferred out of the synchronous effect body (cascading-render rule).
+  useEffect(() => {
+    const id = requestAnimationFrame(resetView);
+    return () => cancelAnimationFrame(id);
+  }, [lightbox]);
+
+  /** Keep the panned image inside the visible area at the current zoom. */
+  const clampOffset = (o: { x: number; y: number }) => {
+    const el = wrapRef.current;
+    if (!el) return o;
+    const maxX = ((el.clientWidth * (zoom - 1)) / 2) * 0.9 + 4;
+    const maxY = ((el.clientHeight * (zoom - 1)) / 2) * 0.9 + 4;
+    return { x: Math.min(maxX, Math.max(-maxX, o.x)), y: Math.min(maxY, Math.max(-maxY, o.y)) };
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length >= 2) {
+      const d = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY,
+      );
+      touchRef.current = { mode: "pinch", startX: 0, startY: 0, startPinch: d, startZoom: zoom, startOffset: offset };
+    } else if (zoom > 1) {
+      touchRef.current = { mode: "pan", startX: e.touches[0].clientX, startY: e.touches[0].clientY, startPinch: 0, startZoom: zoom, startOffset: offset };
+      setDragging(true);
+    } else {
+      touchRef.current = { mode: "swipe", startX: e.touches[0].clientX, startY: e.touches[0].clientY, startPinch: 0, startZoom: 1, startOffset: { x: 0, y: 0 } };
+    }
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    const t = touchRef.current;
+    if (t.mode === "pinch" && e.touches.length >= 2) {
+      const d = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY,
+      );
+      const next = clampZoom(t.startZoom * (d / Math.max(1, t.startPinch)));
+      setZoom(next);
+      setOffset(
+        clampOffset({
+          x: t.startOffset.x * (next / Math.max(1, t.startZoom)),
+          y: t.startOffset.y * (next / Math.max(1, t.startZoom)),
+        }),
+      );
+    } else if (t.mode === "pan" && e.touches.length === 1) {
+      setOffset(
+        clampOffset({
+          x: t.startOffset.x + (e.touches[0].clientX - t.startX),
+          y: t.startOffset.y + (e.touches[0].clientY - t.startY),
+        }),
+      );
+    } else if (t.mode === "swipe" && e.touches.length === 1) {
+      const dx = e.touches[0].clientX - t.startX;
+      const dy = e.touches[0].clientY - t.startY;
+      // Only swipe horizontally so vertical scrolling of the page still works.
+      if (Math.abs(dx) > Math.abs(dy)) {
+        setSwipeX(dx);
+        setDragging(true);
+      }
+    }
+  };
+
+  const onTouchEnd = () => {
+    const t = touchRef.current;
+    if (t.mode === "swipe") {
+      const dx = swipeX;
+      const len = currentItems.length;
+      if (Math.abs(dx) > 60) {
+        setLightbox((i) =>
+          i === null ? null : dx < 0 ? (i + 1) % len : (i - 1 + len) % len,
+        );
+      }
+      setSwipeX(0);
+    }
+    touchRef.current = { mode: "none", startX: 0, startY: 0, startPinch: 0, startZoom: 1, startOffset: { x: 0, y: 0 } };
+    setDragging(false);
+  };
+
+  const onWheel = (e: React.WheelEvent) => {
+    const next = clampZoom(zoom + (e.deltaY < 0 ? 0.15 : -0.15));
+    if (next !== zoom) {
+      setZoom(next);
+      setOffset((o) => clampOffset(o));
+    }
+  };
 
   // Load + group photos by album (newest album first).
   useEffect(() => {
@@ -310,18 +420,49 @@ export default function Gallery() {
           aria-label={active.caption || undefined}
           onClick={() => setLightbox(null)}
         >
-          <div className="flex items-center justify-between px-4 py-3 text-white">
+          <div className="flex items-center justify-between gap-2 px-4 py-3 text-white">
             <span className="text-sm text-slate-300">
               {(lightbox ?? 0) + 1} / {currentItems.length}
             </span>
-            <button
-              type="button"
-              onClick={() => setLightbox(null)}
-              aria-label={common("close")}
-              className="rounded-lg bg-white/10 px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-white/20"
+            <div
+              className="flex items-center gap-1.5"
+              onClick={(e) => e.stopPropagation()}
             >
-              ✕ {common("close")}
-            </button>
+              <button
+                type="button"
+                onClick={() => setZoom((z) => clampZoom(z - 0.5))}
+                aria-label={t("zoomOut")}
+                disabled={zoom <= 1}
+                className="rounded-lg bg-white/10 px-2.5 py-1.5 text-sm font-bold transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                −
+              </button>
+              <button
+                type="button"
+                onClick={resetView}
+                aria-label={t("zoomReset")}
+                className="min-w-14 rounded-lg bg-white/10 px-2 py-1.5 text-center text-xs font-semibold tabular-nums transition-colors hover:bg-white/20"
+              >
+                {Math.round(zoom * 100)}%
+              </button>
+              <button
+                type="button"
+                onClick={() => setZoom((z) => clampZoom(z + 0.5))}
+                aria-label={t("zoomIn")}
+                disabled={zoom >= 5}
+                className="rounded-lg bg-white/10 px-2.5 py-1.5 text-sm font-bold transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                +
+              </button>
+              <button
+                type="button"
+                onClick={() => setLightbox(null)}
+                aria-label={common("close")}
+                className="ml-1 rounded-lg bg-white/10 px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-white/20"
+              >
+                ✕ {common("close")}
+              </button>
+            </div>
           </div>
           <div
             className="relative flex min-h-0 flex-1 items-center justify-center gap-2 px-4 pb-8"
@@ -339,12 +480,30 @@ export default function Gallery() {
               ‹
             </button>
             <figure className="flex min-w-0 max-h-full flex-col items-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={active.imageUrl ?? ""}
-                alt={active.caption}
-                className="max-h-[70vh] max-w-full rounded-lg object-contain shadow-2xl"
-              />
+              <div
+                ref={wrapRef}
+                className={`relative max-h-[70vh] max-w-full overflow-hidden rounded-lg shadow-2xl ${
+                  zoom > 1 ? "cursor-grab touch-none select-none active:cursor-grabbing" : "touch-pan-y"
+                }`}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+                onWheel={onWheel}
+                onDoubleClick={() => (zoom > 1 ? resetView() : setZoom(2.5))}
+                title={zoom > 1 ? "Scroll or pinch to zoom · drag to pan" : undefined}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={active.imageUrl ?? ""}
+                  alt={active.caption}
+                  draggable={false}
+                  style={{
+                    transform: `translate3d(${offset.x + swipeX}px, ${offset.y}px, 0) scale(${zoom})`,
+                    transition: dragging ? "none" : "transform 200ms ease-out",
+                  }}
+                  className="max-h-[70vh] max-w-full rounded-lg object-contain"
+                />
+              </div>
               {active.caption && (
                 <figcaption className="mt-3 max-w-xl text-center text-sm text-slate-200">
                   {active.caption}

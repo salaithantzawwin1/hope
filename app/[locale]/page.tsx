@@ -38,7 +38,7 @@ export default async function HomePage({
           aria-hidden
           className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-accent/20 blur-3xl"
         />
-        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-20 sm:px-6 sm:py-28">
+        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6 sm:py-16">
           <div className="max-w-3xl">
             <SiteText
               k="home_hero_badge"

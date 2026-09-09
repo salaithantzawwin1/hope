@@ -64,6 +64,11 @@ export default function AdminGallery() {
   const [error, setError] = useState("");
   const [savedId, setSavedId] = useState<string | null>(null);
 
+  // Batch selection + mass operations
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [batchAlbumEn, setBatchAlbumEn] = useState("");
+  const [batchAlbumMy, setBatchAlbumMy] = useState("");
+
   // Filter / search
   const [filterAlbum, setFilterAlbum] = useState("");
   const [search, setSearch] = useState("");
@@ -156,6 +161,69 @@ export default function AdminGallery() {
     if (!error) setItems(await load());
   };
 
+  const toggleSelected = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const moveSelected = async () => {
+    if (!supabase || selected.size === 0) return;
+    const { error } = await supabase
+      .from("gallery")
+      .update({
+        album_en: batchAlbumEn.trim() || null,
+        album_my: batchAlbumMy.trim() || null,
+      })
+      .in("id", Array.from(selected));
+    if (error) {
+      setError(error.message);
+    } else {
+      setError("");
+      setSelected(new Set());
+      setBatchAlbumEn("");
+      setBatchAlbumMy("");
+      setItems(await load());
+    }
+  };
+
+  const deleteSelected = async () => {
+    if (!supabase || selected.size === 0) return;
+    if (!window.confirm(`Delete ${selected.size} selected photo(s)?`)) return;
+    const { error } = await supabase
+      .from("gallery")
+      .delete()
+      .in("id", Array.from(selected));
+    if (!error) {
+      setSelected(new Set());
+      setItems(await load());
+    }
+  };
+
+  /** Removes an album entirely; optionally deletes its photos too. */
+  const deleteAlbum = async (key: string) => {
+    if (!supabase) return;
+    const ids = items
+      .filter((i) => `${i.album_en ?? ""}\u0000${i.album_my ?? ""}` === key)
+      .map((i) => i.id);
+    const name = key.split("\u0000").filter(Boolean).join(" / ") || "this album";
+    if (!window.confirm(`Delete album "${name}"?`)) return;
+    if (window.confirm("Also delete the photos themselves? OK = delete photos, Cancel = keep them as uncategorized")) {
+      const { error } = await supabase.from("gallery").delete().in("id", ids);
+      if (error) setError(error.message);
+    } else {
+      const { error } = await supabase
+        .from("gallery")
+        .update({ album_en: null, album_my: null, album_desc_en: null, album_desc_my: null })
+        .in("id", ids);
+      if (error) setError(error.message);
+    }
+    setSelected(new Set());
+    setItems(await load());
+  };
+
   // Group the loaded photos into titled albums for the album-level editor.
   const albumGroups = Array.from(
     new Map(
@@ -241,6 +309,11 @@ export default function AdminGallery() {
     }
     return true;
   });
+
+  const allFilteredSelected =
+    filtered.length > 0 && filtered.every((i) => selected.has(i.id));
+  const toggleSelectAll = () =>
+    setSelected(allFilteredSelected ? new Set() : new Set(filtered.map((i) => i.id)));
 
   if (!supabase) return null;
 
@@ -375,18 +448,27 @@ export default function AdminGallery() {
                     className={inputSm}
                   />
                 </div>
-                <button
-                  type="button"
-                  disabled={!dirty}
-                  onClick={() => saveAlbum(key)}
-                  className={`mt-2 rounded border px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    dirty
-                      ? "border-brand text-brand hover:bg-brand hover:text-white"
-                      : "cursor-not-allowed border-slate-200 text-slate-400"
-                  }`}
-                >
-                  Apply to album
-                </button>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={!dirty}
+                    onClick={() => saveAlbum(key)}
+                    className={`rounded border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                      dirty
+                        ? "border-brand text-brand hover:bg-brand hover:text-white"
+                        : "cursor-not-allowed border-slate-200 text-slate-400"
+                    }`}
+                  >
+                    Apply to album
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteAlbum(key)}
+                    className="rounded border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
+                  >
+                    Delete album…
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -426,9 +508,77 @@ export default function AdminGallery() {
         </div>
       </Card>
 
+      {/* Select all + batch toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+          <input
+            type="checkbox"
+            checked={allFilteredSelected}
+            onChange={toggleSelectAll}
+            className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
+          />
+          Select all {filtered.length} photo(s)
+        </label>
+        {selected.size > 0 && (
+          <button
+            type="button"
+            onClick={() => setSelected(new Set())}
+            className="text-xs font-semibold text-slate-500 hover:underline"
+          >
+            Clear selection ({selected.size})
+          </button>
+        )}
+      </div>
+
+      {selected.size > 0 && (
+        <Card className="space-y-3 border-brand/40 bg-brand/5 p-4">
+          <p className="text-sm font-bold text-brand">
+            {selected.size} photo(s) selected
+          </p>
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="w-44">
+              <Field label="Move to album (EN)" hint="Leave empty to uncategorize.">
+                <TextInput
+                  value={batchAlbumEn}
+                  onChange={(e) => setBatchAlbumEn(e.target.value)}
+                  placeholder="e.g. Sports Day"
+                />
+              </Field>
+            </div>
+            <div className="w-44">
+              <Field label="(မြန်မာ)">
+                <TextInput
+                  value={batchAlbumMy}
+                  onChange={(e) => setBatchAlbumMy(e.target.value)}
+                  placeholder="ဥပမာ — အားကစားနေ့"
+                />
+              </Field>
+            </div>
+            <Button onClick={moveSelected}>Move selected</Button>
+            <Button variant="danger" onClick={deleteSelected}>
+              Delete selected
+            </Button>
+          </div>
+        </Card>
+      )}
+
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         {filtered.map((item) => (
-          <figure key={item.id} className="overflow-hidden rounded-xl border border-slate-200">
+          <figure
+            key={item.id}
+            className={`relative overflow-hidden rounded-xl border ${
+              selected.has(item.id) ? "border-brand ring-2 ring-brand/40" : "border-slate-200"
+            }`}
+          >
+            <label className="absolute left-2 top-2 z-10 flex h-7 w-7 cursor-pointer items-center justify-center rounded-md bg-white/90 shadow">
+              <input
+                type="checkbox"
+                checked={selected.has(item.id)}
+                onChange={() => toggleSelected(item.id)}
+                aria-label="Select photo"
+                className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
+              />
+            </label>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={item.image_url}
