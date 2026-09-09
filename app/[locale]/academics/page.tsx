@@ -113,14 +113,14 @@ export default async function AcademicsPage({
 
       {/* CTA */}
       <section className="bg-brand text-white">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-4 py-16 sm:px-6 md:flex-row md:items-center">
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-5 px-4 py-10 sm:px-6 md:flex-row md:items-center">
           <div className="max-w-xl">
-            <h2 className="text-2xl font-bold sm:text-3xl">{t("ctaTitle")}</h2>
-            <p className="mt-3 text-slate-200">{t("ctaText")}</p>
+            <h2 className="text-xl font-bold sm:text-2xl">{t("ctaTitle")}</h2>
+            <p className="mt-1.5 text-sm text-slate-200">{t("ctaText")}</p>
           </div>
           <Link
             href="/admissions"
-            className="shrink-0 rounded-xl bg-accent px-6 py-3 text-sm font-bold text-brand-dark shadow-lg transition-colors hover:bg-accent-dark"
+            className="shrink-0 rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-brand-dark shadow transition-colors hover:bg-accent-dark"
           >
             {t("ctaButton")}
           </Link>

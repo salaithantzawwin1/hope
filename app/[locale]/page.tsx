@@ -189,23 +189,23 @@ export default async function HomePage({
       <section className="relative overflow-hidden bg-brand text-white">
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-accent/20 blur-3xl"
+          className="pointer-events-none absolute -left-24 top-0 h-48 w-48 rounded-full bg-accent/20 blur-3xl"
         />
-        <div className="relative mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-4 py-16 sm:px-6 md:flex-row md:items-center">
+        <div className="relative mx-auto flex max-w-6xl flex-col items-start justify-between gap-5 px-4 py-10 sm:px-6 md:flex-row md:items-center">
           <div className="max-w-xl">
-            <h2 className="text-3xl font-bold">{t("ctaTitle")}</h2>
-            <p className="mt-3 text-slate-200">{t("ctaText")}</p>
+            <h2 className="text-xl font-bold sm:text-2xl">{t("ctaTitle")}</h2>
+            <p className="mt-1.5 text-sm text-slate-200">{t("ctaText")}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/admissions"
-              className="rounded-xl bg-accent px-6 py-3 text-sm font-bold text-brand-dark shadow-lg transition-colors hover:bg-accent-dark"
+              className="rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-brand-dark shadow transition-colors hover:bg-accent-dark"
             >
               {t("ctaButton")}
             </Link>
             <Link
               href="/admissions"
-              className="rounded-xl border border-white/30 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              className="rounded-lg border border-white/30 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
             >
               {t("ctaSecondary")}
             </Link>
