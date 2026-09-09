@@ -126,6 +126,9 @@ Locally you can deploy or preview with `npm run deploy` / `npm run preview`
 9. **Footer** — edit the footer tagline, contact details (address, phone,
    email, opening hours) and the quick links navigation, in English and
    Burmese. Shown on every page.
+10. **Header** — edit the logo image URL and the nav menu items (each with a
+    URL and a bilingual label). The blue Admissions button is fixed. Shown
+    on every page.
 
 ## Inquiry form
 

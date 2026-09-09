@@ -7,6 +7,7 @@ import type {
   AcademicsPrograms,
   EventItem,
   FooterContent,
+  HeaderContent,
   HomeCta,
   HomePrograms,
   HomeStats,
@@ -146,6 +147,18 @@ export const FALLBACK_SITE_CONTENT: Record<string, { en: string; my: string }> =
     en: "Our curriculum blends international teaching standards with the best of Myanmar culture. Students learn to think deeply, ask questions and apply their knowledge to real life.",
     my: "ကျွန်ုပ်တို့၏ သင်ရိုးညွှန်းတမ်းသည် နိုင်ငံတကာ သင်ကြားရေး စံနှုန်းများနှင့် မြန်မာ့ယဉ်ကျေးမှု၏ အကောင်းဆုံးအရာများကို ပေါင်းစပ်ထားသည်။ ကျောင်းသားများသည် နက်နက်ရှိုင်းရှိုင်း တွေးခေါ်တတ်ရန်၊ မေးခွန်းထုတ်တတ်ရန်နှင့် မိမိတို့၏ အသိပညာကို လက်တွေ့ဘဝတွင် အသုံးချတတ်ရန် သင်ယူကြသည်။",
   },
+};
+
+/** Defaults for the header, edited from the admin portal (Header tab). */
+export const FALLBACK_HEADER: HeaderContent = {
+  logo_url: "/Logo.jpg",
+  links: [
+    { href: "/", label_en: "Home", label_my: "မူလစာမျက်နှာ" },
+    { href: "/about", label_en: "About Us", label_my: "ကျောင်းအကြောင်း" },
+    { href: "/academics", label_en: "Academics", label_my: "ပညာရေး" },
+    { href: "/news", label_en: "News & Events", label_my: "သတင်းနှင့် ပွဲများ" },
+    { href: "/downloads", label_en: "Downloads", label_my: "ဒေါင်းလုဒ်များ" },
+  ],
 };
 
 /** Defaults for the footer, edited from the admin portal (Footer tab). */

@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { FALLBACK_FOOTER } from "@/lib/fallback-data";
-import type { FooterContent, FooterLink } from "@/lib/types";
-import { LangRow } from "./bilingual";
-import { Button, Card, Field, Notice, TextInput } from "./ui";
+import type { FooterContent } from "@/lib/types";
+import { LangRow, LinksEditor } from "./bilingual";
+import { Button, Card, Notice } from "./ui";
 
 const FOOTER_KEY = "footer_content";
 
@@ -74,12 +74,6 @@ export default function AdminFooter() {
   const update = (patch: Partial<FooterContent>) =>
     setFooter({ ...footer, ...patch });
 
-  const updateLink = (i: number, patch: Partial<FooterLink>) =>
-    setFooter({
-      ...footer,
-      links: footer.links.map((l, j) => (j === i ? { ...l, ...patch } : l)),
-    });
-
   if (!supabase) return null;
   if (!loaded) {
     return <p className="text-sm text-slate-500">Loading…</p>;
@@ -144,58 +138,10 @@ export default function AdminFooter() {
             Rows without a URL or label are hidden on the site.
           </p>
         </div>
-        <div className="space-y-3">
-          {footer.links.map((link, i) => (
-            <div key={i} className="space-y-3 rounded-lg border border-slate-200 p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                  Link {i + 1}
-                </p>
-                <Button
-                  type="button"
-                  variant="danger"
-                  onClick={() =>
-                    setFooter({
-                      ...footer,
-                      links: footer.links.filter((_, j) => j !== i),
-                    })
-                  }
-                >
-                  Remove
-                </Button>
-              </div>
-              <Field label="URL (href)">
-                <TextInput
-                  value={link.href}
-                  onChange={(e) => updateLink(i, { href: e.target.value })}
-                  placeholder="/about"
-                />
-              </Field>
-              <LangRow
-                label="Label"
-                en={link.label_en}
-                my={link.label_my}
-                onEn={(v) => updateLink(i, { label_en: v })}
-                onMy={(v) => updateLink(i, { label_my: v })}
-              />
-            </div>
-          ))}
-        </div>
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() =>
-            setFooter({
-              ...footer,
-              links: [
-                ...footer.links,
-                { href: "", label_en: "", label_my: "" },
-              ],
-            })
-          }
-        >
-          + Add link
-        </Button>
+        <LinksEditor
+          links={footer.links}
+          onChange={(links) => setFooter({ ...footer, links })}
+        />
       </Card>
 
       <Button onClick={save} disabled={busy}>

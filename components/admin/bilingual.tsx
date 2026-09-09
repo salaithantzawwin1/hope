@@ -1,5 +1,6 @@
 "use client";
 
+import type { NavLink } from "@/lib/types";
 import { Button, Field, TextArea, TextInput } from "./ui";
 
 /** A bilingual input row (English | မြန်မာ). */
@@ -36,6 +37,64 @@ export function LangRow({
           {...extra}
         />
       </Field>
+    </div>
+  );
+}
+
+/** Editable list of navigation links (href + bilingual label). */
+export function LinksEditor({
+  links,
+  onChange,
+  addLabel = "+ Add link",
+}: {
+  links: NavLink[];
+  onChange: (v: NavLink[]) => void;
+  addLabel?: string;
+}) {
+  const update = (i: number, patch: Partial<NavLink>) =>
+    onChange(links.map((l, j) => (j === i ? { ...l, ...patch } : l)));
+  return (
+    <div>
+      <div className="space-y-3">
+        {links.map((link, i) => (
+          <div key={i} className="space-y-3 rounded-lg border border-slate-200 p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                Link {i + 1}
+              </p>
+              <Button
+                type="button"
+                variant="danger"
+                onClick={() => onChange(links.filter((_, j) => j !== i))}
+              >
+                Remove
+              </Button>
+            </div>
+            <Field label="URL (href)">
+              <TextInput
+                value={link.href}
+                onChange={(e) => update(i, { href: e.target.value })}
+                placeholder="/about"
+              />
+            </Field>
+            <LangRow
+              label="Label"
+              en={link.label_en}
+              my={link.label_my}
+              onEn={(v) => update(i, { label_en: v })}
+              onMy={(v) => update(i, { label_my: v })}
+            />
+          </div>
+        ))}
+      </div>
+      <Button
+        type="button"
+        variant="secondary"
+        className="mt-2"
+        onClick={() => onChange([...links, { href: "", label_en: "", label_my: "" }])}
+      >
+        {addLabel}
+      </Button>
     </div>
   );
 }

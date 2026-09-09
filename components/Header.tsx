@@ -1,14 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
+import { fetchSiteContent } from "@/lib/db";
+import { FALLBACK_HEADER } from "@/lib/fallback-data";
+import type { HeaderContent } from "@/lib/types";
+
+function parseJson<T>(raw: string | undefined): T | null {
+  if (!raw || !raw.trim()) return null;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+}
 
 export default function Header() {
   const t = useTranslations("nav");
   const locale = useLocale();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [db, setDb] = useState<HeaderContent | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetchSiteContent().then((map) => {
+      if (!active) return;
+      setDb(parseJson<HeaderContent>(map["header_content"]?.en));
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // The logo and nav menu items are edited from the Admin portal → Header
+  // tab. Until a row exists — or for fields missing from an older saved row
+  // — the fallback defaults are shown.
+  const data = { ...FALLBACK_HEADER, ...(db ?? {}) };
+  const isMy = locale === "my";
+  const pick = (en: string, my: string) => {
+    const value = isMy && my.trim() ? my : en;
+    return value || en;
+  };
+  const logoUrl = data.logo_url.trim() || FALLBACK_HEADER.logo_url;
 
   const otherLocale = locale === "en" ? "my" : "en";
   const otherLabel = locale === "en" ? "မြန်မာ" : "English";
@@ -19,13 +54,9 @@ export default function Header() {
   // Admissions is not in the list: the prominent blue Admissions button on
   // the right (and the mobile menu CTA) already link there, so repeating it
   // in the nav only crowds the row — especially in Burmese.
-  const links = [
-    { href: "/", label: t("home") },
-    { href: "/about", label: t("about") },
-    { href: "/academics", label: t("academics") },
-    { href: "/news", label: t("news") },
-    { href: "/downloads", label: t("downloads") },
-  ];
+  const links = (data.links ?? FALLBACK_HEADER.links).filter(
+    (l) => l.href.trim() && pick(l.label_en, l.label_my).trim(),
+  );
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -37,7 +68,7 @@ export default function Header() {
         <Link href="/" className="flex shrink-0 items-center gap-2.5" onClick={() => setOpen(false)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/Logo.jpg"
+            src={logoUrl}
             alt="Hope International School logo"
             className="h-10 w-10 rounded-xl object-contain"
           />
@@ -63,7 +94,7 @@ export default function Header() {
                   : "text-slate-600 hover:bg-slate-100 hover:text-brand"
               }`}
             >
-              {link.label}
+              {pick(link.label_en, link.label_my)}
             </Link>
           ))}
         </nav>
@@ -116,7 +147,7 @@ export default function Header() {
                   : "text-slate-700 hover:bg-slate-100"
               }`}
             >
-              {link.label}
+              {pick(link.label_en, link.label_my)}
             </Link>
           ))}
           <Link

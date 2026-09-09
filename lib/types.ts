@@ -32,10 +32,18 @@ export interface SiteContentRow {
   value_my: string;
 }
 
-export interface FooterLink {
+/** A navigation link (href + bilingual label), used in the header and footer. */
+export interface NavLink {
   href: string;
   label_en: string;
   label_my: string;
+}
+
+export interface HeaderContent {
+  /** Logo image URL (falls back to the built-in /Logo.jpg when empty). */
+  logo_url: string;
+  /** Nav menu items shown in the header. */
+  links: NavLink[];
 }
 
 export interface FooterContent {
@@ -50,7 +58,7 @@ export interface FooterContent {
   hours_en: string;
   hours_my: string;
   /** Quick links shown in the footer (internal paths like "/about"). */
-  links: FooterLink[];
+  links: NavLink[];
 }
 
 export interface GalleryImage {
