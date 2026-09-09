@@ -51,7 +51,8 @@ export default function Footer() {
 
   return (
     <footer className="mt-auto bg-brand-dark text-slate-400">
-      <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-4 sm:px-6">
+      <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-5 sm:px-6">
+        {/* Row 1: brand (left) + contact strip (right) */}
         <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
           {/* Brand */}
           <div className="flex shrink-0 items-center gap-2">
@@ -99,20 +100,23 @@ export default function Footer() {
               {pick(data.hours_en, data.hours_my)}
             </span>
           </div>
-
-          {/* Quick links (right) */}
-          <nav className="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[11px]" aria-label={t("quickLinks")}>
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="text-slate-400 transition-colors hover:text-accent"
-              >
-                {pick(l.label_en, l.label_my)}
-              </Link>
-            ))}
-          </nav>
         </div>
+
+        {/* Row 2: quick links (centered) */}
+        <nav
+          className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 border-t border-white/10 pt-4 text-[11px] lg:mt-5 lg:pt-5"
+          aria-label={t("quickLinks")}
+        >
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="text-slate-400 transition-colors hover:text-accent"
+            >
+              {pick(l.label_en, l.label_my)}
+            </Link>
+          ))}
+        </nav>
       </div>
 
       <div className="border-t border-white/10">
