@@ -32,6 +32,19 @@ export interface SiteContentRow {
   value_my: string;
 }
 
+export interface FooterContent {
+  tagline_en: string;
+  tagline_my: string;
+  address_en: string;
+  address_my: string;
+  phone_en: string;
+  phone_my: string;
+  email_en: string;
+  email_my: string;
+  hours_en: string;
+  hours_my: string;
+}
+
 export interface GalleryImage {
   id: string;
   image_url: string;

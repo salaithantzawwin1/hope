@@ -10,9 +10,18 @@ import AdminHome from "@/components/admin/AdminHome";
 import AdminAbout from "@/components/admin/AdminAbout";
 import AdminAcademics from "@/components/admin/AdminAcademics";
 import AdminSiteContent from "@/components/admin/AdminSiteContent";
+import AdminFooter from "@/components/admin/AdminFooter";
 import { Button, Notice } from "@/components/admin/ui";
 
-type Tab = "news" | "events" | "site" | "home" | "about" | "academics" | "gallery";
+type Tab =
+  | "news"
+  | "events"
+  | "site"
+  | "home"
+  | "about"
+  | "academics"
+  | "gallery"
+  | "footer";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "news", label: "News" },
@@ -22,6 +31,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "about", label: "About" },
   { id: "academics", label: "Academics" },
   { id: "gallery", label: "Gallery" },
+  { id: "footer", label: "Footer" },
 ];
 
 function LoginForm({ onSuccess }: { onSuccess: () => void }) {
@@ -216,6 +226,7 @@ export default function AdminPage() {
         {tab === "about" && <AdminAbout />}
         {tab === "academics" && <AdminAcademics />}
         {tab === "gallery" && <AdminGallery />}
+        {tab === "footer" && <AdminFooter />}
       </div>
     </div>
   );

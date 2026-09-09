@@ -6,6 +6,7 @@ import type {
   AcademicsLevels,
   AcademicsPrograms,
   EventItem,
+  FooterContent,
   HomeCta,
   HomePrograms,
   HomeStats,
@@ -145,6 +146,23 @@ export const FALLBACK_SITE_CONTENT: Record<string, { en: string; my: string }> =
     en: "Our curriculum blends international teaching standards with the best of Myanmar culture. Students learn to think deeply, ask questions and apply their knowledge to real life.",
     my: "ကျွန်ုပ်တို့၏ သင်ရိုးညွှန်းတမ်းသည် နိုင်ငံတကာ သင်ကြားရေး စံနှုန်းများနှင့် မြန်မာ့ယဉ်ကျေးမှု၏ အကောင်းဆုံးအရာများကို ပေါင်းစပ်ထားသည်။ ကျောင်းသားများသည် နက်နက်ရှိုင်းရှိုင်း တွေးခေါ်တတ်ရန်၊ မေးခွန်းထုတ်တတ်ရန်နှင့် မိမိတို့၏ အသိပညာကို လက်တွေ့ဘဝတွင် အသုံးချတတ်ရန် သင်ယူကြသည်။",
   },
+};
+
+/** Defaults for the footer, edited from the admin portal (Footer tab). */
+export const FALLBACK_FOOTER: FooterContent = {
+  tagline_en:
+    "Nurturing global citizens — an international education in the heart of Myanmar.",
+  tagline_my:
+    "ကမ္ဘာ့နိုင်ငံသားကောင်းများ ပြုစုပျိုးထောင်ခြင်း — မြန်မာနိုင်ငံ၏ ဗဟိုတွင် နိုင်ငံတကာ ပညာရေး။",
+  address_en:
+    "No. 123, University Avenue Road, Kamayut Township, Yangon, Myanmar",
+  address_my: "တက္ကသိုလ်ရိပ်သာလမ်း ၁၂၃၊ ကမာရွတ်မြို့နယ်၊ ရန်ကုန်မြို့၊ မြန်မာ",
+  phone_en: "+95 9 123 456 789",
+  phone_my: "+95 9 123 456 789",
+  email_en: "info@hopeinternationalschool.com",
+  email_my: "info@hopeinternationalschool.com",
+  hours_en: "Mon – Fri: 8:00 AM – 4:30 PM",
+  hours_my: "တနင်္လာ – သောကြာ: နံနက် ၈:၀၀ – ညနေ ၄:၃၀",
 };
 
 /** Defaults for the Home page sections, edited from the admin portal. */
