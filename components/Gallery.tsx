@@ -338,7 +338,7 @@ export default function Gallery() {
             >
               ‹
             </button>
-            <figure className="flex max-h-full flex-col items-center">
+            <figure className="flex min-w-0 max-h-full flex-col items-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={active.imageUrl ?? ""}
