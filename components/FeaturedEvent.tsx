@@ -60,7 +60,7 @@ export default function FeaturedEvent() {
               src={event.image_url}
               alt={title}
               loading="lazy"
-              className="max-h-[440px] w-auto rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-[1.02]"
+              className="max-h-[440px] w-auto max-w-full rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-[1.02]"
             />
           </a>
 
