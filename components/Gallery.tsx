@@ -213,7 +213,7 @@ export default function Gallery() {
   if (!hasTitledAlbums) {
     // No named albums — show the plain photo grid.
     body = (
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
         {currentItems.map((item, i) => (
           <Tile key={item.id} item={item} index={i} onOpen={setLightbox} />
         ))}
@@ -243,7 +243,7 @@ export default function Gallery() {
             {albumDesc(activeAlbum)}
           </p>
         )}
-        <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">
+        <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
           {activeAlbum.items.map((item, i) => (
             <Tile key={item.id} item={item} index={i} onOpen={setLightbox} />
           ))}
