@@ -47,8 +47,14 @@ create table if not exists public.gallery (
   image_url text not null,
   caption_en text,
   caption_my text,
+  album_en text,
+  album_my text,
   created_at timestamptz not null default now()
 );
+
+-- For databases created before the album columns existed, run once:
+-- alter table public.gallery add column if not exists album_en text;
+-- alter table public.gallery add column if not exists album_my text;
 
 -- ---------- Public image storage bucket ----------
 insert into storage.buckets (id, name, public)

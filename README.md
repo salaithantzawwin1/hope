@@ -121,8 +121,10 @@ Locally you can deploy or preview with `npm run deploy` / `npm run preview`
    text and bullet points, the grade-level cards, and the Beyond the
    Classroom programmes) in English and Burmese.
 8. **Gallery** — upload photos (previewed locally before publishing,
-   auto-resized to 1600px JPEG) with bilingual captions. Shown on the About
-   page.
+   auto-resized to 1600px JPEG) with bilingual captions and an optional
+   **album** name (English + Burmese). Photos are grouped by album on the
+   About page, each album as its own titled section; existing photos can be
+   moved between albums from the per-photo album fields.
 9. **Footer** — edit the footer tagline, contact details (address, phone,
    email, opening hours) and the quick links navigation, in English and
    Burmese. Shown on every page.

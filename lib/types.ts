@@ -66,6 +66,9 @@ export interface GalleryImage {
   image_url: string;
   caption_en: string | null;
   caption_my: string | null;
+  /** Album this photo belongs to (optional; empty = uncategorized). */
+  album_en: string | null;
+  album_my: string | null;
   created_at: string;
 }
 
