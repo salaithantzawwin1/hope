@@ -129,7 +129,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
       </section>
 
       {/* Facts */}
-      <section className="bg-brand text-white">
+      <section className="bg-brand-light text-white">
         <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-14 sm:px-6">
           <h2 className="text-center text-2xl font-bold sm:text-3xl">
             {pick(facts.title_en, facts.title_my)}
@@ -143,7 +143,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
                 <div className="text-3xl font-bold text-accent">
                   {pick(fact.number_en, fact.number_my)}
                 </div>
-                <div className="mt-1.5 text-sm text-slate-200">
+                <div className="mt-1.5 text-sm text-slate-100">
                   {pick(fact.label_en, fact.label_my)}
                 </div>
               </div>

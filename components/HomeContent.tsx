@@ -125,17 +125,17 @@ export function HomeCta({ fallback }: { fallback: HomeCta }) {
   };
 
   return (
-    <section className="relative overflow-hidden bg-brand text-white">
+    <section className="relative overflow-hidden bg-brand-light text-white">
       <div
         aria-hidden
         className="pointer-events-none absolute -left-24 top-0 h-48 w-48 rounded-full bg-accent/20 blur-3xl"
       />
       <div className="relative mx-auto flex max-w-7xl 2xl:max-w-[1440px] flex-col items-start justify-between gap-5 px-4 py-10 sm:px-6 md:flex-row md:items-center">
         <div className="max-w-xl">
-          <h2 className="text-xl font-bold sm:text-2xl">
+          <h2 className="text-2xl font-bold sm:text-3xl">
             {pick(data.title_en, data.title_my)}
           </h2>
-          <p className="mt-1.5 text-sm text-slate-200">
+          <p className="mt-1.5 text-sm text-slate-100">
             {pick(data.text_en, data.text_my)}
           </p>
         </div>
