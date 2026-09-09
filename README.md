@@ -113,10 +113,12 @@ Locally you can deploy or preview with `npm run deploy` / `npm run preview`
    description). Events are shown on the News page and Home page.
 4. **Site Text** — edit the hero banner, welcome text and About/Academics
    intros in both languages. Click **Save All Changes** to publish.
-5. **Academics** — edit the Academics page sections (curriculum title, intro
+5. **About** — edit the Mission & Vision cards, the Core Values, and the
+   School Facts stats in English and Burmese.
+6. **Academics** — edit the Academics page sections (curriculum title, intro
    text and bullet points, the grade-level cards, and the Beyond the
    Classroom programmes) in English and Burmese.
-6. **Gallery** — upload photos (auto-resized to 1600px JPEG) with bilingual
+7. **Gallery** — upload photos (auto-resized to 1600px JPEG) with bilingual
    captions. Shown on the About page.
 
 ## Inquiry form

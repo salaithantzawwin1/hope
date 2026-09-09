@@ -79,6 +79,43 @@ export interface AcademicsPrograms {
   programs: AcademicsProgram[];
 }
 
+export interface AboutMissionVision {
+  mission_title_en: string;
+  mission_title_my: string;
+  mission_text_en: string;
+  mission_text_my: string;
+  vision_title_en: string;
+  vision_title_my: string;
+  vision_text_en: string;
+  vision_text_my: string;
+}
+
+export interface AboutValue {
+  title_en: string;
+  title_my: string;
+  desc_en: string;
+  desc_my: string;
+}
+
+export interface AboutValues {
+  title_en: string;
+  title_my: string;
+  values: AboutValue[];
+}
+
+export interface AboutFact {
+  number_en: string;
+  number_my: string;
+  label_en: string;
+  label_my: string;
+}
+
+export interface AboutFacts {
+  title_en: string;
+  title_my: string;
+  facts: AboutFact[];
+}
+
 /** Pick the localized field from a bilingual record. */
 export function localized<T>(
   row: T,

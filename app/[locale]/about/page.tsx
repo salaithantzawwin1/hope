@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import AboutContent from "@/components/AboutContent";
 import SiteText from "@/components/SiteText";
 import Gallery from "@/components/Gallery";
 
@@ -41,80 +42,41 @@ export default async function AboutPage({
         </div>
       </section>
 
-      {/* Mission & vision */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-3xl border-t-4 border-accent bg-cream p-8">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl" aria-hidden>🎯</span>
-              <h2 className="text-xl font-bold text-slate-900">
-                {t("missionTitle")}
-              </h2>
-            </div>
-            <p className="mt-4 leading-relaxed text-slate-600">
-              {t("missionText")}
-            </p>
-          </div>
-          <div className="rounded-3xl border-t-4 border-brand bg-cream p-8">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl" aria-hidden>🔭</span>
-              <h2 className="text-xl font-bold text-slate-900">
-                {t("visionTitle")}
-              </h2>
-            </div>
-            <p className="mt-4 leading-relaxed text-slate-600">
-              {t("visionText")}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Values */}
-      <section className="bg-cream">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <h2 className="text-3xl font-bold text-slate-900">
-            {t("valuesTitle")}
-          </h2>
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {values.map((value, i) => (
-              <div
-                key={value.title}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-              >
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10 text-xl font-bold text-brand">
-                  {["🤝", "⚖️", "🌟", "🏘️"][i]}
-                </div>
-                <h3 className="mt-4 font-bold text-slate-900">{value.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                  {value.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Facts */}
-      <section className="bg-brand text-white">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <h2 className="text-center text-2xl font-bold sm:text-3xl">
-            {t("factsTitle")}
-          </h2>
-          <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {facts.map((fact) => (
-              <div
-                key={fact.label}
-                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-6 text-center"
-              >
-                <div className="text-3xl font-bold text-accent">
-                  {fact.number}
-                </div>
-                <div className="mt-1.5 text-sm text-slate-200">{fact.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Mission & vision, values, facts (editable) */}
+      <AboutContent
+        fallback={{
+          missionVision: {
+            mission_title_en: t("missionTitle"),
+            mission_title_my: t("missionTitle"),
+            mission_text_en: t("missionText"),
+            mission_text_my: t("missionText"),
+            vision_title_en: t("visionTitle"),
+            vision_title_my: t("visionTitle"),
+            vision_text_en: t("visionText"),
+            vision_text_my: t("visionText"),
+          },
+          values: {
+            title_en: t("valuesTitle"),
+            title_my: t("valuesTitle"),
+            values: values.map((v) => ({
+              title_en: v.title,
+              title_my: v.title,
+              desc_en: v.desc,
+              desc_my: v.desc,
+            })),
+          },
+          facts: {
+            title_en: t("factsTitle"),
+            title_my: t("factsTitle"),
+            facts: facts.map((f) => ({
+              number_en: f.number,
+              number_my: f.number,
+              label_en: f.label,
+              label_my: f.label,
+            })),
+          },
+        }}
+      />
 
       {/* Gallery */}
       <section className="bg-cream">

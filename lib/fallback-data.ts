@@ -1,4 +1,7 @@
 import type {
+  AboutFacts,
+  AboutMissionVision,
+  AboutValues,
   AcademicsCurriculum,
   AcademicsLevels,
   AcademicsPrograms,
@@ -139,6 +142,68 @@ export const FALLBACK_SITE_CONTENT: Record<string, { en: string; my: string }> =
     en: "Our curriculum blends international teaching standards with the best of Myanmar culture. Students learn to think deeply, ask questions and apply their knowledge to real life.",
     my: "ကျွန်ုပ်တို့၏ သင်ရိုးညွှန်းတမ်းသည် နိုင်ငံတကာ သင်ကြားရေး စံနှုန်းများနှင့် မြန်မာ့ယဉ်ကျေးမှု၏ အကောင်းဆုံးအရာများကို ပေါင်းစပ်ထားသည်။ ကျောင်းသားများသည် နက်နက်ရှိုင်းရှိုင်း တွေးခေါ်တတ်ရန်၊ မေးခွန်းထုတ်တတ်ရန်နှင့် မိမိတို့၏ အသိပညာကို လက်တွေ့ဘဝတွင် အသုံးချတတ်ရန် သင်ယူကြသည်။",
   },
+};
+
+/** Defaults for the About page sections, edited from the admin portal. */
+export const FALLBACK_ABOUT_MISSION_VISION: AboutMissionVision = {
+  mission_title_en: "Our Mission",
+  mission_title_my: "ရည်ရွယ်ချက်",
+  mission_text_en:
+    "To nurture confident, compassionate and curious learners who think critically, communicate clearly and contribute positively to their community and the wider world.",
+  mission_text_my:
+    "ဝေဖန်ပိုင်းခြား တွေးခေါ်နိုင်သော၊ ရှင်းလင်းစွာ ပြောဆိုဆက်သွယ်နိုင်သော၊ မိမိပတ်ဝန်းကျင်နှင့် ကမ္ဘာ့အသိုင်းအဝိုင်းအတွက် အကျိုးပြုနိုင်သော ယုံကြည်မှုရှိသည့် ကြင်နာတတ်ပြီး စူးစမ်းလိုစိတ်ရှိသော သင်ယူသူများကို ပြုစုပျိုးထောင်ရန်။",
+  vision_title_en: "Our Vision",
+  vision_title_my: "မျှော်မှန်းချက်",
+  vision_text_en:
+    "To be the leading international school in Myanmar — a place where every student is known, valued and inspired to reach their full potential.",
+  vision_text_my:
+    "မြန်မာနိုင်ငံ၏ ဦးဆောင်သော နိုင်ငံတကာကျောင်း ဖြစ်လာရန် — ကျောင်းသားတိုင်းကို သိရှိနားလည်ကာ တန်ဖိုးထားပြီး မိမိ၏ အလားအလာ အပြည့်အဝ ရောက်ရှိရန် စေ့ဆော်ပေးသော နေရာ။",
+};
+
+export const FALLBACK_ABOUT_VALUES: AboutValues = {
+  title_en: "Our Core Values",
+  title_my: "အခြေခံတန်ဖိုးများ",
+  values: [
+    {
+      title_en: "Respect",
+      title_my: "လေးစားမှု",
+      desc_en: "We honour every person, culture and idea, and treat others with kindness and fairness.",
+      desc_my:
+        "လူတိုင်း၊ ယဉ်ကျေးမှုတိုင်းနှင့် အယူအဆတိုင်းကို လေးစားပြီး ကြင်နာမှုနှင့် တရားမျှတမှုဖြင့် ဆက်ဆံပါသည်။",
+    },
+    {
+      title_en: "Integrity",
+      title_my: "ရိုးသားမှု",
+      desc_en: "We act honestly and take responsibility for our words and actions.",
+      desc_my:
+        "ရိုးသားစွာ ပြုမူပြီး မိမိ၏ စကားနှင့် အပြုအမူများအတွက် တာဝန်ယူပါသည်။",
+    },
+    {
+      title_en: "Excellence",
+      title_my: "ထူးချွန်မှု",
+      desc_en: "We set high standards, work hard and always try to improve.",
+      desc_my:
+        "မြင့်မားသော စံနှုန်းများ သတ်မှတ်ကာ ကြိုးစားပြီး အမြဲတမ်း တိုးတက်အောင် ကြိုးပမ်းပါသည်။",
+    },
+    {
+      title_en: "Community",
+      title_my: "အသိုင်းအဝိုင်း",
+      desc_en: "We care for one another and work together — students, families and staff.",
+      desc_my:
+        "ကျောင်းသား၊ မိသားစုနှင့် ဝန်ထမ်းများ — အချင်းချင်း ဂရုစိုက်ပြီး အတူတကွ လုပ်ဆောင်ပါသည်။",
+    },
+  ],
+};
+
+export const FALLBACK_ABOUT_FACTS: AboutFacts = {
+  title_en: "Our School at a Glance",
+  title_my: "ကျောင်း၏ တစ်ချက်ကြည့်မြင်ကွင်း",
+  facts: [
+    { number_en: "500+", number_my: "၅၀၀+", label_en: "Students", label_my: "ကျောင်းသား ကျောင်းသူများ" },
+    { number_en: "40+", number_my: "၄၀+", label_en: "Qualified Teachers", label_my: "အရည်အချင်းပြည့်မီ ဆရာ ဆရာမများ" },
+    { number_en: "12", number_my: "၁၂", label_en: "Years of Excellence", label_my: "နှစ်ပေါင်း အတွေ့အကြုံ" },
+    { number_en: "1:15", number_my: "၁:၁၅", label_en: "Teacher–Student Ratio", label_my: "ဆရာ–ကျောင်းသား အချိုး" },
+  ],
 };
 
 /** Defaults for the Academics page sections, edited from the admin portal. */
