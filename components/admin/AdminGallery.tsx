@@ -6,6 +6,14 @@ import { uploadImage } from "@/lib/upload";
 import type { GalleryImage } from "@/lib/types";
 import { Button, Card, Field, Notice, Select, TextInput } from "./ui";
 
+/** Writable album fields for the album-level editor. */
+interface AlbumEdit {
+  titleEn: string;
+  titleMy: string;
+  descEn: string;
+  descMy: string;
+}
+
 /** Small input style for the per-photo edit fields. */
 const inputSm =
   "w-full min-w-0 rounded border border-slate-300 px-2 py-1 text-xs focus:border-brand focus:outline-none";
@@ -49,6 +57,9 @@ export default function AdminGallery() {
   const [captionMy, setCaptionMy] = useState("");
   const [albumEn, setAlbumEn] = useState("");
   const [albumMy, setAlbumMy] = useState("");
+  const [albumDescEn, setAlbumDescEn] = useState("");
+  const [albumDescMy, setAlbumDescMy] = useState("");
+  const [albumEdits, setAlbumEdits] = useState<Record<string, AlbumEdit>>({});
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [savedId, setSavedId] = useState<string | null>(null);
@@ -98,6 +109,8 @@ export default function AdminGallery() {
           caption_my: captionMy.trim() || null,
           album_en: albumEn.trim() || null,
           album_my: albumMy.trim() || null,
+          album_desc_en: albumDescEn.trim() || null,
+          album_desc_my: albumDescMy.trim() || null,
         });
         if (error) throw error;
       }
@@ -106,6 +119,8 @@ export default function AdminGallery() {
       setCaptionMy("");
       setAlbumEn("");
       setAlbumMy("");
+      setAlbumDescEn("");
+      setAlbumDescMy("");
       setItems(await load());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
@@ -139,6 +154,63 @@ export default function AdminGallery() {
     if (!window.confirm("Delete this photo?")) return;
     const { error } = await supabase.from("gallery").delete().eq("id", item.id);
     if (!error) setItems(await load());
+  };
+
+  // Group the loaded photos into titled albums for the album-level editor.
+  const albumGroups = Array.from(
+    new Map(
+      items
+        .filter((i) => i.album_en?.trim() || i.album_my?.trim())
+        .map((i) => {
+          const key = `${i.album_en ?? ""}\u0000${i.album_my ?? ""}`;
+          return [key, { key, count: 0, item: i }] as const;
+        }),
+    ).values(),
+  ).map((g) => ({ ...g, count: items.filter((i) => `${i.album_en ?? ""}\u0000${i.album_my ?? ""}` === g.key).length }));
+
+  /** Current edit value for an album (draft if present, otherwise first photo). */
+  const albumValue = (key: string, item: GalleryImage): AlbumEdit =>
+    albumEdits[key] ?? {
+      titleEn: item.album_en ?? "",
+      titleMy: item.album_my ?? "",
+      descEn: item.album_desc_en ?? "",
+      descMy: item.album_desc_my ?? "",
+    };
+
+  const setAlbumValue = (key: string, field: keyof AlbumEdit, value: string) =>
+    setAlbumEdits((prev) => ({
+      ...prev,
+      [key]: { ...(prev[key] ?? { titleEn: "", titleMy: "", descEn: "", descMy: "" }), [field]: value },
+    }));
+
+  const saveAlbum = async (key: string) => {
+    if (!supabase) return;
+    const edit = albumEdits[key];
+    if (!edit) return;
+    const ids = items
+      .filter((i) => `${i.album_en ?? ""}\u0000${i.album_my ?? ""}` === key)
+      .map((i) => i.id);
+    const { error } = await supabase
+      .from("gallery")
+      .update({
+        album_en: edit.titleEn.trim() || null,
+        album_my: edit.titleMy.trim() || null,
+        album_desc_en: edit.descEn.trim() || null,
+        album_desc_my: edit.descMy.trim() || null,
+      })
+      .in("id", ids);
+    if (error) {
+      setError(error.message);
+    } else {
+      setError("");
+      setItems(await load());
+      // Clear the draft so the editor shows the saved values.
+      setAlbumEdits((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    }
   };
 
   // Unique albums for the filter dropdown (from the loaded photos).
@@ -234,10 +306,92 @@ export default function AdminGallery() {
             />
           </Field>
         </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Album description (English)" hint="Shown on the album cover card.">
+            <TextInput
+              value={albumDescEn}
+              onChange={(e) => setAlbumDescEn(e.target.value)}
+              placeholder="e.g. Highlights from our annual sports festival"
+            />
+          </Field>
+          <Field label="Album description (မြန်မာ)">
+            <TextInput
+              value={albumDescMy}
+              onChange={(e) => setAlbumDescMy(e.target.value)}
+              placeholder="ဥပမာ — နှစ်စဉ် အားကစားပွဲတော်မှ အထူးအခိုက်အတန့်များ"
+            />
+          </Field>
+        </div>
         <Button onClick={upload} disabled={uploading}>
           {uploading ? "Uploading…" : "Upload"}
         </Button>
       </Card>
+
+      {/* Album-level editor: rename or describe an album in one go. */}
+      {albumGroups.length > 0 && (
+        <Card className="space-y-4 p-5">
+          <div>
+            <h3 className="font-bold text-slate-900">Edit Albums</h3>
+            <p className="text-xs text-slate-500">
+              Title and description changes apply to every photo in the album.
+            </p>
+          </div>
+          {albumGroups.map(({ key, count, item }) => {
+            const edit = albumValue(key, item);
+            const dirty =
+              edit.titleEn !== (item.album_en ?? "") ||
+              edit.titleMy !== (item.album_my ?? "") ||
+              edit.descEn !== (item.album_desc_en ?? "") ||
+              edit.descMy !== (item.album_desc_my ?? "");
+            return (
+              <div key={key} className="rounded-xl border border-slate-200 p-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  {[edit.titleEn, edit.titleMy].filter(Boolean).join(" / ") || "Untitled album"}{" "}
+                  <span className="font-normal normal-case">({count} photo{count === 1 ? "" : "s"})</span>
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <input
+                    value={edit.titleEn}
+                    onChange={(e) => setAlbumValue(key, "titleEn", e.target.value)}
+                    placeholder="Title (EN)"
+                    className={inputSm}
+                  />
+                  <input
+                    value={edit.titleMy}
+                    onChange={(e) => setAlbumValue(key, "titleMy", e.target.value)}
+                    placeholder="Title (MY)"
+                    className={inputSm}
+                  />
+                  <input
+                    value={edit.descEn}
+                    onChange={(e) => setAlbumValue(key, "descEn", e.target.value)}
+                    placeholder="Description (EN)"
+                    className={inputSm}
+                  />
+                  <input
+                    value={edit.descMy}
+                    onChange={(e) => setAlbumValue(key, "descMy", e.target.value)}
+                    placeholder="Description (MY)"
+                    className={inputSm}
+                  />
+                </div>
+                <button
+                  type="button"
+                  disabled={!dirty}
+                  onClick={() => saveAlbum(key)}
+                  className={`mt-2 rounded border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    dirty
+                      ? "border-brand text-brand hover:bg-brand hover:text-white"
+                      : "cursor-not-allowed border-slate-200 text-slate-400"
+                  }`}
+                >
+                  Apply to album
+                </button>
+              </div>
+            );
+          })}
+        </Card>
+      )}
 
       {/* Filter / search */}
       <Card className="space-y-3 p-5">

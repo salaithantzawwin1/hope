@@ -17,6 +17,8 @@ interface AlbumGroup {
   key: string;
   titleEn: string;
   titleMy: string;
+  descEn: string;
+  descMy: string;
   newestAt: string;
   items: GalleryTile[];
 }
@@ -86,6 +88,8 @@ export default function Gallery() {
             key: "fallback",
             titleEn: "",
             titleMy: "",
+            descEn: "",
+            descMy: "",
             newestAt: "",
             items: FALLBACK_GALLERY.map((g, i) => ({
               id: `fallback-${i}`,
@@ -103,7 +107,15 @@ export default function Gallery() {
         const key = `${titleEn}\u0000${titleMy}`;
         let group = groups.get(key);
         if (!group) {
-          group = { key, titleEn, titleMy, newestAt: row.created_at, items: [] };
+          group = {
+            key,
+            titleEn,
+            titleMy,
+            descEn: row.album_desc_en ?? "",
+            descMy: row.album_desc_my ?? "",
+            newestAt: row.created_at,
+            items: [],
+          };
           groups.set(key, group);
         }
         group.items.push({
@@ -188,6 +200,15 @@ export default function Gallery() {
         : a.titleEn
       : t("photos");
 
+  const albumDesc = (a: AlbumGroup) =>
+    locale === "my" && a.descMy.trim()
+      ? a.descMy
+      : locale === "en" && a.descEn.trim()
+        ? a.descEn
+        : a.descMy.trim()
+          ? a.descMy
+          : a.descEn;
+
   let body;
   if (!hasTitledAlbums) {
     // No named albums — show the plain photo grid.
@@ -217,6 +238,11 @@ export default function Gallery() {
             {t("photoCount", { count: activeAlbum.items.length })}
           </p>
         </div>
+        {albumDesc(activeAlbum) && (
+          <p className="mt-2 max-w-2xl text-sm text-slate-600">
+            {albumDesc(activeAlbum)}
+          </p>
+        )}
         <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">
           {activeAlbum.items.map((item, i) => (
             <Tile key={item.id} item={item} index={i} onOpen={setLightbox} />
@@ -254,6 +280,11 @@ export default function Gallery() {
               </div>
               <div className="p-4">
                 <h3 className="font-bold text-slate-900">{albumTitle(album)}</h3>
+                {albumDesc(album) && (
+                  <p className="mt-1 line-clamp-2 text-xs text-slate-600">
+                    {albumDesc(album)}
+                  </p>
+                )}
                 <p className="mt-1 text-xs text-slate-500">
                   {t("photoCount", { count: album.items.length })}
                 </p>

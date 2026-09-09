@@ -69,6 +69,9 @@ export interface GalleryImage {
   /** Album this photo belongs to (optional; empty = uncategorized). */
   album_en: string | null;
   album_my: string | null;
+  /** Short album description shown on the cover card and album page. */
+  album_desc_en: string | null;
+  album_desc_my: string | null;
   created_at: string;
 }
 
