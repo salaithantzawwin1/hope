@@ -18,7 +18,6 @@ function parseJson<T>(raw: string | undefined): T | null {
 
 export default function Footer() {
   const t = useTranslations("footer");
-  const nav = useTranslations("nav");
   const locale = useLocale();
   const [db, setDb] = useState<FooterContent | null>(null);
 
@@ -33,9 +32,10 @@ export default function Footer() {
     };
   }, []);
 
-  // The tagline and contact details are edited from the Admin portal →
-  // Footer tab. Until a row exists, the fallback defaults are shown.
-  const data = db ?? FALLBACK_FOOTER;
+  // The tagline, contact details and quick links are edited from the Admin
+  // portal → Footer tab. Until a row exists — or for fields missing from an
+  // older saved row — the fallback defaults are shown.
+  const data = { ...FALLBACK_FOOTER, ...(db ?? {}) };
   const isMy = locale === "my";
   // Empty fields fall back to the English value (same rule as elsewhere).
   const pick = (en: string, my: string) => {
@@ -43,14 +43,11 @@ export default function Footer() {
     return value || en;
   };
 
-  const links = [
-    { href: "/", label: nav("home") },
-    { href: "/about", label: nav("about") },
-    { href: "/academics", label: nav("academics") },
-    { href: "/admissions", label: nav("admissions") },
-    { href: "/news", label: nav("news") },
-    { href: "/downloads", label: nav("downloads") },
-  ];
+  // Quick links are also edited from the Footer tab; rows without a href or
+  // label are skipped.
+  const links = (data.links ?? FALLBACK_FOOTER.links).filter(
+    (l) => l.href.trim() && pick(l.label_en, l.label_my).trim(),
+  );
 
   return (
     <footer className="mt-auto bg-brand-dark text-slate-400">
@@ -83,7 +80,7 @@ export default function Footer() {
                 href={l.href}
                 className="text-slate-400 transition-colors hover:text-accent"
               >
-                {l.label}
+                {pick(l.label_en, l.label_my)}
               </Link>
             ))}
           </nav>

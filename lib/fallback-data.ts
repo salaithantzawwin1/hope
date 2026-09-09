@@ -163,6 +163,14 @@ export const FALLBACK_FOOTER: FooterContent = {
   email_my: "info@hopeinternationalschool.com",
   hours_en: "Mon – Fri: 8:00 AM – 4:30 PM",
   hours_my: "တနင်္လာ – သောကြာ: နံနက် ၈:၀၀ – ညနေ ၄:၃၀",
+  links: [
+    { href: "/", label_en: "Home", label_my: "မူလစာမျက်နှာ" },
+    { href: "/about", label_en: "About Us", label_my: "ကျောင်းအကြောင်း" },
+    { href: "/academics", label_en: "Academics", label_my: "ပညာရေး" },
+    { href: "/admissions", label_en: "Admissions", label_my: "ဝင်ခွင့်" },
+    { href: "/news", label_en: "News & Events", label_my: "သတင်းနှင့် ပွဲများ" },
+    { href: "/downloads", label_en: "Downloads", label_my: "ဒေါင်းလုဒ်များ" },
+  ],
 };
 
 /** Defaults for the Home page sections, edited from the admin portal. */

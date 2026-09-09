@@ -32,6 +32,12 @@ export interface SiteContentRow {
   value_my: string;
 }
 
+export interface FooterLink {
+  href: string;
+  label_en: string;
+  label_my: string;
+}
+
 export interface FooterContent {
   tagline_en: string;
   tagline_my: string;
@@ -43,6 +49,8 @@ export interface FooterContent {
   email_my: string;
   hours_en: string;
   hours_my: string;
+  /** Quick links shown in the footer (internal paths like "/about"). */
+  links: FooterLink[];
 }
 
 export interface GalleryImage {

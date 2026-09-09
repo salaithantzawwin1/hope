@@ -123,8 +123,9 @@ Locally you can deploy or preview with `npm run deploy` / `npm run preview`
 8. **Gallery** — upload photos (previewed locally before publishing,
    auto-resized to 1600px JPEG) with bilingual captions. Shown on the About
    page.
-9. **Footer** — edit the footer tagline and contact details (address, phone,
-   email, opening hours) in English and Burmese. Shown on every page.
+9. **Footer** — edit the footer tagline, contact details (address, phone,
+   email, opening hours) and the quick links navigation, in English and
+   Burmese. Shown on every page.
 
 ## Inquiry form
 
