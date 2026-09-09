@@ -118,6 +118,41 @@ free form service such as:
 
 The form lives in `components/InquiryForm.tsx`.
 
+## Registration form
+
+The **Register** page (`/en/register`, `/my/register`) lets families register
+online for events and programmes (Open House, campus tours, …). The site is
+fully static, so submissions are sent to a free **Google Apps Script** web app
+which stores each entry in a **Google Sheet** and emails the list as an
+**Excel (.xlsx) file** to the school.
+
+### One-time setup (≈5 minutes, free)
+
+1. Open <https://sheets.new> and create a spreadsheet (any name).
+2. **Extensions → Apps Script**, delete the sample code, paste the whole
+   contents of `registration-emailer/Code.gs`, and save (💾).
+3. At the top of the script, confirm `ADMIN_EMAIL` — this is the address
+   that receives the Excel list. **To change the email later, only edit this
+   line** (and the `REGISTRATION_EMAIL` constant in `lib/registration.ts`).
+4. **Deploy → New deployment → Web app**:
+   - *Execute as*: **Me**
+   - *Who has access*: **Anyone**
+   - Click **Deploy**, authorise the requested Google permissions, and copy
+     the `/exec` URL it shows.
+5. Paste that URL into `lib/registration.ts` as `REGISTRATION_ENDPOINT`, then
+   rebuild (`npm run build`) and re-upload `out/`.
+
+### What happens on each submission
+
+- A row is appended to the **Registrations** sheet (columns: time, parent,
+  email, phone, student, grade, event, notes).
+- The whole sheet is emailed to `ADMIN_EMAIL` as **hope-registrations.xlsx**.
+- Staff can also email the file manually any time via the Sheet menu
+  **Registrations → Send Excel to admin email**.
+
+> Note: if the email fails (daily Gmail quota), the registration is still
+> saved in the Sheet — nothing is lost.
+
 ## Customization
 
 - **School name / contact details**: edit `messages/en.json` and

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { fetchEvents } from "@/lib/db";
 import { formatDateShort } from "@/lib/format";
 import { localized, type EventItem } from "@/lib/types";
@@ -19,8 +20,12 @@ export default function FeaturedEvent() {
     let active = true;
     fetchEvents().then((rows) => {
       if (!active) return;
+      const today = new Date().toISOString().slice(0, 10);
       // Prefer the soonest upcoming event that carries a flyer image.
-      setEvent(rows.find((e) => e.image_url) ?? null);
+      // Past events are never featured, even if they still have a flyer.
+      setEvent(
+        rows.find((e) => e.image_url && e.date >= today) ?? null,
+      );
     });
     return () => {
       active = false;
@@ -85,12 +90,18 @@ export default function FeaturedEvent() {
                 {description}
               </p>
             )}
-            <div className="mt-6">
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href={`/register?event=${encodeURIComponent(title)}`}
+                className="inline-block rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+              >
+                {t("featuredRegister")}
+              </Link>
               <a
                 href={event.image_url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-block rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+                className="inline-block rounded-xl border border-brand px-5 py-2.5 text-sm font-semibold text-brand transition-colors hover:bg-brand/5"
               >
                 {t("featuredCta")} ↗
               </a>

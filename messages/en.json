@@ -6,6 +6,7 @@
     "admissions": "Admissions",
     "news": "News & Events",
     "downloads": "Downloads",
+    "register": "Register",
     "admin": "Admin Login"
   },
   "common": {
@@ -62,6 +63,7 @@
     "eventsSubtitle": "Mark your calendar.",
     "featuredEvent": "Featured Event",
     "featuredCta": "View Full Flyer",
+    "featuredRegister": "Register for this event",
     "ctaTitle": "Ready to join our community?",
     "ctaText": "We would love to meet you and your family. Book a campus tour or start your application today.",
     "ctaButton": "Contact Admissions",
@@ -174,6 +176,54 @@
       "validationName": "Please enter your name",
       "validationEmail": "Please enter a valid email address",
       "validationMessage": "Please write a short message"
+    }
+  },
+  "register": {
+    "title": "Register",
+    "intro": "Register online for our events and programmes — Open House, campus tours and more. Your registration is sent straight to our admissions office.",
+    "stepsTitle": "What happens next?",
+    "steps": [
+      {
+        "title": "Submit the form",
+        "desc": "Fill in your details below — it takes less than a minute."
+      },
+      {
+        "title": "We receive your registration",
+        "desc": "Your entry is added to our registration list automatically."
+      },
+      {
+        "title": "We confirm by email or phone",
+        "desc": "Our team contacts you to confirm your place and answer any questions."
+      }
+    ],
+    "questionsTitle": "Questions?",
+    "questionsText": "Contact our office or give us a call — we are happy to help.",
+    "formTitle": "Registration Form",
+    "formSubtitle": "Fields marked * are required.",
+    "form": {
+      "parentName": "Parent / Guardian Name",
+      "parentNamePlaceholder": "Your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "phone": "Phone Number",
+      "phonePlaceholder": "+95 9 123 456 789",
+      "studentName": "Student Name",
+      "studentNamePlaceholder": "Full name of the student",
+      "grade": "Grade / Level",
+      "program": "Registering For",
+      "programPlaceholder": "e.g. Open House, Campus Tour, Early Years 2027",
+      "notes": "Notes (optional)",
+      "notesPlaceholder": "Anything we should know?",
+      "submit": "Submit Registration",
+      "sending": "Submitting…",
+      "successTitle": "Thank you — you are registered!",
+      "successText": "Your registration has been received. Our admissions team will contact you to confirm.",
+      "errorTitle": "Something went wrong",
+      "errorText": "Your registration could not be sent. Please try again, or contact us by email.",
+      "notConfigured": "Online registration is being set up. For now, please contact us by email or call the school.",
+      "validationName": "Please enter the parent / guardian name",
+      "validationEmail": "Please enter a valid email address",
+      "validationPhone": "Please enter a phone number"
     }
   },
   "news": {

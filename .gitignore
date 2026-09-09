@@ -25,6 +25,9 @@
 .DS_Store
 *.pem
 
+# Freebuff agent workspace
+.freebuff/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

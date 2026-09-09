@@ -23,6 +23,7 @@ export default function Header() {
     { href: "/admissions", label: t("admissions") },
     { href: "/news", label: t("news") },
     { href: "/downloads", label: t("downloads") },
+    { href: "/register", label: t("register") },
   ];
 
   const isActive = (href: string) =>

@@ -29,7 +29,10 @@ export async function fetchNews(): Promise<NewsItem[]> {
 
 export async function fetchEvents(): Promise<EventItem[]> {
   const supabase = getSupabase();
-  if (!supabase) return FALLBACK_EVENTS;
+  if (!supabase) {
+    const today = new Date().toISOString().slice(0, 10);
+    return FALLBACK_EVENTS.filter((e) => e.date >= today);
+  }
   try {
     const today = new Date().toISOString().slice(0, 10);
     const { data, error } = await supabase

@@ -12,6 +12,7 @@ export default function Footer() {
     { href: "/admissions", label: nav("admissions") },
     { href: "/news", label: nav("news") },
     { href: "/downloads", label: nav("downloads") },
+    { href: "/register", label: nav("register") },
   ];
 
   return (
