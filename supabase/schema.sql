@@ -58,12 +58,19 @@ on conflict (id) do nothing;
 -- Policies for storage.objects (uploads into the images bucket). Without
 -- these, signed-in staff get "new row violates row-level security policy"
 -- when uploading photos.
+--
+-- If you see that error, run this whole file again — the policies below are
+-- re-runnable (each existing policy is dropped first).
+drop policy if exists "Public read images" on storage.objects;
 create policy "Public read images" on storage.objects
   for select using (bucket_id = 'images');
+drop policy if exists "Staff upload images" on storage.objects;
 create policy "Staff upload images" on storage.objects
   for insert with check (bucket_id = 'images' and auth.role() = 'authenticated');
+drop policy if exists "Staff update images" on storage.objects;
 create policy "Staff update images" on storage.objects
   for update using (bucket_id = 'images' and auth.role() = 'authenticated');
+drop policy if exists "Staff delete images" on storage.objects;
 create policy "Staff delete images" on storage.objects
   for delete using (bucket_id = 'images' and auth.role() = 'authenticated');
 
@@ -76,23 +83,31 @@ alter table public.events enable row level security;
 alter table public.site_content enable row level security;
 alter table public.gallery enable row level security;
 
+drop policy if exists "Public read news" on public.news;
 create policy "Public read news" on public.news
   for select using (true);
+drop policy if exists "Staff manage news" on public.news;
 create policy "Staff manage news" on public.news
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 
+drop policy if exists "Public read events" on public.events;
 create policy "Public read events" on public.events
   for select using (true);
+drop policy if exists "Staff manage events" on public.events;
 create policy "Staff manage events" on public.events
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 
+drop policy if exists "Public read site_content" on public.site_content;
 create policy "Public read site_content" on public.site_content
   for select using (true);
+drop policy if exists "Staff manage site_content" on public.site_content;
 create policy "Staff manage site_content" on public.site_content
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 
+drop policy if exists "Public read gallery" on public.gallery;
 create policy "Public read gallery" on public.gallery
   for select using (true);
+drop policy if exists "Staff manage gallery" on public.gallery;
 create policy "Staff manage gallery" on public.gallery
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 
