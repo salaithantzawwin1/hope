@@ -182,6 +182,22 @@ export interface AboutFact {
   label_my: string;
 }
 
+export interface AboutCustomCard {
+  icon: string;
+  title_en: string;
+  title_my: string;
+  text_en: string;
+  text_my: string;
+}
+
+export interface AboutCustomSection {
+  eyebrow_en: string;
+  eyebrow_my: string;
+  title_en: string;
+  title_my: string;
+  cards: AboutCustomCard[];
+}
+
 export interface AboutFacts {
   title_en: string;
   title_my: string;

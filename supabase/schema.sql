@@ -131,13 +131,16 @@ insert into public.site_content (key, value_en, value_my) values
   ('home_welcome_title', 'Welcome to Our School', 'ကျောင်းမှ ကြိုဆိုပါသည်'),
   ('home_welcome_text', 'At Hope International School, we believe every child is unique. Our caring teachers, modern facilities and a balanced international curriculum help each student discover their strengths, think critically and act with kindness.', 'Hope အပြည်ပြည်ဆိုင်ရာကျောင်းတွင် ကလေးတိုင်းသည် ထူးခြားသည်ဟု ကျွန်ုပ်တို့ ယုံကြည်ပါသည်။ ဂရုစိုက်တတ်သော ဆရာ ဆရာမများ၊ ခေတ်မီသော သင်ကြားရေးအဆောက်အအုံများနှင့် မျှတသော နိုင်ငံတကာ သင်ရိုးညွှန်းတမ်းသည် ကျောင်းသားတိုင်း မိမိ၏ အရည်အချင်းများကို ရှာဖွေတွေ့ရှိနိုင်ရန် ကူညီပေးပါသည်။'),
   ('about_intro', 'Hope International School is a vibrant learning community in Myanmar where international standards meet local values.', 'Hope အပြည်ပြည်ဆိုင်ရာကျောင်းသည် နိုင်ငံတကာ စံနှုန်းများနှင့် ဒေသဆိုင်ရာ တန်ဖိုးများ ပေါင်းစပ်ထားသော မြန်မာနိုင်ငံရှိ တက်ကြွသော သင်ယူမှု အသိုင်းအဝိုင်းတစ်ခုဖြစ်သည်။'),
-  ('academics_intro', 'Our curriculum blends international teaching standards with the best of Myanmar culture. Students learn to think deeply, ask questions and apply their knowledge to real life.', 'ကျွန်ုပ်တို့၏ သင်ရိုးညွှန်းတမ်းသည် နိုင်ငံတကာ သင်ကြားရေး စံနှုန်းများနှင့် မြန်မာ့ယဉ်ကျေးမှု၏ အကောင်းဆုံးအရာများကို ပေါင်းစပ်ထားသည်။ ကျောင်းသားများသည် နက်နက်ရှိုင်းရှိုင်း တွေးခေါ်တတ်ရန်၊ မေးခွန်းထုတ်တတ်ရန်နှင့် မိမိတို့၏ အသိပညာကို လက်တွေ့ဘဝတွင် အသုံးချတတ်ရန် သင်ယူကြသည်။')
+  ('academics_intro', 'Our curriculum blends international teaching standards with the best of Myanmar culture. Students learn to think deeply, ask questions and apply their knowledge to real life.', 'ကျွန်ုပ်တို့၏ သင်ရိုးညွှန်းတမ်းသည် နိုင်ငံတကာ သင်ကြားရေး စံနှုန်းများနှင့် မြန်မာ့ယဉ်ကျေးမှု၏ အကောင်းဆုံးအရာများကို ပေါင်းစပ်ထားသည်။ ကျောင်းသားများသည် နက်နက်ရှိုင်းရှိုင်း တွေးခေါ်တတ်ရန်၊ မေးခွန်းထုတ်တတ်ရန်နှင့် မိမိတို့၏ အသိပညာကို လက်တွေ့ဘဝတွင် အသုံးချတတ်ရန် သင်ယူကြသည်။'),
+  ('about_sections', '[]', '[]')
 on conflict (key) do nothing;
 
 -- The Home, Academics, About, Header and Footer page sections are stored
 -- here as JSON in the rows home_stats, home_programs, home_cta,
 -- academics_curriculum, academics_levels, academics_programs,
--- about_mission_vision, about_values, about_facts, header_content and
--- footer_content. They are seeded from code defaults (lib/fallback-data.ts)
--- and are created in this table the first time staff save them from the
--- Admin portal → Home / About / Academics / Header / Footer tab.
+-- about_mission_vision, about_values, about_facts, about_sections,
+-- header_content and footer_content. They are seeded from code defaults
+-- (lib/fallback-data.ts) and are created in this table the first time staff
+-- save them from the Admin portal → Home / About / Academics / Header /
+-- Footer tab. about_sections holds extra About page blocks (like Mission &
+-- Vision) added by staff; it starts empty.

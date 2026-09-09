@@ -72,6 +72,7 @@ export default async function AboutPage({
               label_my: f.label,
             })),
           },
+          sections: [],
         }}
       />
 

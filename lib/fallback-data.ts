@@ -1,4 +1,5 @@
 import type {
+  AboutCustomSection,
   AboutFacts,
   AboutMissionVision,
   AboutValues,
@@ -310,6 +311,13 @@ export const FALLBACK_ABOUT_FACTS: AboutFacts = {
     { number_en: "1:15", number_my: "၁:၁၅", label_en: "Teacher–Student Ratio", label_my: "ဆရာ–ကျောင်းသား အချိုး" },
   ],
 };
+
+/**
+ * Extra editable About page sections (two-card blocks like Mission & Vision),
+ * edited from the admin portal. Empty by default — nothing renders until a
+ * section is added. Stored as JSON in the `about_sections` site_content row.
+ */
+export const FALLBACK_ABOUT_SECTIONS: AboutCustomSection[] = [];
 
 /** Defaults for the Academics page sections, edited from the admin portal. */
 export const FALLBACK_ACADEMICS_CURRICULUM: AcademicsCurriculum = {

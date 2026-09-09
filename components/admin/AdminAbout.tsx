@@ -5,9 +5,12 @@ import { getSupabase } from "@/lib/supabase";
 import {
   FALLBACK_ABOUT_FACTS,
   FALLBACK_ABOUT_MISSION_VISION,
+  FALLBACK_ABOUT_SECTIONS,
   FALLBACK_ABOUT_VALUES,
 } from "@/lib/fallback-data";
 import type {
+  AboutCustomCard,
+  AboutCustomSection,
   AboutFact,
   AboutFacts,
   AboutMissionVision,
@@ -15,11 +18,12 @@ import type {
   AboutValues,
 } from "@/lib/types";
 import { LangRow } from "./bilingual";
-import { Button, Card, Notice } from "./ui";
+import { Button, Card, Field, Notice, TextInput } from "./ui";
 
 const MISSION_VISION_KEY = "about_mission_vision";
 const VALUES_KEY = "about_values";
 const FACTS_KEY = "about_facts";
+const SECTIONS_KEY = "about_sections";
 
 function parseJson<T>(raw: string | undefined | null): T | null {
   if (!raw || !raw.trim()) return null;
@@ -37,6 +41,9 @@ export default function AdminAbout() {
   );
   const [values, setValues] = useState<AboutValues>(FALLBACK_ABOUT_VALUES);
   const [facts, setFacts] = useState<AboutFacts>(FALLBACK_ABOUT_FACTS);
+  const [sections, setSections] = useState<AboutCustomSection[]>(
+    FALLBACK_ABOUT_SECTIONS,
+  );
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -49,15 +56,17 @@ export default function AdminAbout() {
       const { data } = await supabase
         .from("site_content")
         .select("key, value_en")
-        .in("key", [MISSION_VISION_KEY, VALUES_KEY, FACTS_KEY]);
+        .in("key", [MISSION_VISION_KEY, VALUES_KEY, FACTS_KEY, SECTIONS_KEY]);
       if (!active) return;
       const map = new Map<string, string>((data ?? []).map((r) => [r.key, r.value_en]));
       const mv = parseJson<AboutMissionVision>(map.get(MISSION_VISION_KEY));
       const v = parseJson<AboutValues>(map.get(VALUES_KEY));
       const f = parseJson<AboutFacts>(map.get(FACTS_KEY));
+      const s = parseJson<AboutCustomSection[]>(map.get(SECTIONS_KEY));
       setMissionVision(mv ?? FALLBACK_ABOUT_MISSION_VISION);
       setValues(v ?? FALLBACK_ABOUT_VALUES);
       setFacts(f ?? FALLBACK_ABOUT_FACTS);
+      setSections(s ?? FALLBACK_ABOUT_SECTIONS);
       setLoaded(true);
     })();
     return () => {
@@ -76,6 +85,7 @@ export default function AdminAbout() {
         { key: MISSION_VISION_KEY, value_en: JSON.stringify(missionVision), value_my: JSON.stringify(missionVision) },
         { key: VALUES_KEY, value_en: JSON.stringify(values), value_my: JSON.stringify(values) },
         { key: FACTS_KEY, value_en: JSON.stringify(facts), value_my: JSON.stringify(facts) },
+        { key: SECTIONS_KEY, value_en: JSON.stringify(sections), value_my: JSON.stringify(sections) },
       ];
       for (const row of rows) {
         const { error } = await supabase
@@ -102,6 +112,21 @@ export default function AdminAbout() {
       ...facts,
       facts: facts.facts.map((f, j) => (j === i ? { ...f, ...patch } : f)),
     });
+
+  const updateSection = (i: number, patch: Partial<AboutCustomSection>) =>
+    setSections(sections.map((s, j) => (j === i ? { ...s, ...patch } : s)));
+
+  const updateSectionCard = (si: number, ci: number, patch: Partial<AboutCustomCard>) =>
+    setSections(
+      sections.map((s, j) =>
+        j === si
+          ? {
+              ...s,
+              cards: s.cards.map((c, k) => (k === ci ? { ...c, ...patch } : c)),
+            }
+          : s,
+      ),
+    );
 
   if (!supabase) return null;
   if (!loaded) {
@@ -223,6 +248,131 @@ export default function AdminAbout() {
           }
         >
           + Add value
+        </Button>
+      </Card>
+
+      {/* Additional sections (two-card blocks like Mission & Vision) */}
+      <Card className="space-y-4 p-5">
+        <div>
+          <p className="text-sm font-bold text-slate-900">Additional Sections</p>
+          <p className="text-xs text-slate-500">
+            Add more two-card sections to the About page (like Mission &amp;
+            Vision) — e.g. Our History, Why Choose Us. They appear right
+            below Mission &amp; Vision.
+          </p>
+        </div>
+
+        {sections.length === 0 && (
+          <p className="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-xs text-slate-400">
+            No additional sections yet — use &quot;+ Add section&quot; below.
+          </p>
+        )}
+
+        {sections.map((section, si) => (
+          <div key={si} className="space-y-4 rounded-lg border border-slate-200 p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                Section {si + 1}
+              </p>
+              <Button
+                type="button"
+                variant="danger"
+                onClick={() => setSections(sections.filter((_, j) => j !== si))}
+              >
+                Remove section
+              </Button>
+            </div>
+            <LangRow
+              label="Eyebrow (small label)"
+              en={section.eyebrow_en}
+              my={section.eyebrow_my}
+              onEn={(v) => updateSection(si, { eyebrow_en: v })}
+              onMy={(v) => updateSection(si, { eyebrow_my: v })}
+            />
+            <LangRow
+              label="Section title"
+              en={section.title_en}
+              my={section.title_my}
+              onEn={(v) => updateSection(si, { title_en: v })}
+              onMy={(v) => updateSection(si, { title_my: v })}
+            />
+
+            <div className="space-y-3">
+              {section.cards.map((card, ci) => (
+                <div
+                  key={ci}
+                  className="space-y-3 rounded-lg border border-slate-200 bg-slate-50/60 p-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                      Card {ci + 1}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      onClick={() =>
+                        updateSection(si, {
+                          cards: section.cards.filter((_, k) => k !== ci),
+                        })
+                      }
+                    >
+                      Remove card
+                    </Button>
+                  </div>
+                  <Field label="Icon (emoji)" hint="Shown in a gradient tile — e.g. 🏫, 📜, 🌍">
+                    <TextInput
+                      value={card.icon}
+                      onChange={(e) => updateSectionCard(si, ci, { icon: e.target.value })}
+                      placeholder="✨"
+                      className="max-w-40"
+                    />
+                  </Field>
+                  <LangRow
+                    label="Card title"
+                    en={card.title_en}
+                    my={card.title_my}
+                    onEn={(v) => updateSectionCard(si, ci, { title_en: v })}
+                    onMy={(v) => updateSectionCard(si, ci, { title_my: v })}
+                  />
+                  <LangRow
+                    label="Card text"
+                    en={card.text_en}
+                    my={card.text_my}
+                    textarea
+                    onEn={(v) => updateSectionCard(si, ci, { text_en: v })}
+                    onMy={(v) => updateSectionCard(si, ci, { text_my: v })}
+                  />
+                </div>
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() =>
+                updateSection(si, {
+                  cards: [
+                    ...section.cards,
+                    { icon: "✨", title_en: "", title_my: "", text_en: "", text_my: "" },
+                  ],
+                })
+              }
+            >
+              + Add card
+            </Button>
+          </div>
+        ))}
+
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() =>
+            setSections([
+              ...sections,
+              { eyebrow_en: "", eyebrow_my: "", title_en: "", title_my: "", cards: [] },
+            ])
+          }
+        >
+          + Add section
         </Button>
       </Card>
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { fetchSiteContent } from "@/lib/db";
 import type {
+  AboutCustomSection,
   AboutFacts,
   AboutMissionVision,
   AboutValues,
@@ -24,6 +25,7 @@ interface AboutData {
   missionVision: AboutMissionVision;
   values: AboutValues;
   facts: AboutFacts;
+  sections: AboutCustomSection[];
 }
 
 /**
@@ -47,11 +49,13 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
       );
       const values = parseJson<AboutValues>(map["about_values"]?.en);
       const facts = parseJson<AboutFacts>(map["about_facts"]?.en);
-      if (missionVision || values || facts) {
+      const sections = parseJson<AboutCustomSection[]>(map["about_sections"]?.en);
+      if (missionVision || values || facts || sections) {
         setDb({
           missionVision: missionVision ?? fallback.missionVision,
           values: values ?? fallback.values,
           facts: facts ?? fallback.facts,
+          sections: sections ?? fallback.sections,
         });
       }
     });
@@ -71,6 +75,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
   const mv = data.missionVision;
   const values = data.values;
   const facts = data.facts;
+  const sections = data.sections;
 
   return (
     <>
@@ -127,6 +132,71 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
           </article>
         </div>
       </section>
+
+      {/* Extra admin-added sections (two-card blocks like Mission & Vision) */}
+      {sections.map((section, si) => (
+        <section
+          key={si}
+          className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6"
+        >
+          {(section.eyebrow_en.trim() || section.eyebrow_my.trim()) && (
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">
+              {pick(section.eyebrow_en, section.eyebrow_my)}
+            </p>
+          )}
+          {section.title_en.trim() || section.title_my.trim() ? (
+            <h2 className="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">
+              {pick(section.title_en, section.title_my)}
+            </h2>
+          ) : null}
+          <div
+            className={`grid gap-6 md:grid-cols-2 ${
+              section.title_en.trim() || section.title_my.trim() ? "mt-10" : "mt-6"
+            }`}
+          >
+            {section.cards.map((card, ci) => (
+              <article
+                key={ci}
+                className="group relative overflow-hidden rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              >
+                <div
+                  aria-hidden
+                  className={`pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full blur-2xl transition-colors duration-300 ${
+                    ci % 2 === 0
+                      ? "bg-brand/10 group-hover:bg-brand/20"
+                      : "bg-accent/10 group-hover:bg-accent/20"
+                  }`}
+                />
+                <div
+                  aria-hidden
+                  className={`absolute inset-x-0 top-0 h-1.5 ${
+                    ci % 2 === 0
+                      ? "bg-gradient-to-r from-brand to-brand-light"
+                      : "bg-gradient-to-r from-accent to-accent-dark"
+                  }`}
+                />
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl shadow-md transition-transform duration-300 group-hover:scale-110 ${
+                      ci % 2 === 0
+                        ? "bg-gradient-to-br from-brand to-brand-light"
+                        : "bg-gradient-to-br from-accent to-accent-dark"
+                    }`}
+                  >
+                    <span aria-hidden>{card.icon.trim() || "✨"}</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900">
+                    {pick(card.title_en, card.title_my)}
+                  </h3>
+                </div>
+                <p className="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg">
+                  {pick(card.text_en, card.text_my)}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+      ))}
 
       {/* Values */}
       <section className="bg-cream">
