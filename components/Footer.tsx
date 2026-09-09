@@ -87,12 +87,6 @@ export default function Footer() {
             © {new Date().getFullYear()} Hope International School.{" "}
             {t("rights")}
           </p>
-          <Link
-            href="/admin"
-            className="text-slate-500 transition-colors hover:text-accent"
-          >
-            {t("adminLink")}
-          </Link>
         </div>
       </div>
     </footer>
