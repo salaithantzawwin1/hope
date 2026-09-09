@@ -25,16 +25,40 @@ type Tab =
   | "header"
   | "footer";
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: "news", label: "News" },
-  { id: "events", label: "Events" },
-  { id: "site", label: "Site Text" },
-  { id: "home", label: "Home" },
-  { id: "about", label: "About" },
-  { id: "academics", label: "Academics" },
-  { id: "gallery", label: "Gallery" },
-  { id: "header", label: "Header" },
-  { id: "footer", label: "Footer" },
+type Group = "content" | "pages" | "settings";
+
+const GROUPS: {
+  id: Group;
+  label: string;
+  tabs: { id: Tab; label: string }[];
+}[] = [
+  {
+    id: "content",
+    label: "Content",
+    tabs: [
+      { id: "news", label: "News" },
+      { id: "events", label: "Events" },
+      { id: "gallery", label: "Gallery" },
+    ],
+  },
+  {
+    id: "pages",
+    label: "Pages",
+    tabs: [
+      { id: "home", label: "Home" },
+      { id: "about", label: "About" },
+      { id: "academics", label: "Academics" },
+      { id: "site", label: "Site Text" },
+    ],
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    tabs: [
+      { id: "header", label: "Header" },
+      { id: "footer", label: "Footer" },
+    ],
+  },
 ];
 
 function LoginForm({ onSuccess }: { onSuccess: () => void }) {
@@ -234,22 +258,31 @@ export default function AdminPage() {
       </header>
 
       <div className="mx-auto max-w-5xl px-4 py-8">
-        <div className="mb-6 flex flex-wrap gap-2">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTab(t.id)}
-              className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
-                tab === t.id
-                  ? "bg-brand text-white"
-                  : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+        <div className="mb-6 space-y-4">
+        {GROUPS.map((group) => (
+          <div key={group.id}>
+            <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-slate-400">
+              {group.label}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {group.tabs.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTab(t.id)}
+                  className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+                    tab === t.id
+                      ? "bg-brand text-white"
+                      : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
 
         {tab === "news" && <AdminNews />}
         {tab === "events" && <AdminEvents />}
