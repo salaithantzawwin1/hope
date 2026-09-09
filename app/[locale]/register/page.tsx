@@ -34,7 +34,7 @@ export default async function RegisterPage({
       </PageHeader>
 
       {/* Steps */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
           {t("stepsTitle")}
         </h2>
@@ -60,7 +60,7 @@ export default async function RegisterPage({
 
       {/* Form */}
       <section className="bg-cream">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-3">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <RegisterPageContent />
           </div>
