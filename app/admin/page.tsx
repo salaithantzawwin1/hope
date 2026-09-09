@@ -238,7 +238,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
           <div className="flex items-center gap-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand text-base font-bold text-white">
               H
@@ -257,42 +257,50 @@ export default function AdminPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-4 py-8">
-        <div className="mb-6 space-y-4">
-        {GROUPS.map((group) => (
-          <div key={group.id}>
-            <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-slate-400">
-              {group.label}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {group.tabs.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setTab(t.id)}
-                  className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
-                    tab === t.id
-                      ? "bg-brand text-white"
-                      : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  {t.label}
-                </button>
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
+          {/* Left sidebar navigation: a full-width scrollable strip on
+              mobile, a sticky vertical menu on desktop. */}
+          <nav className="w-full shrink-0 lg:sticky lg:top-8 lg:w-52 lg:self-start">
+            <div className="flex gap-8 overflow-x-auto pb-2 lg:flex-col lg:gap-6 lg:overflow-visible lg:pb-0">
+              {GROUPS.map((group) => (
+                <div key={group.id} className="shrink-0">
+                  <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-slate-400">
+                    {group.label}
+                  </p>
+                  <div className="flex gap-1 lg:flex-col">
+                    {group.tabs.map((t) => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setTab(t.id)}
+                        className={`whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-semibold transition-colors ${
+                          tab === t.id
+                            ? "bg-brand text-white"
+                            : "text-slate-600 hover:bg-slate-100"
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
-        ))}
-      </div>
+          </nav>
 
-        {tab === "news" && <AdminNews />}
-        {tab === "events" && <AdminEvents />}
-        {tab === "site" && <AdminSiteContent />}
-        {tab === "home" && <AdminHome />}
-        {tab === "about" && <AdminAbout />}
-        {tab === "academics" && <AdminAcademics />}
-        {tab === "gallery" && <AdminGallery />}
-        {tab === "header" && <AdminHeader />}
-        {tab === "footer" && <AdminFooter />}
+          <main className="min-w-0 flex-1">
+            {tab === "news" && <AdminNews />}
+            {tab === "events" && <AdminEvents />}
+            {tab === "site" && <AdminSiteContent />}
+            {tab === "home" && <AdminHome />}
+            {tab === "about" && <AdminAbout />}
+            {tab === "academics" && <AdminAcademics />}
+            {tab === "gallery" && <AdminGallery />}
+            {tab === "header" && <AdminHeader />}
+            {tab === "footer" && <AdminFooter />}
+          </main>
+        </div>
       </div>
     </div>
   );
