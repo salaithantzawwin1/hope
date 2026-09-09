@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { FALLBACK_FOOTER } from "@/lib/fallback-data";
 import type { FooterContent } from "@/lib/types";
-import { LangRow, LinksEditor } from "./bilingual";
+import { LangRow } from "./bilingual";
 import { Button, Card, Notice } from "./ui";
 
 const FOOTER_KEY = "footer_content";
@@ -126,21 +126,6 @@ export default function AdminFooter() {
           my={footer.hours_my}
           onEn={(v) => update({ hours_en: v })}
           onMy={(v) => update({ hours_my: v })}
-        />
-      </Card>
-
-      {/* Quick links */}
-      <Card className="space-y-4 p-5">
-        <div>
-          <p className="text-sm font-bold text-slate-900">Quick Links</p>
-          <p className="text-xs text-slate-500">
-            The footer navigation links (internal paths like &quot;/about&quot;).
-            Rows without a URL or label are hidden on the site.
-          </p>
-        </div>
-        <LinksEditor
-          links={footer.links}
-          onChange={(links) => setFooter({ ...footer, links })}
         />
       </Card>
 
