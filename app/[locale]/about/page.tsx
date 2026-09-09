@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import AboutContent from "@/components/AboutContent";
 import SiteText from "@/components/SiteText";
-import Gallery from "@/components/Gallery";
 
 export async function generateMetadata({
   params,
@@ -78,18 +77,6 @@ export default async function AboutPage({
         }}
       />
 
-      {/* Gallery */}
-      <section className="bg-cream">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900">
-              {t("galleryTitle")}
-            </h2>
-            <p className="mt-2 text-slate-500">{t("gallerySubtitle")}</p>
-          </div>
-          <Gallery />
-        </div>
-      </section>
     </>
   );
 }

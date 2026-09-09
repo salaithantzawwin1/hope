@@ -239,7 +239,8 @@
     "noEvents": "No upcoming events right now. Check back soon!"
   },
   "gallery": {
-    "title": "Photo Gallery"
+    "title": "Photo Gallery",
+    "subtitle": "Moments from our classrooms, playgrounds and celebrations — browse the albums below."
   },
   "downloads": {
     "title": "Downloads",

@@ -157,6 +157,7 @@ export const FALLBACK_HEADER: HeaderContent = {
     { href: "/about", label_en: "About Us", label_my: "ကျောင်းအကြောင်း" },
     { href: "/academics", label_en: "Academics", label_my: "ပညာရေး" },
     { href: "/news", label_en: "News & Events", label_my: "သတင်းနှင့် ပွဲများ" },
+    { href: "/gallery", label_en: "Gallery", label_my: "ဓာတ်ပုံပြခန်း" },
     { href: "/downloads", label_en: "Downloads", label_my: "ဒေါင်းလုဒ်များ" },
   ],
 };
@@ -182,6 +183,7 @@ export const FALLBACK_FOOTER: FooterContent = {
     { href: "/academics", label_en: "Academics", label_my: "ပညာရေး" },
     { href: "/admissions", label_en: "Admissions", label_my: "ဝင်ခွင့်" },
     { href: "/news", label_en: "News & Events", label_my: "သတင်းနှင့် ပွဲများ" },
+    { href: "/gallery", label_en: "Gallery", label_my: "ဓာတ်ပုံပြခန်း" },
     { href: "/downloads", label_en: "Downloads", label_my: "ဒေါင်းလုဒ်များ" },
   ],
 };
