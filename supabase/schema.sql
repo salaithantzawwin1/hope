@@ -97,8 +97,9 @@ insert into public.site_content (key, value_en, value_my) values
   ('academics_intro', 'Our curriculum blends international teaching standards with the best of Myanmar culture. Students learn to think deeply, ask questions and apply their knowledge to real life.', 'ကျွန်ုပ်တို့၏ သင်ရိုးညွှန်းတမ်းသည် နိုင်ငံတကာ သင်ကြားရေး စံနှုန်းများနှင့် မြန်မာ့ယဉ်ကျေးမှု၏ အကောင်းဆုံးအရာများကို ပေါင်းစပ်ထားသည်။ ကျောင်းသားများသည် နက်နက်ရှိုင်းရှိုင်း တွေးခေါ်တတ်ရန်၊ မေးခွန်းထုတ်တတ်ရန်နှင့် မိမိတို့၏ အသိပညာကို လက်တွေ့ဘဝတွင် အသုံးချတတ်ရန် သင်ယူကြသည်။')
 on conflict (key) do nothing;
 
--- The Academics and About page sections are stored here as JSON in the
--- rows academics_curriculum, academics_levels, academics_programs,
--- about_mission_vision, about_values and about_facts. They are seeded from
--- code defaults (lib/fallback-data.ts) and are created in this table the
--- first time staff save them from the Admin portal → About / Academics tab.
+-- The Home, Academics and About page sections are stored here as JSON in
+-- the rows home_stats, home_programs, home_cta, academics_curriculum,
+-- academics_levels, academics_programs, about_mission_vision, about_values
+-- and about_facts. They are seeded from code defaults (lib/fallback-data.ts)
+-- and are created in this table the first time staff save them from the
+-- Admin portal → Home / About / Academics tab.

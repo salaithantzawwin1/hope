@@ -6,6 +6,9 @@ import type {
   AcademicsLevels,
   AcademicsPrograms,
   EventItem,
+  HomeCta,
+  HomePrograms,
+  HomeStats,
   NewsItem,
 } from "./types";
 
@@ -142,6 +145,67 @@ export const FALLBACK_SITE_CONTENT: Record<string, { en: string; my: string }> =
     en: "Our curriculum blends international teaching standards with the best of Myanmar culture. Students learn to think deeply, ask questions and apply their knowledge to real life.",
     my: "ကျွန်ုပ်တို့၏ သင်ရိုးညွှန်းတမ်းသည် နိုင်ငံတကာ သင်ကြားရေး စံနှုန်းများနှင့် မြန်မာ့ယဉ်ကျေးမှု၏ အကောင်းဆုံးအရာများကို ပေါင်းစပ်ထားသည်။ ကျောင်းသားများသည် နက်နက်ရှိုင်းရှိုင်း တွေးခေါ်တတ်ရန်၊ မေးခွန်းထုတ်တတ်ရန်နှင့် မိမိတို့၏ အသိပညာကို လက်တွေ့ဘဝတွင် အသုံးချတတ်ရန် သင်ယူကြသည်။",
   },
+};
+
+/** Defaults for the Home page sections, edited from the admin portal. */
+export const FALLBACK_HOME_STATS: HomeStats = {
+  stats: [
+    { number_en: "500+", number_my: "၅၀၀+", label_en: "Students", label_my: "ကျောင်းသား ကျောင်းသူများ" },
+    { number_en: "40+", number_my: "၄၀+", label_en: "Qualified Teachers", label_my: "အရည်အချင်းပြည့်မီ ဆရာ ဆရာမများ" },
+    { number_en: "12", number_my: "၁၂", label_en: "Years of Excellence", label_my: "နှစ်ပေါင်း အတွေ့အကြုံ" },
+    { number_en: "1:15", number_my: "၁:၁၅", label_en: "Teacher–Student Ratio", label_my: "ဆရာ–ကျောင်းသား အချိုး" },
+  ],
+};
+
+export const FALLBACK_HOME_PROGRAMS: HomePrograms = {
+  title_en: "Our Programs",
+  title_my: "ကျွန်ုပ်တို့၏ သင်တန်းအစီအစဉ်များ",
+  subtitle_en: "A complete learning journey from age 2 to 18, built around international standards.",
+  subtitle_my:
+    "အသက် ၂ နှစ်မှ ၁၈ နှစ်အထိ နိုင်ငံတကာ စံနှုန်းများအပေါ် အခြေခံထားသော ပြီးပြည့်စုံသည့် သင်ယူမှုခရီး။",
+  programs: [
+    {
+      title_en: "Early Years",
+      title_my: "မူကြိုပညာရေး",
+      desc_en: "A warm, play-based start for ages 2–5 that builds curiosity, confidence and early language skills.",
+      desc_my:
+        "အသက် ၂–၅ နှစ်များအတွက် ပျော်ရွှင်ဖွယ် ကစားနည်းအခြေပြု စတင်မှု — စူးစမ်းလိုစိတ်၊ ယုံကြည်မှုနှင့် ဘာသာစကား ကျွမ်းကျင်မှုတို့ကို တည်ဆောက်ပေးသည်။",
+    },
+    {
+      title_en: "Primary School",
+      title_my: "မူလတန်း",
+      desc_en: "Grades 1–5 with a strong foundation in literacy, numeracy, science and creative thinking.",
+      desc_my:
+        "တန်း ၁–၅ — စာဖတ်၊ စာရေး၊ သင်္ချာ၊ သိပ္ပံနှင့် တီထွင်ဖန်တီးမှု တွေးခေါ်ခြင်းတို့တွင် ခိုင်မာသော အခြေခံအုတ်မြစ်။",
+    },
+    {
+      title_en: "Middle School",
+      title_my: "အလယ်တန်း",
+      desc_en: "Grades 6–8 that deepen knowledge, develop study skills and encourage independent learning.",
+      desc_my:
+        "တန်း ၆–၈ — အသိပညာ နက်ရှိုင်းစေပြီး လေ့လာမှုစွမ်းရည်နှင့် ကိုယ်တိုင်သင်ယူတတ်သည့် အလေ့အကျင့်ကို အားပေးသည်။",
+    },
+    {
+      title_en: "High School",
+      title_my: "အထက်တန်း",
+      desc_en: "Grades 9–12 preparing students for international exams and university admission worldwide.",
+      desc_my:
+        "တန်း ၉–၁၂ — နိုင်ငံတကာ စာမေးပွဲများနှင့် ကမ္ဘာ့တက္ကသိုလ်များသို့ ဝင်ခွင့်အတွက် ပြင်ဆင်ပေးသည်။",
+    },
+  ],
+};
+
+export const FALLBACK_HOME_CTA: HomeCta = {
+  title_en: "Ready to join our community?",
+  title_my: "ကျွန်ုပ်တို့၏ အသိုင်းအဝိုင်းတွင် ပူးပေါင်းရန် အသင့်ဖြစ်ပြီလား?",
+  text_en:
+    "We would love to meet you and your family. Book a campus tour or start your application today.",
+  text_my:
+    "သင့်မိသားစုနှင့် တွေ့ဆုံရတာ ဝမ်းသာပါသည်။ ကျောင်းဝင်းလေ့လာရန် စာရင်းသွင်းပါ သို့မဟုတ် ယနေ့ပင် လျှောက်လွှာ စတင်ပါ။",
+  button_en: "Contact Admissions",
+  button_my: "ဝင်ခွင့်ဌာနကို ဆက်သွယ်ရန်",
+  secondary_en: "Apply Now",
+  secondary_my: "အခုပဲ လျှောက်ထားပါ",
 };
 
 /** Defaults for the About page sections, edited from the admin portal. */

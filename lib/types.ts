@@ -103,6 +103,43 @@ export interface AboutValues {
   values: AboutValue[];
 }
 
+export interface HomeStat {
+  number_en: string;
+  number_my: string;
+  label_en: string;
+  label_my: string;
+}
+
+export interface HomeStats {
+  stats: HomeStat[];
+}
+
+export interface HomeProgram {
+  title_en: string;
+  title_my: string;
+  desc_en: string;
+  desc_my: string;
+}
+
+export interface HomePrograms {
+  title_en: string;
+  title_my: string;
+  subtitle_en: string;
+  subtitle_my: string;
+  programs: HomeProgram[];
+}
+
+export interface HomeCta {
+  title_en: string;
+  title_my: string;
+  text_en: string;
+  text_my: string;
+  button_en: string;
+  button_my: string;
+  secondary_en: string;
+  secondary_my: string;
+}
+
 export interface AboutFact {
   number_en: string;
   number_my: string;
