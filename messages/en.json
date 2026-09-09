@@ -240,7 +240,12 @@
   },
   "gallery": {
     "title": "Photo Gallery",
-    "subtitle": "Moments from our classrooms, playgrounds and celebrations — browse the albums below."
+    "subtitle": "Moments from our classrooms, playgrounds and celebrations — browse the albums below.",
+    "photos": "Photos",
+    "photoCount": "{count, plural, =1 {1 photo} other {# photos}}",
+    "backToAlbums": "All albums",
+    "prev": "Previous photo",
+    "next": "Next photo"
   },
   "downloads": {
     "title": "Downloads",
