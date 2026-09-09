@@ -119,14 +119,43 @@ export default function AdminPage() {
   useEffect(() => {
     const supabase = getSupabase();
     if (!supabase) return;
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setChecking(false);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-    });
-    return () => sub.subscription.unsubscribe();
+    let active = true;
+
+    // Never leave the "Checking session…" screen hanging: if the session
+    // check fails or takes too long (e.g. Supabase unreachable), fall
+    // through to the login form instead of getting stuck forever.
+    const check = Promise.race([
+      supabase.auth.getSession(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Session check timed out")), 10000),
+      ),
+    ]);
+    check
+      .then(({ data }) => {
+        if (active) setSession(data.session);
+      })
+      .catch(() => {
+        // Treat any failure as signed-out; the login form is shown.
+        if (active) setSession(null);
+      })
+      .finally(() => {
+        if (active) setChecking(false);
+      });
+
+    const { data: sub } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
+        if (!active) return;
+        setSession(newSession);
+        // A session event (including right after signing in) means the
+        // check is done — never flip back to the checking screen.
+        setChecking(false);
+      },
+    );
+
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   const supabase = getSupabase();
@@ -174,7 +203,7 @@ export default function AdminPage() {
   if (!session) {
     return (
       <div className="flex min-h-screen items-center bg-slate-50 px-4 py-16">
-        <LoginForm onSuccess={() => setChecking(true)} />
+        <LoginForm onSuccess={() => setChecking(false)} />
       </div>
     );
   }
