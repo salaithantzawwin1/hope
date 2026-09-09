@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { fetchSiteContent } from "@/lib/db";
 import { FALLBACK_FOOTER } from "@/lib/fallback-data";
 import type { FooterContent } from "@/lib/types";
@@ -43,12 +42,6 @@ export default function Footer() {
     return value || en;
   };
 
-  // Quick links are also edited from the Footer tab; rows without a href or
-  // label are skipped.
-  const links = (data.links ?? FALLBACK_FOOTER.links).filter(
-    (l) => l.href.trim() && pick(l.label_en, l.label_my).trim(),
-  );
-
   return (
     <footer className="mt-auto bg-brand-dark text-slate-400">
       <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 py-5 sm:px-6">
@@ -72,12 +65,12 @@ export default function Footer() {
 
           {/* Contact strip: address + phone + email + hours inline */}
           <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-[11px]">
-            <span className="flex min-w-0 items-center gap-1.5 xl:max-w-[300px]">
+            <span className="flex items-center gap-1.5">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
-              <span className="min-w-0">{pick(data.address_en, data.address_my)}</span>
+              {pick(data.address_en, data.address_my)}
             </span>
             <span className="flex items-center gap-1.5">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
@@ -101,22 +94,6 @@ export default function Footer() {
             </span>
           </div>
         </div>
-
-        {/* Row 2: quick links (centered) */}
-        <nav
-          className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 border-t border-white/10 pt-4 text-[11px] lg:mt-5 lg:pt-5"
-          aria-label={t("quickLinks")}
-        >
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-slate-400 transition-colors hover:text-accent"
-            >
-              {pick(l.label_en, l.label_my)}
-            </Link>
-          ))}
-        </nav>
       </div>
 
       <div className="border-t border-white/10">
