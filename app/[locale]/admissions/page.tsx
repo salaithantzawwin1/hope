@@ -62,7 +62,7 @@ export default async function AdmissionsPage({
 
       {/* Requirements + fees */}
       <section className="bg-cream">
-        <div className="mx-auto grid max-w-7xl 2xl:max-w-[1440px] gap-8 px-4 py-12 sm:px-6 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-2">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">
               {t("requirementsTitle")}

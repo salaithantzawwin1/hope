@@ -116,7 +116,7 @@ export default async function HomePage({
 
       {/* Welcome */}
       <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-16 sm:px-6 sm:py-24">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
           <div>
             <SiteText
               k="home_welcome_title"

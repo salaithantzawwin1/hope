@@ -75,7 +75,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
     <>
       {/* Mission & vision */}
       <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
           <div className="rounded-3xl border-t-4 border-accent bg-cream p-8">
             <div className="flex items-center gap-3">
               <span className="text-3xl" aria-hidden>🎯</span>

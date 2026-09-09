@@ -44,7 +44,7 @@ export default function FeaturedEvent() {
   );
 
   return (
-    <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-16 sm:px-6">
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="grid md:grid-cols-[2fr_3fr]">
           {/* Flyer */}

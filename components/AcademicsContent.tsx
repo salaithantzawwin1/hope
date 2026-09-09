@@ -68,7 +68,7 @@ export default function AcademicsContent({ fallback }: { fallback: AcademicsData
     <>
       {/* Curriculum */}
       <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
-        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-center">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
               {pick(data.curriculum.title_en, data.curriculum.title_my)}
