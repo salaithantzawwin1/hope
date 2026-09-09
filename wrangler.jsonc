@@ -1,0 +1,19 @@
+// This site is a fully static Next.js export (`npm run build` → `out/`),
+// so we deploy it as a Cloudflare static-assets Worker — no OpenNext,
+// no server runtime needed.
+//
+// Cloudflare Workers Builds runs:
+//   build:  npm run build      → produces ./out
+//   deploy: npx wrangler deploy → uploads ./out as static assets
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hope",
+  "compatibility_date": "2026-09-08",
+  "assets": {
+    "directory": "./out",
+    // Serve out/404.html for unknown routes (Next.js static export generates it).
+    "not_found_handling": "404-page",
+    // Directory-style output (en/index.html): /en → /en/ → en/index.html
+    "html_handling": "auto-trailing-slash"
+  }
+}

@@ -89,6 +89,19 @@ changes made in the admin portal do **not** require re-uploading.
 > On cPanel, ensure the folder `out/admin/` is uploaded (the portal lives at
 > `https://your-school.com/admin`).
 
+### Deploying to Cloudflare (Workers static assets)
+
+The repo includes a `wrangler.jsonc` that deploys the static `out/` folder
+as a Cloudflare Worker (static assets) — no OpenNext needed, because the
+site is a fully static export. Every push to `main` deploys automatically
+when the Workers build runs:
+
+- **Build command:** `npm run build` → produces `out/`
+- **Deploy command:** `npx wrangler deploy` → uploads `out/`
+
+Locally you can deploy or preview with `npm run deploy` / `npm run preview`
+(after `npx wrangler login`).
+
 ## Using the admin portal
 
 1. Open `https://your-school.com/admin` and sign in with a staff account
