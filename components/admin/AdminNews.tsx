@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { uploadImage } from "@/lib/upload";
 import type { NewsItem } from "@/lib/types";
-import { Button, Card, Field, Notice, TextArea, TextInput } from "./ui";
+import { Button, Card, Field, Notice, SubTabs, TextArea, TextInput } from "./ui";
 
 interface FormState {
   id: string | null;
@@ -26,7 +26,10 @@ const EMPTY: FormState = {
   published_at: new Date().toISOString().slice(0, 10),
 };
 
+type NewsSection = "all" | string;
+
 export default function AdminNews() {
+  const [section, setSection] = useState<NewsSection>("all");
   const [items, setItems] = useState<NewsItem[]>([]);
   const [form, setForm] = useState<FormState>(EMPTY);
   const [editing, setEditing] = useState(false);
@@ -124,12 +127,33 @@ export default function AdminNews() {
 
   if (!supabase) return null;
 
+  // Group posts by publication year so staff can browse the archive.
+  const years = Array.from(
+    new Set(items.map((i) => i.published_at.slice(0, 4)).filter((y) => /^\d{4}$/.test(y))),
+  ).sort((a, b) => b.localeCompare(a));
+  const visible =
+    section === "all" ? items : items.filter((i) => i.published_at.slice(0, 4) === section);
+
+  const sectionTabs = [
+    { id: "all", label: `All (${items.length})` },
+    ...years.map((year) => ({
+      id: year,
+      label: `${year} (${items.filter((i) => i.published_at.slice(0, 4) === year).length})`,
+    })),
+  ];
+
   return (
     <div className="space-y-6">
       {error && <Notice kind="error">{error}</Notice>}
 
+      <SubTabs
+        tabs={sectionTabs}
+        active={section}
+        onChange={(id) => setSection(id)}
+      />
+
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500">{items.length} post(s)</p>
+        <p className="text-sm text-slate-500">{visible.length} post(s)</p>
         <Button onClick={() => startEdit()}>+ New Post</Button>
       </div>
 
@@ -202,7 +226,7 @@ export default function AdminNews() {
       )}
 
       <div className="space-y-3">
-        {items.map((item) => (
+        {visible.map((item) => (
           <Card key={item.id} className="flex items-center justify-between gap-4 p-4">
             <div className="min-w-0">
               <p className="truncate font-semibold text-slate-900">
@@ -223,6 +247,14 @@ export default function AdminNews() {
           </Card>
         ))}
       </div>
+
+      {visible.length === 0 && (
+        <p className="rounded-xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-sm text-slate-500">
+          {section === "all"
+            ? "No posts yet — click \u201c+ New Post\u201d to add one."
+            : `No posts published in ${section}.`}
+        </p>
+      )}
     </div>
   );
 }

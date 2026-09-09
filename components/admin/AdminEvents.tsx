@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { uploadImage } from "@/lib/upload";
 import type { EventItem } from "@/lib/types";
-import { Button, Card, Field, Notice, TextArea, TextInput } from "./ui";
+import { Button, Card, Field, Notice, SubTabs, TextArea, TextInput } from "./ui";
 
 interface FormState {
   id: string | null;
@@ -32,7 +32,15 @@ const EMPTY: FormState = {
   image_url: "",
 };
 
+type EventsSection = "upcoming" | "past";
+
+const EVENTS_SECTIONS: { id: EventsSection; label: string }[] = [
+  { id: "upcoming", label: "Upcoming" },
+  { id: "past", label: "Past" },
+];
+
 export default function AdminEvents() {
+  const [section, setSection] = useState<EventsSection>("upcoming");
   const [items, setItems] = useState<EventItem[]>([]);
   const [form, setForm] = useState<FormState>(EMPTY);
   const [editing, setEditing] = useState(false);
@@ -137,12 +145,30 @@ export default function AdminEvents() {
 
   if (!supabase) return null;
 
+  // Split by date so staff can focus on what is coming up vs. what has
+  // already happened (past is shown most-recent-first).
+  const today = new Date().toISOString().slice(0, 10);
+  const upcoming = items.filter((i) => i.date >= today);
+  const past = [...items.filter((i) => i.date < today)].reverse();
+  const visible = section === "upcoming" ? upcoming : past;
+
+  const sectionTabs = EVENTS_SECTIONS.map((s) => ({
+    id: s.id,
+    label: `${s.label} (${s.id === "upcoming" ? upcoming.length : past.length})`,
+  }));
+
   return (
     <div className="space-y-6">
       {error && <Notice kind="error">{error}</Notice>}
 
+      <SubTabs
+        tabs={sectionTabs}
+        active={section}
+        onChange={(id) => setSection(id as EventsSection)}
+      />
+
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500">{items.length} event(s)</p>
+        <p className="text-sm text-slate-500">{visible.length} event(s)</p>
         <Button onClick={() => startEdit()}>+ New Event</Button>
       </div>
 
@@ -236,7 +262,7 @@ export default function AdminEvents() {
       )}
 
       <div className="space-y-3">
-        {items.map((item) => (
+        {visible.map((item) => (
           <Card key={item.id} className="flex items-center justify-between gap-4 p-4">
             <div className="flex min-w-0 items-center gap-3">
               {item.image_url && (
@@ -268,6 +294,14 @@ export default function AdminEvents() {
           </Card>
         ))}
       </div>
+
+      {visible.length === 0 && (
+        <p className="rounded-xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-sm text-slate-500">
+          {section === "upcoming"
+            ? "No upcoming events — click \u201c+ New Event\u201d to add one."
+            : "No past events yet."}
+        </p>
+      )}
     </div>
   );
 }
