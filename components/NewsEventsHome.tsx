@@ -10,6 +10,7 @@ import NewsCard from "./NewsCard";
 
 export default function NewsEventsHome() {
   const t = useTranslations("home");
+  const newsT = useTranslations("news");
   const common = useTranslations("common");
   const locale = useLocale();
   const [news, setNews] = useState<NewsItem[]>([]);
@@ -47,17 +48,23 @@ export default function NewsEventsHome() {
                 {common("viewAll")} →
               </Link>
             </div>
-            <div className="mt-6 grid gap-5 sm:grid-cols-2">
-              {news.map((item) => (
-                <NewsCard
-                  key={item.id}
-                  item={item}
-                  onRead={() =>
-                    window.open(`/${locale}/news/?post=${item.id}`, "_self")
-                  }
-                />
-              ))}
-            </div>
+            {news.length === 0 ? (
+              <p className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center text-sm text-slate-500">
+                {newsT("noNews")}
+              </p>
+            ) : (
+              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                {news.map((item) => (
+                  <NewsCard
+                    key={item.id}
+                    item={item}
+                    onRead={() =>
+                      window.open(`/${locale}/news/?post=${item.id}`, "_self")
+                    }
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Events */}

@@ -8,11 +8,12 @@ import { localized, type EventItem } from "@/lib/types";
 export default function EventsList({ events }: { events: EventItem[] }) {
   const locale = useLocale();
   const t = useTranslations("nav");
+  const news = useTranslations("news");
 
   if (events.length === 0) {
     return (
       <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center text-sm text-slate-500">
-        —
+        {news("noEvents")}
       </p>
     );
   }

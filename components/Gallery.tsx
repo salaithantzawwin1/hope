@@ -45,14 +45,16 @@ export default function Gallery({ title }: { title?: string }) {
     };
   }, [locale]);
 
+  // Renders just the grid (no page section wrapper): the About page already
+  // provides the container, heading and padding around this component.
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+    <div>
       {title && (
         <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
           {title}
         </h2>
       )}
-      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
+      <div className={`grid grid-cols-2 gap-4 md:grid-cols-3 ${title ? "mt-8" : "mt-6"}`}>
         {items.map((item, i) => (
           <figure
             key={item.id}
@@ -83,6 +85,6 @@ export default function Gallery({ title }: { title?: string }) {
           </figure>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
