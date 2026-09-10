@@ -27,7 +27,8 @@ export type RegistrationPayload = {
  * form"), paste the deployed /exec URL here. Keep this empty until then —
  * the form will show a friendly "not connected" message instead of failing.
  */
-export const REGISTRATION_ENDPOINT = "";
+export const REGISTRATION_ENDPOINT =
+  "https://script.google.com/macros/s/AKfycbzpJyV1JBNb7ScKFe3h2bYj2kJUBcENfs2MuZcO_qCOwvG-dMPgtA6t0mmpXuKrMVQ6/exec";
 
 /**
  * Public email shown to visitors with registration questions.
