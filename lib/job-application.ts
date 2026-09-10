@@ -32,7 +32,8 @@ export type JobApplicationPayload = {
  * application form"), paste the deployed /exec URL here. Keep this empty
  * until then — the form falls back to opening the visitor's email app.
  */
-export const APPLICATION_ENDPOINT = "";
+export const APPLICATION_ENDPOINT =
+  "https://script.google.com/macros/s/AKfycby84waf_QodYf4pwoICrUXRNK-LZIrf7OnvrTH0QzXvKrjJHY_prDuxCeeUW1j4toUROA/exec";
 
 /** Admin address that receives job applications (see Code.gs ADMIN_EMAIL). */
 export const APPLICATION_EMAIL = "iyfmyanmar.admin@gmail.com";
