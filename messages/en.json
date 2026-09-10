@@ -308,6 +308,7 @@
       "successText": "Thank you for applying. Our HR team will review your application and contact you soon.",
       "errorTitle": "Could not send",
       "errorText": "Something went wrong. Please try again, or email us directly:",
+      "notConfigured": "Online applications are being set up. For now, please email us your CV directly:",
       "validationName": "Please enter your full name.",
       "validationPhone": "Please enter your phone number.",
       "validationEmail": "Please enter a valid email address.",

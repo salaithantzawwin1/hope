@@ -323,7 +323,18 @@ export default function ApplyModal({
               )}
             </div>
 
-            {status === "error" && (
+            {status === "error" && errorKind === "notConfigured" && (
+              <div className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                <p>{f("notConfigured")}</p>
+                <a
+                  href={`mailto:${APPLICATION_EMAIL}`}
+                  className="mt-1 inline-block font-semibold underline"
+                >
+                  {APPLICATION_EMAIL}
+                </a>
+              </div>
+            )}
+            {status === "error" && errorKind !== "notConfigured" && (
               <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
                 <p>
                   <strong>{f("errorTitle")}</strong> — {f("errorText")}
