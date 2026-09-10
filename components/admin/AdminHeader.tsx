@@ -38,7 +38,12 @@ export default function AdminHeader() {
       if (!active) return;
       const parsed = parseJson<HeaderContent>(data?.value_en);
       // Merge with defaults so older saved rows still have every field.
-      if (parsed) setHeader({ ...FALLBACK_HEADER, ...parsed });
+      if (parsed) {
+        // Merge links using fallback order as source of truth
+        const dbLinkMap = new Map((parsed.links ?? []).map((l) => [l.href, l]));
+        const mergedLinks = FALLBACK_HEADER.links.map((fl) => dbLinkMap.get(fl.href) ?? fl);
+        setHeader({ ...FALLBACK_HEADER, ...parsed, links: mergedLinks });
+      }
       setLoaded(true);
     })();
     return () => {

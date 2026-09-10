@@ -83,7 +83,7 @@ export default function CarrierPageContent() {
           <p className="mt-3 text-slate-500">
             {pick(data.positions_subtitle_en, data.positions_subtitle_my)}
           </p>
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {data.positions.map((pos, i) => (
               <div
                 key={i}

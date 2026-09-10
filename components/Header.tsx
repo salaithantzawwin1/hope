@@ -37,15 +37,10 @@ export default function Header() {
   // The logo and nav menu items are edited from the Admin portal → Header
   // tab. Until a row exists — or for fields missing from an older saved row
   // — the fallback defaults are shown.
-  // Merge links so new fallback links (e.g. Carrier) appear even when the
-  // database was saved before they existed.
+  // Use FALLBACK order as source of truth; merge db overrides per-link.
   const dbLinks = db?.links ?? [];
-  const mergedLinks = [
-    ...FALLBACK_HEADER.links.filter(
-      (fl) => !dbLinks.some((dl) => dl.href === fl.href),
-    ),
-    ...dbLinks,
-  ];
+  const dbLinkMap = new Map(dbLinks.map((l) => [l.href, l]));
+  const mergedLinks = FALLBACK_HEADER.links.map((fl) => dbLinkMap.get(fl.href) ?? fl);
   const data = {
     ...FALLBACK_HEADER,
     ...(db ?? {}),
