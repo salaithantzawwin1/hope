@@ -49,7 +49,12 @@ export async function submitRegistration(
   try {
     const res = await fetch(REGISTRATION_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      // text/plain keeps this a CORS-safelisted "simple request" — no
+      // preflight. Apps Script does not answer OPTIONS preflights, so an
+      // application/json content type would make every browser submission
+      // fail (curl works fine, which hides the bug). doPost() reads
+      // e.postData.contents regardless of the content type.
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(data),
     });
     if (!res.ok) return { ok: false, error: "server" };
