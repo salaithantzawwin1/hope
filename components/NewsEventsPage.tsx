@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { fetchEvents, fetchNews } from "@/lib/db";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatDateShort } from "@/lib/format";
+import { Link } from "@/i18n/navigation";
 import { localized, type EventItem, type NewsItem } from "@/lib/types";
 import EventsList from "./EventsList";
 import NewsCard from "./NewsCard";
@@ -14,10 +15,12 @@ type Tab = "all" | "news" | "events";
 export default function NewsEventsPage() {
   const t = useTranslations("news");
   const common = useTranslations("common");
+  const nav = useTranslations("nav");
   const locale = useLocale();
   const [news, setNews] = useState<NewsItem[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
   const [selected, setSelected] = useState<NewsItem | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [tab, setTab] = useState<Tab>("all");
 
   useEffect(() => {
@@ -39,14 +42,18 @@ export default function NewsEventsPage() {
   }, []);
 
   const close = useCallback(() => setSelected(null), []);
+  const closeEvent = useCallback(() => setSelectedEvent(null), []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape") {
+        close();
+        closeEvent();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [close]);
+  }, [close, closeEvent]);
 
   const selectedTitle = selected
     ? localized(selected, locale, "title_en", "title_my")
@@ -160,33 +167,63 @@ export default function NewsEventsPage() {
           </article>
         )}
 
-        {/* All — news grid beside the events sidebar */}
+        {/* All — remaining news beside the events sidebar. The layout
+            adapts whenever one side has nothing to show, so no blank
+            column remains (a lone post becomes the hero, a lone side
+            stretches to fill). */}
         {tab === "all" && (
-          <div className="mt-10 grid gap-10 lg:grid-cols-5">
-            <div className="lg:col-span-3">
-              {gridNews.length > 0 ? (
-                <>
-                  {newsHeading}
-                  <div className="mt-5 grid gap-5 sm:grid-cols-2">
-                    {gridNews.map((item) => (
-                      <NewsCard key={item.id} item={item} onRead={setSelected} />
-                    ))}
-                  </div>
-                </>
-              ) : (
-                news.length === 0 && (
+          <div
+            className={`mt-10 grid gap-10 ${
+              gridNews.length > 0 && events.length > 0 ? "lg:grid-cols-5" : ""
+            }`}
+          >
+            {(gridNews.length > 0 || news.length === 0) && (
+              <div
+                className={
+                  gridNews.length > 0
+                    ? events.length > 0
+                      ? "lg:col-span-3"
+                      : ""
+                    : "mx-auto w-full max-w-3xl"
+                }
+              >
+                {gridNews.length > 0 ? (
+                  <>
+                    {newsHeading}
+                    <div
+                      className={`mt-5 grid gap-5 sm:grid-cols-2 ${
+                        events.length > 0 ? "" : "xl:grid-cols-3"
+                      }`}
+                    >
+                      {gridNews.map((item) => (
+                        <NewsCard key={item.id} item={item} onRead={setSelected} />
+                      ))}
+                    </div>
+                  </>
+                ) : (
                   <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center text-sm text-slate-500">
                     {t("noNews")}
                   </p>
-                )
-              )}
-            </div>
-            <div className="lg:col-span-2">
-              {eventsHeading}
-              <div className="mt-5">
-                <EventsList events={events} />
+                )}
               </div>
-            </div>
+            )}
+            {events.length > 0 && (
+              <div
+                className={
+                  gridNews.length > 0
+                    ? "lg:col-span-2"
+                    : "mx-auto w-full max-w-3xl"
+                }
+              >
+                {eventsHeading}
+                <div className="mt-5">
+                  <EventsList
+                    events={events}
+                    onDetails={(ev) => setSelectedEvent(ev)}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -215,7 +252,71 @@ export default function NewsEventsPage() {
           <div className="mx-auto mt-10 max-w-3xl">
             {eventsHeading}
             <div className="mt-5">
-              <EventsList events={events} />
+              <EventsList
+                events={events}
+                onDetails={(ev) => setSelectedEvent(ev)}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Event details modal */}
+        {selectedEvent && (
+          <div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
+            onClick={closeEvent}
+          >
+            <div
+              className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-label={localized(selectedEvent, locale, "title_en", "title_my")}
+            >
+              {selectedEvent.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={selectedEvent.image_url}
+                  alt={localized(selectedEvent, locale, "title_en", "title_my")}
+                  className="max-h-72 w-full object-contain"
+                />
+              ) : (
+                <div className="flex h-36 w-full items-center justify-center bg-gradient-to-br from-brand to-brand-light text-6xl">
+                  <span aria-hidden>📅</span>
+                </div>
+              )}
+              <div className="p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wider text-accent-dark">
+                  {formatDateShort(selectedEvent.date, locale)}
+                  {selectedEvent.time ? ` · ${selectedEvent.time}` : ""}
+                </p>
+                <h2 className="mt-2 text-2xl font-bold leading-snug text-slate-900">
+                  {localized(selectedEvent, locale, "title_en", "title_my")}
+                </h2>
+                {localized(selectedEvent, locale, "location_en", "location_my") && (
+                  <p className="mt-2 text-sm text-slate-500">
+                    📍 {localized(selectedEvent, locale, "location_en", "location_my")}
+                  </p>
+                )}
+                <div className="mt-4 whitespace-pre-line text-[15px] leading-relaxed text-slate-700">
+                  {localized(selectedEvent, locale, "description_en", "description_my")}
+                </div>
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <Link
+                    href={`/register?event=${selectedEvent.id}`}
+                    className="rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-dark"
+                  >
+                    {nav("register")}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={closeEvent}
+                    className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                  >
+                    {common("close")}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}

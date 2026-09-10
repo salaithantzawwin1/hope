@@ -5,10 +5,18 @@ import { Link } from "@/i18n/navigation";
 import { formatDateShort, monthShort } from "@/lib/format";
 import { localized, type EventItem } from "@/lib/types";
 
-export default function EventsList({ events }: { events: EventItem[] }) {
+export default function EventsList({
+  events,
+  onDetails,
+}: {
+  events: EventItem[];
+  /** When given, events with a description/flyer get a "Read More" button. */
+  onDetails?: (event: EventItem) => void;
+}) {
   const locale = useLocale();
   const t = useTranslations("nav");
   const news = useTranslations("news");
+  const common = useTranslations("common");
 
   if (events.length === 0) {
     return (
@@ -31,6 +39,9 @@ export default function EventsList({ events }: { events: EventItem[] }) {
         const date = new Date(`${event.date}T00:00:00`);
         const day = Number.isNaN(date.getTime()) ? event.date.slice(8) : date.getDate();
         const month = Number.isNaN(date.getTime()) ? "" : monthShort(event.date, locale);
+        const hasMore =
+          Boolean(localized(event, locale, "description_en", "description_my").trim()) ||
+          Boolean(event.image_url);
 
         return (
           <li
@@ -60,6 +71,15 @@ export default function EventsList({ events }: { events: EventItem[] }) {
               >
                 {t("register")}
               </Link>
+              {onDetails && hasMore && (
+                <button
+                  type="button"
+                  onClick={() => onDetails(event)}
+                  className="mt-1.5 block text-sm font-semibold text-brand transition-colors hover:text-brand-dark hover:underline"
+                >
+                  {common("readMore")} →
+                </button>
+              )}
             </div>
             {event.image_url && (
               <a
