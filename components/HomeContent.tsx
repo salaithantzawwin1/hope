@@ -125,7 +125,7 @@ export function HomeCta({ fallback }: { fallback: HomeCta }) {
   };
 
   return (
-    <section className="relative mx-4 overflow-hidden rounded-3xl bg-brand-light text-white sm:mx-6">
+    <section className="relative mx-4 mb-12 overflow-hidden rounded-3xl bg-brand-light text-white sm:mx-6">
       <div
         aria-hidden
         className="pointer-events-none absolute -left-24 top-0 h-48 w-48 rounded-full bg-accent/20 blur-3xl"
