@@ -493,8 +493,6 @@ export const FALLBACK_ACADEMICS_PROGRAMS: AcademicsPrograms = {
 /**
  * Fill in fields that may be missing on older saved Carrier content and
  * migrate the legacy single requirements list onto every position.
- * Per-job step/contact overrides that are empty are cleared so they
- * inherit the global values.
  */
 export function normalizeCarrier(
   parsed: Partial<CarrierContent> & {
@@ -510,14 +508,6 @@ export function normalizeCarrier(
     requirements_en: pos.requirements_en?.length ? pos.requirements_en : legacyEn,
     requirements_my: pos.requirements_my?.length ? pos.requirements_my : legacyMy,
     active: pos.active ?? true,
-    apply_steps_en: pos.apply_steps_en?.length ? pos.apply_steps_en : undefined,
-    apply_steps_my: pos.apply_steps_my?.length ? pos.apply_steps_my : undefined,
-    contact_phone_en: pos.contact_phone_en?.trim() ? pos.contact_phone_en : undefined,
-    contact_phone_my: pos.contact_phone_my?.trim() ? pos.contact_phone_my : undefined,
-    contact_email_en: pos.contact_email_en?.trim() ? pos.contact_email_en : undefined,
-    contact_email_my: pos.contact_email_my?.trim() ? pos.contact_email_my : undefined,
-    contact_note_en: pos.contact_note_en?.trim() ? pos.contact_note_en : undefined,
-    contact_note_my: pos.contact_note_my?.trim() ? pos.contact_note_my : undefined,
   }));
   return merged;
 }

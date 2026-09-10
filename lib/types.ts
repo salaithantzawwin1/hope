@@ -237,16 +237,6 @@ export interface CarrierPosition {
   requirements_my: string[];
   /** Inactive positions are hidden from the public Carrier page. */
   active: boolean;
-  /** Optional job-specific "How to Apply" steps. Empty = use the global steps. */
-  apply_steps_en?: { title: string; desc: string }[];
-  apply_steps_my?: { title: string; desc: string }[];
-  /** Optional job-specific contact overrides. Empty string = use the global value. */
-  contact_phone_en?: string;
-  contact_phone_my?: string;
-  contact_email_en?: string;
-  contact_email_my?: string;
-  contact_note_en?: string;
-  contact_note_my?: string;
 }
 
 /** Carrier page content (editable from the admin portal). */
