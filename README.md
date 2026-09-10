@@ -191,6 +191,44 @@ list as an **Excel (.xlsx) file** to the school.
 > Note: if the email fails (daily Gmail quota), the registration is still
 > saved in the Sheet — nothing is lost.
 
+## Job application form
+
+The **Apply Now** button on the Carrier page opens a popup form (name,
+phone, email, position, message and a **CV/Resume upload**). Submissions are
+sent to the same kind of free Google Apps Script web app as the registration
+form: each CV is saved to a **Google Drive folder** ("Hope Job
+Applications"), the application is logged in a **Google Sheet**, and an email
+with the CV attached is sent to `iyfmyanmar.admin@gmail.com`.
+
+### One-time setup (≈5 minutes, free)
+
+1. Open <https://sheets.new> and create a spreadsheet (any name).
+2. **Extensions → Apps Script**, delete the sample code, paste the whole
+   contents of `application-emailer/Code.gs`, and save (💾).
+3. At the top of the script, confirm `ADMIN_EMAIL` — this is the address
+   that receives the applications.
+4. **Deploy → New deployment → Web app**:
+   - *Execute as*: **Me**
+   - *Who has access*: **Anyone**
+   - Click **Deploy**, authorise the requested Google permissions, and copy
+     the `/exec` URL it shows.
+5. Paste that URL into `lib/job-application.ts` as `APPLICATION_ENDPOINT`,
+   then rebuild (`npm run build`) and re-upload `out/`.
+
+### What happens on each application
+
+- The CV is saved to the **Hope Job Applications** Drive folder (shareable
+  link recorded in the Sheet).
+- A row is appended to the **Applications** sheet (time, name, phone, email,
+  position, notes, CV file + Drive link).
+- The application is emailed to `ADMIN_EMAIL` **with the CV attached**, and
+  replies go straight to the applicant (`Reply-To` is set to their email).
+- If the email fails (daily Gmail quota), the CV is still in Drive and the
+  row is still in the Sheet — nothing is lost.
+
+> Until `APPLICATION_ENDPOINT` is set, the popup shows a friendly error with
+> a direct `mailto:` link so no applicant is turned away.
+
 ## Customization
 
 - **School name / contact details**: edit `messages/en.json` and
@@ -210,10 +248,11 @@ app/
   page.tsx           root redirect (language detection)
 components/
   admin/             portal editor components
-  Header, Footer, ...
-i18n/                next-intl routing + request config
-lib/                 supabase client, db helpers, uploads, types
-messages/            en.json + my.json (all UI copy)
+  Header, Footer, ...i18n/                 next-intl routing + request config
+lib/                  supabase client, db helpers, uploads, types
+messages/             en.json + my.json (all UI copy)
+registration-emailer/ Google Apps Script for the registration form
+application-emailer/  Google Apps Script for the job application form
 supabase/schema.sql  one-click Supabase setup
 ```
 

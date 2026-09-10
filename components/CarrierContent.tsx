@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
+import ApplyModal from "@/components/ApplyModal";
 import { fetchSiteContent } from "@/lib/db";
 import { FALLBACK_CARRIER, normalizeCarrier } from "@/lib/fallback-data";
 import type { CarrierContent } from "@/lib/types";
@@ -45,15 +46,17 @@ export default function CarrierPageContent() {
   const pickArr = (en: string[], my: string[]) => (isMy && my.length ? my : en);
   // Inactive jobs are hidden from the public page.
   const activePositions = data.positions.filter((pos) => pos.active);
-  const email = pick(data.contact_email_en, data.contact_email_my);
-  // Apply Now opens a mail draft; the subject pre-fills the chosen position.
-  // With a single active job the choice is automatic (no dropdown shown).
+  // Apply Now opens the application popup; the position is pre-selected
+  // with the job chosen in the CTA dropdown (automatic with a single job).
   const [jobChoice, setJobChoice] = useState(0);
+  const [applyOpen, setApplyOpen] = useState(false);
   const chosen =
     activePositions.length > 0
       ? activePositions[Math.min(jobChoice, activePositions.length - 1)]
       : undefined;
-  const applySubject = chosen ? pick(chosen.title_en, chosen.title_my) : "";
+  const positionTitles = activePositions.map((pos) =>
+    pick(pos.title_en, pos.title_my),
+  );
 
   return (
     <>
@@ -201,17 +204,27 @@ export default function CarrierPageContent() {
                     ))}
                   </select>
                 )}
-                <a
-                  href={`mailto:${email}?subject=${encodeURIComponent(applySubject)}`}
+                <button
+                  type="button"
+                  onClick={() => setApplyOpen(true)}
                   className="rounded-lg bg-accent px-5 py-2.5 text-center text-sm font-bold text-brand-dark shadow transition-colors hover:bg-accent-dark"
                 >
                   Apply Now
-                </a>
+                </button>
               </div>
             )}
           </div>
         </div>
       </section>
+
+      {/* Keyed by open state so each open starts a fresh application form. */}
+      <ApplyModal
+        key={applyOpen ? "open" : "closed"}
+        open={applyOpen}
+        onClose={() => setApplyOpen(false)}
+        positions={positionTitles}
+        initialPosition={chosen ? pick(chosen.title_en, chosen.title_my) : undefined}
+      />
     </>
   );
 }
