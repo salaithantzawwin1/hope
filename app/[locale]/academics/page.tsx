@@ -81,7 +81,7 @@ export default async function AcademicsPage({
 
       {/* CTA */}
       <section className="mx-4 mb-12 overflow-hidden rounded-3xl bg-brand-light text-white sm:mx-6">
-        <div className="mx-auto flex max-w-7xl 2xl:max-w-[1440px] flex-col items-start justify-between gap-5 px-4 py-10 sm:px-6 md:flex-row md:items-center">
+        <div className="mx-auto flex max-w-7xl 2xl:max-w-[1440px] flex-col items-start justify-between gap-5 px-4 py-10 sm:px-6 sm:py-12 md:flex-row md:items-center">
           <div className="max-w-xl">
             <h2 className="text-2xl font-bold sm:text-3xl">{t("ctaTitle")}</h2>
             <p className="mt-1.5 text-sm text-slate-100">{t("ctaText")}</p>
