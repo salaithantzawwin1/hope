@@ -327,13 +327,13 @@ export const FALLBACK_WHY_CHOOSE: WhyChoose = {
         "အရည်အချင်းပြည့်မီသော ဆရာ ဆရာမများက ကျောင်းသားတိုင်းကို ဂရုစိုက်ပြီး စံနှုန်းမြင့် ပညာရေးကို ဦးဆောင်ပေးပါသည်။",
     },
     {
-      icon: "🎓",
-      title_en: "One Stop Education",
-      title_my: "တစ်နေရာတည်း ပညာရေး",
+      icon: "🧠",
+      title_en: "Mind Education",
+      title_my: "စိတ်ပညာရေး",
       text_en:
-        "From Early Years to High School on one campus — inclusive guidance and support remove the need for costly external tuition.",
+        "Special mind education programmes, led by expert instructors, build strong character, emotional strength and healthy attitudes for every student.",
       text_my:
-        "နို့ဆိုင်းကနေ အထက်တန်းအထိ တစ်ကျောင်းတည်း — အခမဲ့ လမ်းညွှန်မှုများဖြင့် အခကြေးငွေကြီးမားသော အပြင်သင်တန်းများ မလိုအပ်တော့ပါ။",
+        "ကျွမ်းကျင်သော ဆရာများ၏ လမ်းညွှန်မှုဖြင့် စိတ်ပညာရေး သင်တန်းများ ပြုလုပ်ပေးခြင်းအားဖြင့် ကျောင်းသားတိုင်းတွင် စရိုက်ကောင်းမှု၊ စိတ်ကျန်းမာခိုင်မာမှုနှင့် ကျန်းမာသော စိတ်သဘောထားများ ဖြစ်ပေါ်လာစေပါသည်။",
     },
     {
       icon: "⚽",
