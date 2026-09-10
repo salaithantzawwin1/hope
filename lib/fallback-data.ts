@@ -161,6 +161,7 @@ export const FALLBACK_HEADER: HeaderContent = {
     { href: "/news", label_en: "News & Events", label_my: "သတင်းနှင့် ပွဲများ" },
     { href: "/gallery", label_en: "Gallery", label_my: "ဓာတ်ပုံပြခန်း" },
     { href: "/downloads", label_en: "Downloads", label_my: "ဒေါင်းလုဒ်များ" },
+    { href: "/carrier", label_en: "Carrier", label_my: "အလုပ်အကိုင်" },
   ],
 };
 
@@ -187,6 +188,7 @@ export const FALLBACK_FOOTER: FooterContent = {
     { href: "/news", label_en: "News & Events", label_my: "သတင်းနှင့် ပွဲများ" },
     { href: "/gallery", label_en: "Gallery", label_my: "ဓာတ်ပုံပြခန်း" },
     { href: "/downloads", label_en: "Downloads", label_my: "ဒေါင်းလုဒ်များ" },
+    { href: "/carrier", label_en: "Carrier", label_my: "အလုပ်အကိုင်" },
   ],
 };
 

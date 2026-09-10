@@ -266,6 +266,28 @@
     "download": "Download",
     "view": "View"
   },
+  "carrier": {
+    "title": "Carrier",
+    "intro": "Join our team of passionate educators and staff. We are always looking for talented individuals who share our vision of nurturing global citizens.",
+    "whyJoinTitle": "Why Join Hope?",
+    "whyJoinText": "At Hope International School, you will be part of a supportive community that values innovation, collaboration and professional growth. We offer competitive benefits, ongoing training opportunities and a vibrant work environment.",
+    "positionsTitle": "Open Positions",
+    "positionsSubtitle": "Current opportunities at Hope International School.",
+    "noPositions": "No open positions at this time. Check back soon!",
+    "howToApplyTitle": "How to Apply",
+    "step1Title": "Review Openings",
+    "step1Desc": "Browse our current vacancies and find a role that matches your skills and interests.",
+    "step2Title": "Prepare Documents",
+    "step2Desc": "Update your CV and prepare a cover letter explaining why you would be a great fit.",
+    "step3Title": "Submit Application",
+    "step3Desc": "Send your application documents to our HR team via email.",
+    "step4Title": "Interview & Onboarding",
+    "step4Desc": "Shortlisted candidates will be invited for an interview and school tour.",
+    "ctaTitle": "Ready to make a difference?",
+    "ctaText": "Send us your application and join our mission to nurture the next generation of global citizens.",
+    "ctaButton": "Send Your CV",
+    "ctaEmail": "hr@hopeinternationalschool.com"
+  },
   "footer": {
     "tagline": "Nurturing global citizens — an international education in the heart of Myanmar.",
     "quickLinks": "Quick Links",
