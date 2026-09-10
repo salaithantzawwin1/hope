@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/format";
 import { localized, type EventItem, type NewsItem } from "@/lib/types";
 import EventsList from "./EventsList";
 import NewsCard from "./NewsCard";
+import PageHeader from "./PageHeader";
 
 export default function NewsEventsPage() {
   const t = useTranslations("news");
@@ -52,13 +53,13 @@ export default function NewsEventsPage() {
     : "";
 
   return (
-    <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
-      <header className="max-w-2xl">
-        <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
-          {t("title")}
-        </h1>
-        <p className="mt-3 text-lg text-slate-600">{t("subtitle")}</p>
-      </header>
+    <>
+      <PageHeader title={t("title")}>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-200">
+          {t("subtitle")}
+        </p>
+      </PageHeader>
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
 
       <div className="mt-10 grid gap-10 lg:grid-cols-5">
         {/* News grid */}
@@ -135,5 +136,6 @@ export default function NewsEventsPage() {
         </div>
       )}
     </div>
+    </>
   );
 }
