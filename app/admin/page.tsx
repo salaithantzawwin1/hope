@@ -12,6 +12,7 @@ import AdminAcademics from "@/components/admin/AdminAcademics";
 import AdminSiteContent from "@/components/admin/AdminSiteContent";
 import AdminFooter from "@/components/admin/AdminFooter";
 import AdminHeader from "@/components/admin/AdminHeader";
+import AdminCarrier from "@/components/admin/AdminCarrier";
 import { Button, Notice } from "@/components/admin/ui";
 
 type Tab =
@@ -21,6 +22,7 @@ type Tab =
   | "home"
   | "about"
   | "academics"
+  | "carrier"
   | "gallery"
   | "header"
   | "footer";
@@ -39,6 +41,7 @@ const GROUPS: {
       { id: "news", label: "News" },
       { id: "events", label: "Events" },
       { id: "gallery", label: "Gallery" },
+      { id: "carrier", label: "Carrier" },
     ],
   },
   {
@@ -297,6 +300,7 @@ export default function AdminPage() {
             {tab === "about" && <AdminAbout />}
             {tab === "academics" && <AdminAcademics />}
             {tab === "gallery" && <AdminGallery />}
+            {tab === "carrier" && <AdminCarrier />}
             {tab === "header" && <AdminHeader />}
             {tab === "footer" && <AdminFooter />}
           </main>

@@ -37,7 +37,20 @@ export default function Header() {
   // The logo and nav menu items are edited from the Admin portal → Header
   // tab. Until a row exists — or for fields missing from an older saved row
   // — the fallback defaults are shown.
-  const data = { ...FALLBACK_HEADER, ...(db ?? {}) };
+  // Merge links so new fallback links (e.g. Carrier) appear even when the
+  // database was saved before they existed.
+  const dbLinks = db?.links ?? [];
+  const mergedLinks = [
+    ...FALLBACK_HEADER.links.filter(
+      (fl) => !dbLinks.some((dl) => dl.href === fl.href),
+    ),
+    ...dbLinks,
+  ];
+  const data = {
+    ...FALLBACK_HEADER,
+    ...(db ?? {}),
+    links: mergedLinks,
+  };
   const isMy = locale === "my";
   const pick = (en: string, my: string) => {
     const value = isMy && my.trim() ? my : en;

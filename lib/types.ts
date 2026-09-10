@@ -224,6 +224,53 @@ export interface AboutFacts {
   facts: AboutFact[];
 }
 
+/** A job position listed on the Carrier page. */
+export interface CarrierPosition {
+  title_en: string;
+  title_my: string;
+  type_en: string;
+  type_my: string;
+  desc_en: string;
+  desc_my: string;
+}
+
+/** Carrier page content (editable from the admin portal). */
+export interface CarrierContent {
+  /** Hero title (e.g. "We Are Hiring"). */
+  hero_title_en: string;
+  hero_title_my: string;
+  hero_subtitle_en: string;
+  hero_subtitle_my: string;
+  /** Why join section. */
+  why_title_en: string;
+  why_title_my: string;
+  why_text_en: string;
+  why_text_my: string;
+  /** Open positions section. */
+  positions_title_en: string;
+  positions_title_my: string;
+  positions_subtitle_en: string;
+  positions_subtitle_my: string;
+  positions: CarrierPosition[];
+  /** Job requirements section. */
+  requirements_title_en: string;
+  requirements_title_my: string;
+  requirements_en: string[];
+  requirements_my: string[];
+  /** How to apply section. */
+  apply_title_en: string;
+  apply_title_my: string;
+  apply_steps_en: { title: string; desc: string }[];
+  apply_steps_my: { title: string; desc: string }[];
+  /** Contact info for applying. */
+  contact_phone_en: string;
+  contact_phone_my: string;
+  contact_email_en: string;
+  contact_email_my: string;
+  contact_note_en: string;
+  contact_note_my: string;
+}
+
 /** Pick the localized field from a bilingual record. */
 export function localized<T>(
   row: T,
