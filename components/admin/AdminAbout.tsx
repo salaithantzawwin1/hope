@@ -37,7 +37,7 @@ function parseJson<T>(raw: string | undefined | null): T | null {
 type AboutSection = "mission" | "values" | "sections" | "facts";
 
 const ABOUT_SECTIONS: { id: AboutSection; label: string }[] = [
-  { id: "mission", label: "Mission & Vision" },
+  { id: "mission", label: "Purpose & Direction" },
   { id: "values", label: "Core Values" },
   { id: "sections", label: "Additional Sections" },
   { id: "facts", label: "School Facts" },
@@ -73,6 +73,10 @@ export default function AdminAbout() {
       const v = parseJson<AboutValues>(map.get(VALUES_KEY));
       const f = parseJson<AboutFacts>(map.get(FACTS_KEY));
       const s = parseJson<AboutCustomSection[]>(map.get(SECTIONS_KEY));
+      if (mv) {
+        // Rows saved before extra_cards existed lack the field.
+        mv.extra_cards ??= [];
+      }
       setMissionVision(mv ?? FALLBACK_ABOUT_MISSION_VISION);
       setValues(v ?? FALLBACK_ABOUT_VALUES);
       setFacts(f ?? FALLBACK_ABOUT_FACTS);
@@ -138,6 +142,14 @@ export default function AdminAbout() {
       ),
     );
 
+  const updateExtraCard = (ci: number, patch: Partial<AboutCustomCard>) =>
+    setMissionVision({
+      ...missionVision,
+      extra_cards: (missionVision.extra_cards ?? []).map((c, k) =>
+        k === ci ? { ...c, ...patch } : c,
+      ),
+    });
+
   if (!supabase) return null;
   if (!loaded) {
     return <p className="text-sm text-slate-500">Loading…</p>;
@@ -162,9 +174,12 @@ export default function AdminAbout() {
       {section === "mission" && (
       <Card className="space-y-4 p-5">
         <div>
-          <p className="text-sm font-bold text-slate-900">Mission &amp; Vision</p>
+          <p className="text-sm font-bold text-slate-900">Purpose &amp; Direction</p>
           <p className="text-xs text-slate-500">
-            The two cards at the top of the About page.
+            The cards at the top of the About page: Mission and Vision, plus
+            any extra cards you add below. On desktop the grid widens to fit
+            them — two cards side by side, three across, and up to four
+            across once you add a fourth.
           </p>
         </div>
         <LangRow
@@ -197,6 +212,73 @@ export default function AdminAbout() {
           onEn={(v) => setMissionVision({ ...missionVision, vision_text_en: v })}
           onMy={(v) => setMissionVision({ ...missionVision, vision_text_my: v })}
         />
+
+        <div className="space-y-3">
+          {(missionVision.extra_cards ?? []).map((card, ci) => (
+            <div
+              key={ci}
+              className="space-y-3 rounded-lg border border-slate-200 bg-slate-50/60 p-4"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Extra card {ci + 1}
+                </p>
+                <Button
+                  type="button"
+                  variant="danger"
+                  onClick={() =>
+                    setMissionVision({
+                      ...missionVision,
+                      extra_cards: (missionVision.extra_cards ?? []).filter(
+                        (_, k) => k !== ci,
+                      ),
+                    })
+                  }
+                >
+                  Remove
+                </Button>
+              </div>
+              <Field label="Icon (emoji)" hint="Shown in a gradient tile — e.g. 🎓, 🤝, 🌱">
+                <TextInput
+                  value={card.icon}
+                  onChange={(e) => updateExtraCard(ci, { icon: e.target.value })}
+                  placeholder="✨"
+                  className="max-w-40"
+                />
+              </Field>
+              <LangRow
+                label="Card title"
+                en={card.title_en}
+                my={card.title_my}
+                onEn={(v) => updateExtraCard(ci, { title_en: v })}
+                onMy={(v) => updateExtraCard(ci, { title_my: v })}
+              />
+              <LangRow
+                label="Card text"
+                en={card.text_en}
+                my={card.text_my}
+                textarea
+                onEn={(v) => updateExtraCard(ci, { text_en: v })}
+                onMy={(v) => updateExtraCard(ci, { text_my: v })}
+              />
+            </div>
+          ))}
+        </div>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() =>
+            setMissionVision({
+              ...missionVision,
+              extra_cards: [
+                ...(missionVision.extra_cards ?? []),
+                { icon: "✨", title_en: "", title_my: "", text_en: "", text_my: "" },
+              ],
+            })
+          }
+        >
+          + Add extra card
+        </Button>
       </Card>
       )}
 

@@ -51,6 +51,7 @@ export default async function AboutPage({
             vision_title_my: t("visionTitle"),
             vision_text_en: t("visionText"),
             vision_text_my: t("visionText"),
+            extra_cards: [],
           },
           values: {
             title_en: t("valuesTitle"),

@@ -77,59 +77,85 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
   const facts = data.facts;
   const sections = data.sections;
 
+  // Purpose & Direction cards: Mission + Vision + any admin-added extras.
+  const purposeCards = [
+    {
+      icon: "🎯",
+      title: pick(mv.mission_title_en, mv.mission_title_my),
+      text: pick(mv.mission_text_en, mv.mission_text_my),
+      accent: false,
+    },
+    {
+      icon: "🔭",
+      title: pick(mv.vision_title_en, mv.vision_title_my),
+      text: pick(mv.vision_text_en, mv.vision_text_my),
+      accent: true,
+    },
+    ...(mv.extra_cards ?? []).map((card, i) => ({
+      icon: card.icon.trim() || "✨",
+      title: pick(card.title_en, card.title_my),
+      text: pick(card.text_en, card.text_my),
+      accent: (i + 2) % 2 === 1,
+    })),
+  ];
+  // Desktop widens the grid as cards are added: 2 → 3 → 4 across.
+  const purposeCols =
+    purposeCards.length >= 4
+      ? "lg:grid-cols-4"
+      : purposeCards.length === 3
+        ? "lg:grid-cols-3"
+        : "";
+
   return (
     <>
-      {/* Mission & vision */}
+      {/* Mission, vision and extra purpose cards */}
       <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">
           {t("purposeEyebrow")}
         </p>
-        <div className="mt-6 grid gap-5 md:grid-cols-2">
-          {/* Mission */}
-          <article className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-brand/10 blur-2xl transition-colors duration-300 group-hover:bg-brand/20"
-            />
-            <div
-              aria-hidden
-              className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand to-brand-light"
-            />
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand to-brand-light text-xl shadow-md transition-transform duration-300 group-hover:scale-110">
-                <span aria-hidden>🎯</span>
+        <div
+          className={`mt-6 grid gap-5 sm:grid-cols-2 ${purposeCols}`}
+        >
+          {purposeCards.map((card, i) => (
+            <article
+              key={i}
+              className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+            >
+              <div
+                aria-hidden
+                className={`pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full blur-2xl transition-colors duration-300 ${
+                  card.accent
+                    ? "bg-accent/10 group-hover:bg-accent/20"
+                    : "bg-brand/10 group-hover:bg-brand/20"
+                }`}
+              />
+              <div
+                aria-hidden
+                className={`absolute inset-x-0 top-0 h-1 ${
+                  card.accent
+                    ? "bg-gradient-to-r from-accent to-accent-dark"
+                    : "bg-gradient-to-r from-brand to-brand-light"
+                }`}
+              />
+              <div className="flex items-center gap-3">
+                <div
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xl shadow-md transition-transform duration-300 group-hover:scale-110 ${
+                    card.accent
+                      ? "bg-gradient-to-br from-accent to-accent-dark"
+                      : "bg-gradient-to-br from-brand to-brand-light"
+                  }`}
+                >
+                  <span aria-hidden>{card.icon}</span>
+                </div>
+                <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
+                  {card.title}
+                </h2>
               </div>
-              <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
-                {pick(mv.mission_title_en, mv.mission_title_my)}
-              </h2>
-            </div>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
-              {pick(mv.mission_text_en, mv.mission_text_my)}
-            </p>
-          </article>
-
-          {/* Vision */}
-          <article className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-accent/10 blur-2xl transition-colors duration-300 group-hover:bg-accent/20"
-            />
-            <div
-              aria-hidden
-              className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent to-accent-dark"
-            />
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-dark text-xl shadow-md transition-transform duration-300 group-hover:scale-110">
-                <span aria-hidden>🔭</span>
-              </div>
-              <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
-                {pick(mv.vision_title_en, mv.vision_title_my)}
-              </h2>
-            </div>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
-              {pick(mv.vision_text_en, mv.vision_text_my)}
-            </p>
-          </article>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
+                {card.text}
+              </p>
+            </article>
+          ))}
         </div>
       </section>
 

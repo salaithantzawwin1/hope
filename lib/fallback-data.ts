@@ -264,6 +264,7 @@ export const FALLBACK_ABOUT_MISSION_VISION: AboutMissionVision = {
     "To be the leading international school in Myanmar — a place where every student is known, valued and inspired to reach their full potential.",
   vision_text_my:
     "မြန်မာနိုင်ငံ၏ ဦးဆောင်သော နိုင်ငံတကာကျောင်း ဖြစ်လာရန် — ကျောင်းသားတိုင်းကို သိရှိနားလည်ကာ တန်ဖိုးထားပြီး မိမိ၏ အလားအလာ အပြည့်အဝ ရောက်ရှိရန် စေ့ဆော်ပေးသော နေရာ။",
+  extra_cards: [],
 };
 
 export const FALLBACK_ABOUT_VALUES: AboutValues = {

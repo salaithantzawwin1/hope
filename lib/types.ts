@@ -123,6 +123,11 @@ export interface AboutMissionVision {
   vision_title_my: string;
   vision_text_en: string;
   vision_text_my: string;
+  /**
+   * Extra cards appended after Mission and Vision in the same
+   * "Purpose & Direction" grid (desktop shows up to 4 across).
+   */
+  extra_cards: AboutCustomCard[];
 }
 
 export interface AboutValue {
