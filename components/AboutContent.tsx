@@ -231,7 +231,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
       ))}
 
       {/* Why Choose Hope? (dark band) */}
-      <section className="relative overflow-hidden bg-brand-dark text-white">
+      <section className="relative mx-4 overflow-hidden rounded-3xl bg-brand-dark text-white sm:mx-6">
         <div
           aria-hidden
           className="pointer-events-none absolute -right-24 top-0 h-64 w-64 rounded-full bg-brand-light/20 blur-3xl"
@@ -307,7 +307,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
       </section>
 
       {/* Facts */}
-      <section className="relative overflow-hidden bg-brand-light text-white">
+      <section className="relative mx-4 overflow-hidden rounded-3xl bg-brand-light text-white sm:mx-6">
         <div
           aria-hidden
           className="pointer-events-none absolute -left-24 top-0 h-56 w-56 rounded-full bg-accent/20 blur-3xl"
