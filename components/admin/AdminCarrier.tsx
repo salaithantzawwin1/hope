@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { FALLBACK_CARRIER } from "@/lib/fallback-data";
+import {
+  FALLBACK_CARRIER,
+  normalizeCarrier,
+} from "@/lib/fallback-data";
 import type { CarrierContent, CarrierPosition } from "@/lib/types";
 import {
   Button,
   Card,
   Field,
   Notice,
+  SubTabs,
   TextArea,
   TextInput,
 } from "./ui";
@@ -24,9 +28,16 @@ function parseJson<T>(raw: string | undefined | null): T | null {
   }
 }
 
+/** A short label for a position tab (falls back through MY then a placeholder). */
+function positionLabel(pos: CarrierPosition, index: number) {
+  const name = pos.title_en.trim() || pos.title_my.trim();
+  return name || `Job ${index + 1}`;
+}
+
 export default function AdminCarrier() {
   const supabase = getSupabase();
   const [data, setData] = useState<CarrierContent>(FALLBACK_CARRIER);
+  const [jobTab, setJobTab] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -43,7 +54,7 @@ export default function AdminCarrier() {
         .maybeSingle();
       if (!active) return;
       const parsed = parseJson<CarrierContent>(row?.value_en);
-      if (parsed) setData({ ...FALLBACK_CARRIER, ...parsed });
+      if (parsed) setData(normalizeCarrier(parsed));
       setLoaded(true);
     })();
     return () => {
@@ -79,36 +90,12 @@ export default function AdminCarrier() {
     setData({ ...data, [key]: value });
   };
 
-  const updateArrayField = (
-    key: "requirements_en" | "requirements_my",
-    index: number,
-    value: string,
-  ) => {
-    const arr = [...data[key]];
-    arr[index] = value;
-    setData({ ...data, [key]: arr });
-  };
-
-  const addRequirement = (key: "requirements_en" | "requirements_my") => {
-    setData({ ...data, [key]: [...data[key], ""] });
-  };
-
-  const removeRequirement = (
-    key: "requirements_en" | "requirements_my",
-    index: number,
-  ) => {
-    const arr = [...data[key]];
-    arr.splice(index, 1);
-    setData({ ...data, [key]: arr });
-  };
-
   const updatePosition = (
     index: number,
-    field: keyof CarrierPosition,
-    value: string,
+    update: Partial<CarrierPosition>,
   ) => {
     const positions = [...data.positions];
-    positions[index] = { ...positions[index], [field]: value };
+    positions[index] = { ...positions[index], ...update };
     setData({ ...data, positions });
   };
 
@@ -117,15 +104,74 @@ export default function AdminCarrier() {
       ...data,
       positions: [
         ...data.positions,
-        { title_en: "", title_my: "", type_en: "", type_my: "", desc_en: "", desc_my: "" },
+        {
+          title_en: "",
+          title_my: "",
+          type_en: "",
+          type_my: "",
+          desc_en: "",
+          desc_my: "",
+          requirements_en: [],
+          requirements_my: [],
+          active: true,
+        },
       ],
     });
+    setJobTab(data.positions.length);
   };
 
   const removePosition = (index: number) => {
+    if (
+      !window.confirm(
+        `Remove "${positionLabel(data.positions[index], index)}"? This cannot be undone until you save.`,
+      )
+    )
+      return;
     const positions = [...data.positions];
     positions.splice(index, 1);
     setData({ ...data, positions });
+    setJobTab((tab) => Math.max(0, Math.min(tab, positions.length - 1)));
+  };
+
+  const movePosition = (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= data.positions.length) return;
+    const positions = [...data.positions];
+    [positions[index], positions[target]] = [positions[target], positions[index]];
+    setData({ ...data, positions });
+    setJobTab(target);
+  };
+
+  const togglePositionActive = (index: number) => {
+    updatePosition(index, { active: !data.positions[index].active });
+  };
+
+  const updateRequirement = (
+    index: number,
+    key: "requirements_en" | "requirements_my",
+    reqIndex: number,
+    value: string,
+  ) => {
+    const arr = [...data.positions[index][key]];
+    arr[reqIndex] = value;
+    updatePosition(index, { [key]: arr });
+  };
+
+  const addRequirement = (
+    index: number,
+    key: "requirements_en" | "requirements_my",
+  ) => {
+    updatePosition(index, { [key]: [...data.positions[index][key], ""] });
+  };
+
+  const removeRequirement = (
+    index: number,
+    key: "requirements_en" | "requirements_my",
+    reqIndex: number,
+  ) => {
+    const arr = [...data.positions[index][key]];
+    arr.splice(reqIndex, 1);
+    updatePosition(index, { [key]: arr });
   };
 
   const updateStep = (
@@ -155,10 +201,85 @@ export default function AdminCarrier() {
     setData({ ...data, [key]: steps });
   };
 
+  // --- Per-job overrides (undefined = inherit the global value) ---
+
+  const jobSteps = (
+    index: number,
+    key: "apply_steps_en" | "apply_steps_my",
+  ) => data.positions[index][key] ?? [];
+
+  const updateJobStep = (
+    index: number,
+    key: "apply_steps_en" | "apply_steps_my",
+    stepIndex: number,
+    field: "title" | "desc",
+    value: string,
+  ) => {
+    const steps = [...(data.positions[index][key] ?? [])];
+    steps[stepIndex] = { ...steps[stepIndex], [field]: value };
+    updatePosition(index, { [key]: steps });
+  };
+
+  const addJobStep = (
+    index: number,
+    key: "apply_steps_en" | "apply_steps_my",
+  ) => {
+    updatePosition(index, {
+      [key]: [...(data.positions[index][key] ?? []), { title: "", desc: "" }],
+    });
+  };
+
+  const removeJobStep = (
+    index: number,
+    key: "apply_steps_en" | "apply_steps_my",
+    stepIndex: number,
+  ) => {
+    const steps = [...(data.positions[index][key] ?? [])];
+    steps.splice(stepIndex, 1);
+    updatePosition(index, { [key]: steps });
+  };
+
+  const hasContactOverride = (index: number) => {
+    const p = data.positions[index];
+    return (
+      p.contact_phone_en !== undefined ||
+      p.contact_phone_my !== undefined ||
+      p.contact_email_en !== undefined ||
+      p.contact_email_my !== undefined ||
+      p.contact_note_en !== undefined ||
+      p.contact_note_my !== undefined
+    );
+  };
+
+  const clearContactOverride = (index: number) => {
+    updatePosition(index, {
+      contact_phone_en: undefined,
+      contact_phone_my: undefined,
+      contact_email_en: undefined,
+      contact_email_my: undefined,
+      contact_note_en: undefined,
+      contact_note_my: undefined,
+    });
+  };
+
+  const hasStepOverride = (index: number) => {
+    const p = data.positions[index];
+    return p.apply_steps_en !== undefined || p.apply_steps_my !== undefined;
+  };
+
+  const clearStepOverride = (index: number) => {
+    updatePosition(index, {
+      apply_steps_en: undefined,
+      apply_steps_my: undefined,
+    });
+  };
+
   if (!supabase) return null;
   if (!loaded) {
     return <p className="text-sm text-slate-500">Loading…</p>;
   }
+
+  const pos = data.positions[jobTab];
 
   return (
     <div className="space-y-6">
@@ -166,8 +287,10 @@ export default function AdminCarrier() {
       {saved && <Notice kind="info">All changes saved ✓</Notice>}
 
       <p className="text-sm text-slate-500">
-        Edit the Carrier (We Are Hiring) page content. Leave Burmese fields
-        empty to fall back to English. Save to publish immediately.
+        Edit the Carrier (We Are Hiring) page content. Each job has its own tab
+        with its own requirements — use Active/Inactive to show or hide a job
+        from the public page. Leave Burmese fields empty to fall back to
+        English. Save to publish immediately.
       </p>
 
       {/* Hero */}
@@ -240,14 +363,9 @@ export default function AdminCarrier() {
         </div>
       </Card>
 
-      {/* Positions */}
+      {/* Job Positions */}
       <Card className="space-y-4 p-5">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-bold text-slate-900">Job Positions</p>
-          <Button variant="secondary" onClick={addPosition}>
-            + Add Position
-          </Button>
-        </div>
+        <p className="text-sm font-bold text-slate-900">Job Positions</p>
         <div className="grid gap-3 lg:grid-cols-2">
           <Field label="Section Title (EN)">
             <TextInput
@@ -262,29 +380,83 @@ export default function AdminCarrier() {
             />
           </Field>
         </div>
-        {data.positions.map((pos, i) => (
-          <div key={i} className="rounded-lg border border-slate-200 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-bold text-slate-500">Position {i + 1}</p>
-              <button
-                type="button"
-                onClick={() => removePosition(i)}
-                className="text-xs text-red-500 hover:text-red-700"
-              >
-                Remove
-              </button>
+
+        {data.positions.length === 0 ? (
+          <p className="text-sm text-slate-500">No jobs yet. Add one below.</p>
+        ) : (
+          <SubTabs
+            tabs={data.positions.map((p, i) => ({
+              id: String(i),
+              label: positionLabel(p, i),
+              dot: p.active ? "green" : "gray",
+            }))}
+            active={String(jobTab)}
+            onChange={(id) => setJobTab(Number(id))}
+          />
+        )}
+
+        {pos && (
+          <div className="rounded-lg border border-slate-200 p-4 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-bold text-slate-500">
+                Job {jobTab + 1} of {data.positions.length}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => movePosition(jobTab, -1)}
+                  disabled={jobTab === 0}
+                  className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                  title="Move left"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={() => movePosition(jobTab, 1)}
+                  disabled={jobTab === data.positions.length - 1}
+                  className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                  title="Move right"
+                >
+                  →
+                </button>
+                <button
+                  type="button"
+                  onClick={() => togglePositionActive(jobTab)}
+                  className={`rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${
+                    pos.active
+                      ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                      : "bg-slate-200 text-slate-500 hover:bg-slate-300"
+                  }`}
+                >
+                  {pos.active ? "● Active" : "○ Inactive"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removePosition(jobTab)}
+                  className="text-xs text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
+            {!pos.active && (
+              <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
+                This job is inactive — it is hidden from the public Carrier page
+                until you set it back to Active.
+              </p>
+            )}
             <div className="grid gap-3 lg:grid-cols-2">
               <Field label="Title (EN)">
                 <TextInput
                   value={pos.title_en}
-                  onChange={(e) => updatePosition(i, "title_en", e.target.value)}
+                  onChange={(e) => updatePosition(jobTab, { title_en: e.target.value })}
                 />
               </Field>
               <Field label="Title (MY)">
                 <TextInput
                   value={pos.title_my}
-                  onChange={(e) => updatePosition(i, "title_my", e.target.value)}
+                  onChange={(e) => updatePosition(jobTab, { title_my: e.target.value })}
                 />
               </Field>
             </div>
@@ -292,14 +464,14 @@ export default function AdminCarrier() {
               <Field label="Type (EN)">
                 <TextInput
                   value={pos.type_en}
-                  onChange={(e) => updatePosition(i, "type_en", e.target.value)}
+                  onChange={(e) => updatePosition(jobTab, { type_en: e.target.value })}
                   placeholder="e.g. Full-time, Part-time"
                 />
               </Field>
               <Field label="Type (MY)">
                 <TextInput
                   value={pos.type_my}
-                  onChange={(e) => updatePosition(i, "type_my", e.target.value)}
+                  onChange={(e) => updatePosition(jobTab, { type_my: e.target.value })}
                   placeholder="ဥပမာ — အပြည့်အချိန်၊ အပိုင်းအချိန်"
                 />
               </Field>
@@ -309,94 +481,295 @@ export default function AdminCarrier() {
                 <TextArea
                   rows={2}
                   value={pos.desc_en}
-                  onChange={(e) => updatePosition(i, "desc_en", e.target.value)}
+                  onChange={(e) => updatePosition(jobTab, { desc_en: e.target.value })}
                 />
               </Field>
               <Field label="Description (MY)">
                 <TextArea
                   rows={2}
                   value={pos.desc_my}
-                  onChange={(e) => updatePosition(i, "desc_my", e.target.value)}
+                  onChange={(e) => updatePosition(jobTab, { desc_my: e.target.value })}
                 />
               </Field>
             </div>
-          </div>
-        ))}
-      </Card>
 
-      {/* Requirements */}
-      <Card className="space-y-4 p-5">
-        <p className="text-sm font-bold text-slate-900">Job Requirements</p>
-        <div className="grid gap-3 lg:grid-cols-2">
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-xs font-bold text-slate-500">English</p>
-              <button
-                type="button"
-                onClick={() => addRequirement("requirements_en")}
-                className="text-xs text-brand hover:underline"
-              >
-                + Add
-              </button>
+            {/* Requirements for this job */}
+            <div className="space-y-3 border-t border-slate-200 pt-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
+                Job Requirements (this job)
+              </p>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <p className="text-xs font-bold text-slate-500">English</p>
+                    <button
+                      type="button"
+                      onClick={() => addRequirement(jobTab, "requirements_en")}
+                      className="text-xs text-brand hover:underline"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {pos.requirements_en.map((req, i) => (
+                      <div key={i} className="flex gap-2">
+                        <TextInput
+                          value={req}
+                          onChange={(e) =>
+                            updateRequirement(jobTab, "requirements_en", i, e.target.value)
+                          }
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeRequirement(jobTab, "requirements_en", i)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    {pos.requirements_en.length === 0 && (
+                      <p className="text-xs text-slate-400">No requirements yet.</p>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <p className="text-xs font-bold text-slate-500">မြန်မာ</p>
+                    <button
+                      type="button"
+                      onClick={() => addRequirement(jobTab, "requirements_my")}
+                      className="text-xs text-brand hover:underline"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {pos.requirements_my.map((req, i) => (
+                      <div key={i} className="flex gap-2">
+                        <TextInput
+                          value={req}
+                          onChange={(e) =>
+                            updateRequirement(jobTab, "requirements_my", i, e.target.value)
+                          }
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeRequirement(jobTab, "requirements_my", i)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    {pos.requirements_my.length === 0 && (
+                      <p className="text-xs text-slate-400">
+                        လိုအပ်ချက် မရှိသေးပါ။
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              {data.requirements_en.map((req, i) => (
-                <div key={i} className="flex gap-2">
-                  <TextInput
-                    value={req}
-                    onChange={(e) =>
-                      updateArrayField("requirements_en", i, e.target.value)
-                    }
-                  />
+
+            {/* Per-job How to Apply steps (optional override) */}
+            <div className="space-y-3 border-t border-slate-200 pt-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
+                  How to Apply steps (this job)
+                </p>
+                {hasStepOverride(jobTab) ? (
                   <button
                     type="button"
-                    onClick={() => removeRequirement("requirements_en", i)}
-                    className="text-red-500 hover:text-red-700"
+                    onClick={() => clearStepOverride(jobTab)}
+                    className="text-xs text-slate-500 hover:text-slate-700 hover:underline"
                   >
-                    ✕
+                    Use global steps
                   </button>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-xs font-bold text-slate-500">မြန်မာ</p>
-              <button
-                type="button"
-                onClick={() => addRequirement("requirements_my")}
-                className="text-xs text-brand hover:underline"
-              >
-                + Add
-              </button>
-            </div>
-            <div className="space-y-2">
-              {data.requirements_my.map((req, i) => (
-                <div key={i} className="flex gap-2">
-                  <TextInput
-                    value={req}
-                    onChange={(e) =>
-                      updateArrayField("requirements_my", i, e.target.value)
-                    }
-                  />
+                ) : (
                   <button
                     type="button"
-                    onClick={() => removeRequirement("requirements_my", i)}
-                    className="text-red-500 hover:text-red-700"
+                    onClick={() => addJobStep(jobTab, "apply_steps_en")}
+                    className="text-xs text-brand hover:underline"
                   >
-                    ✕
+                    + Override for this job
                   </button>
+                )}
+              </div>
+              {hasStepOverride(jobTab) ? (
+                <div className="grid gap-4 lg:grid-cols-2">
+                  {(["apply_steps_en", "apply_steps_my"] as const).map((key) => (
+                    <div key={key}>
+                      <div className="mb-2 flex items-center justify-between">
+                        <p className="text-xs font-bold text-slate-500">
+                          {key === "apply_steps_en" ? "Steps (EN)" : "Steps (MY)"}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => addJobStep(jobTab, key)}
+                          className="text-xs text-brand hover:underline"
+                        >
+                          + Add
+                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        {jobSteps(jobTab, key).map((step, i) => (
+                          <div key={i} className="rounded-lg border border-slate-200 p-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <p className="text-xs text-slate-400">Step {i + 1}</p>
+                              <button
+                                type="button"
+                                onClick={() => removeJobStep(jobTab, key, i)}
+                                className="text-xs text-red-500 hover:text-red-700"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                            <TextInput
+                              value={step.title}
+                              onChange={(e) =>
+                                updateJobStep(jobTab, key, i, "title", e.target.value)
+                              }
+                              placeholder={key === "apply_steps_en" ? "Title" : "ခေါင်းစဉ်"}
+                            />
+                            <TextArea
+                              rows={2}
+                              value={step.desc}
+                              onChange={(e) =>
+                                updateJobStep(jobTab, key, i, "desc", e.target.value)
+                              }
+                              placeholder={key === "apply_steps_en" ? "Description" : "ဖော်ပြချက်"}
+                            />
+                          </div>
+                        ))}
+                        {jobSteps(jobTab, key).length === 0 && (
+                          <p className="text-xs text-slate-400">No steps yet.</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                <p className="text-xs text-slate-400">
+                  Using the global How to Apply steps below. Add a step to
+                  override them for this job.
+                </p>
+              )}
+            </div>
+
+            {/* Per-job contact info (optional override) */}
+            <div className="space-y-3 border-t border-slate-200 pt-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
+                  Contact info (this job)
+                </p>
+                {hasContactOverride(jobTab) ? (
+                  <button
+                    type="button"
+                    onClick={() => clearContactOverride(jobTab)}
+                    className="text-xs text-slate-500 hover:text-slate-700 hover:underline"
+                  >
+                    Use global contact info
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updatePosition(jobTab, {
+                        contact_phone_en: "",
+                        contact_phone_my: "",
+                        contact_email_en: "",
+                        contact_email_my: "",
+                        contact_note_en: "",
+                        contact_note_my: "",
+                      })
+                    }
+                    className="text-xs text-brand hover:underline"
+                  >
+                    + Override for this job
+                  </button>
+                )}
+              </div>
+              {hasContactOverride(jobTab) ? (
+                <div className="space-y-3">
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    <Field label="Phone (EN)">
+                      <TextInput
+                        value={pos.contact_phone_en ?? ""}
+                        onChange={(e) =>
+                          updatePosition(jobTab, { contact_phone_en: e.target.value })
+                        }
+                      />
+                    </Field>
+                    <Field label="Phone (MY)">
+                      <TextInput
+                        value={pos.contact_phone_my ?? ""}
+                        onChange={(e) =>
+                          updatePosition(jobTab, { contact_phone_my: e.target.value })
+                        }
+                      />
+                    </Field>
+                  </div>
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    <Field label="Email (EN)">
+                      <TextInput
+                        value={pos.contact_email_en ?? ""}
+                        onChange={(e) =>
+                          updatePosition(jobTab, { contact_email_en: e.target.value })
+                        }
+                      />
+                    </Field>
+                    <Field label="Email (MY)">
+                      <TextInput
+                        value={pos.contact_email_my ?? ""}
+                        onChange={(e) =>
+                          updatePosition(jobTab, { contact_email_my: e.target.value })
+                        }
+                      />
+                    </Field>
+                  </div>
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    <Field label="Button Text (EN)">
+                      <TextInput
+                        value={pos.contact_note_en ?? ""}
+                        onChange={(e) =>
+                          updatePosition(jobTab, { contact_note_en: e.target.value })
+                        }
+                      />
+                    </Field>
+                    <Field label="Button Text (MY)">
+                      <TextInput
+                        value={pos.contact_note_my ?? ""}
+                        onChange={(e) =>
+                          updatePosition(jobTab, { contact_note_my: e.target.value })
+                        }
+                      />
+                    </Field>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Leave a field empty to fall back to the global value below.
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400">
+                  Using the global contact info below.
+                </p>
+              )}
             </div>
           </div>
+        )}
+
+        <div>
+          <Button variant="secondary" onClick={addPosition}>
+            + Add Job
+          </Button>
         </div>
       </Card>
 
       {/* How to Apply */}
       <Card className="space-y-4 p-5">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-bold text-slate-900">How to Apply</p>
+          <p className="text-sm font-bold text-slate-900">How to Apply (Global Defaults)</p>
           <Button variant="secondary" onClick={() => addStep("apply_steps_en")}>
             + Add Step
           </Button>
@@ -485,7 +858,7 @@ export default function AdminCarrier() {
 
       {/* Contact Info */}
       <Card className="space-y-4 p-5">
-        <p className="text-sm font-bold text-slate-900">Contact Info</p>
+        <p className="text-sm font-bold text-slate-900">Contact Info (Global Defaults)</p>
         <div className="grid gap-3 lg:grid-cols-2">
           <Field label="Phone (EN)">
             <TextInput

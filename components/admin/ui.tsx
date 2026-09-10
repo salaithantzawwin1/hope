@@ -76,7 +76,7 @@ export function SubTabs({
   active,
   onChange,
 }: {
-  tabs: { id: string; label: string }[];
+  tabs: { id: string; label: string; dot?: "green" | "gray" }[];
   active: string;
   onChange: (id: string) => void;
 }) {
@@ -93,7 +93,16 @@ export function SubTabs({
               : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
           }`}
         >
-          {t.label}
+          <span className="inline-flex items-center gap-1.5">
+            {t.dot && (
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  t.dot === "green" ? "bg-emerald-500" : "bg-slate-400"
+                }`}
+              />
+            )}
+            {t.label}
+          </span>
         </button>
       ))}
     </div>

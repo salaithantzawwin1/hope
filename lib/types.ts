@@ -232,6 +232,21 @@ export interface CarrierPosition {
   type_my: string;
   desc_en: string;
   desc_my: string;
+  /** Requirements specific to this position. */
+  requirements_en: string[];
+  requirements_my: string[];
+  /** Inactive positions are hidden from the public Carrier page. */
+  active: boolean;
+  /** Optional job-specific "How to Apply" steps. Empty = use the global steps. */
+  apply_steps_en?: { title: string; desc: string }[];
+  apply_steps_my?: { title: string; desc: string }[];
+  /** Optional job-specific contact overrides. Empty string = use the global value. */
+  contact_phone_en?: string;
+  contact_phone_my?: string;
+  contact_email_en?: string;
+  contact_email_my?: string;
+  contact_note_en?: string;
+  contact_note_my?: string;
 }
 
 /** Carrier page content (editable from the admin portal). */
@@ -252,11 +267,9 @@ export interface CarrierContent {
   positions_subtitle_en: string;
   positions_subtitle_my: string;
   positions: CarrierPosition[];
-  /** Job requirements section. */
+  /** Job requirements section heading (requirements live on each position). */
   requirements_title_en: string;
   requirements_title_my: string;
-  requirements_en: string[];
-  requirements_my: string[];
   /** How to apply section. */
   apply_title_en: string;
   apply_title_my: string;

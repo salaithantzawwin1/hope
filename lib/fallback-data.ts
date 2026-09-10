@@ -490,6 +490,38 @@ export const FALLBACK_ACADEMICS_PROGRAMS: AcademicsPrograms = {
   ],
 };
 
+/**
+ * Fill in fields that may be missing on older saved Carrier content and
+ * migrate the legacy single requirements list onto every position.
+ * Per-job step/contact overrides that are empty are cleared so they
+ * inherit the global values.
+ */
+export function normalizeCarrier(
+  parsed: Partial<CarrierContent> & {
+    requirements_en?: string[];
+    requirements_my?: string[];
+  },
+): CarrierContent {
+  const merged = { ...FALLBACK_CARRIER, ...parsed } as CarrierContent;
+  const legacyEn = parsed.requirements_en ?? [];
+  const legacyMy = parsed.requirements_my ?? [];
+  merged.positions = merged.positions.map((pos) => ({
+    ...pos,
+    requirements_en: pos.requirements_en?.length ? pos.requirements_en : legacyEn,
+    requirements_my: pos.requirements_my?.length ? pos.requirements_my : legacyMy,
+    active: pos.active ?? true,
+    apply_steps_en: pos.apply_steps_en?.length ? pos.apply_steps_en : undefined,
+    apply_steps_my: pos.apply_steps_my?.length ? pos.apply_steps_my : undefined,
+    contact_phone_en: pos.contact_phone_en?.trim() ? pos.contact_phone_en : undefined,
+    contact_phone_my: pos.contact_phone_my?.trim() ? pos.contact_phone_my : undefined,
+    contact_email_en: pos.contact_email_en?.trim() ? pos.contact_email_en : undefined,
+    contact_email_my: pos.contact_email_my?.trim() ? pos.contact_email_my : undefined,
+    contact_note_en: pos.contact_note_en?.trim() ? pos.contact_note_en : undefined,
+    contact_note_my: pos.contact_note_my?.trim() ? pos.contact_note_my : undefined,
+  }));
+  return merged;
+}
+
 /** Defaults for the Carrier page, edited from the admin portal. */
 export const FALLBACK_CARRIER: CarrierContent = {
   hero_title_en: "We Are Hiring",
@@ -514,30 +546,100 @@ export const FALLBACK_CARRIER: CarrierContent = {
       type_my: "အပိုင်းအချိန်",
       desc_en: "Working days: Monday to Friday",
       desc_my: "အလုပ်လုပ်ရက် — တနင်္လာမှ သောကြာ",
+      requirements_en: [
+        "Relevant Bachelor degree holder",
+        "Teaching certification or license (if applicable)",
+        "Additional qualification in ESL/EAL, Early Childhood is an advantage",
+        "Minimum 2 years of teaching experience in an international primary/elementary school",
+        "English proficiency (4 skills) at a professional teaching level",
+        "Ability to communicate clearly with students and parents",
+        "Able to use basic education technology",
+        "Willingness to attend school events, parent meetings, PD training",
+      ],
+      requirements_my: [
+        "သက်ဆိုင်ရာ ဘွဲ့ကြိုက်းရှိသူ",
+        "သင်ကြားခွင့်လက်မှတ် သို့မဟုတ် လိုင်စင် (ရှိပါက)",
+        "ESL/EAL၊ မူကြိုပညာရေးတွင် ထပ်ဆောင်းအရည်အချင်းရှိပါက အားသာချက်ဖြစ်သည်",
+        "နိုင်ငံတကာ မူလတန်းကျောင်းတွင် အနည်းဆုံး သင်ကြားရေးအတွေ့အကြုံ နှစ် ၂ ရှိရမည်",
+        "အင်္ဂလိပ်ဘာသာ ကျွမ်းကျင်မှု (စွမ်းရည် ၄ ခု) — ပညာရေးဆရာအဆင့်",
+        "ကျောင်းသားများနှင့် မိဘများနှင့် ရှင်းလင်းစွာ ဆက်သွယ်နိုင်မှု",
+        "အခြေခံပညာရေးနည်းပညာကို အသုံးပြုနိုင်မှု",
+        "ကျောင်းပွဲများ၊ မိဘအစည်းအဝေးများ၊ PD လေ့ကျင့်ရေးများတွင် တက်ရောက်ရန် ဆန္ဒရှိမှု",
+      ],
+      active: true,
+    },
+    {
+      title_en: "English Teacher (Primary)",
+      title_my: "အင်္ဂလိပ်စာ ဆရာ/ဆရာမ (မူလတန်း)",
+      type_en: "Full-time",
+      type_my: "အချိန်ပြည့်",
+      desc_en: "Teach English language and literature to Primary students in an immersive, English-speaking classroom.",
+      desc_my: "အင်္ဂလိပ်ဘာသာဖြင့် ဆက်သွယ်ပြောဆိုသော ခန်းမှာ မူလတန်း ကျောင်းသားများကို အင်္ဂလိပ်စာနှင့် စာပေ သင်ကြားပေးမည်။",
+      requirements_en: [
+        "Bachelor's degree in English, Education or a related field",
+        "Minimum 2 years of experience teaching primary English",
+        "Excellent spoken and written English",
+        "Warm, patient and passionate about young learners",
+        "Willing to participate in school activities and parent meetings",
+      ],
+      requirements_my: [
+        "အင်္ဂလိပ်စာ၊ ပညာရေး (သို့) နယ်ပယ်နီးစပ်သည့် ဘွဲ့ရှိသူ",
+        "မူလတန်း အင်္ဂလိပ်စာ သင်ကြားရေး အတွေ့အကြုံ အနည်းဆုံး ၂ နှစ် ရှိရမည်",
+        "အင်္ဂလိပ်စကားပြောနှင့် ရေးသားမှု ကျွမ်းကျင်စွာ ပြောနိုင်၊ ရေးနိုင်ရမည်",
+        "ကလေးငယ်များအပေါ် ဂရုစိုက်ပြီး စိတ်အားထက်သန်သူ ဖြစ်ရမည်",
+        "ကျောင်းပွဲများနှင့် မိဘအစည်းအဝေးများတွင် ပါဝင်ဆောင်ရွက်နိုင်ရမည်",
+      ],
+      active: true,
+    },
+    {
+      title_en: "Mathematics Teacher (Middle School)",
+      title_my: "သင်္ချာ ဆရာ/ဆရာမ (အလယ်တန်း)",
+      type_en: "Full-time",
+      type_my: "အချိန်ပြည့်",
+      desc_en: "Teach Mathematics to Grade 5–8 students following the international curriculum.",
+      desc_my: "နိုင်ငံတကာ သင်ရိုးညွှန်းတမ်းအတိုင်း တန်း ၅-၈ ကျောင်းသားများကို သင်္ချာ သင်ကြားပေးမည်။",
+      requirements_en: [
+        "Bachelor's degree in Mathematics or a related field",
+        "Teaching certification is an advantage",
+        "At least 2 years of experience teaching middle school Mathematics",
+        "Able to explain concepts clearly to mixed-ability classes",
+        "Confident using smartboards and educational software",
+      ],
+      requirements_my: [
+        "သင်္ချာ (သို့) နယ်ပယ်နီးစပ်သည့် ဘွဲ့ရှိသူ",
+        "သင်ကြားခွင့်လက်မှတ် ရှိပါက အားသာချက်ဖြစ်သည်",
+        "အလယ်တန်း သင်္ချာ သင်ကြားရေး အတွေ့အကြုံ အနည်းဆုံး ၂ နှစ် ရှိရမည်",
+        "စွမ်းရည်ကွာခြားသော ကျောင်းသားများကို ရှင်းလင်းစွာ ရှင်းပြနိုင်ရမည်",
+        "Smartboard နှင့် ပညာရေးဆော့ဖ်ဝဲများကို ယုံကြည်စိတ်ချစွာ အသုံးပြုနိုင်ရမည်",
+      ],
+      active: true,
+    },
+    {
+      title_en: "School Librarian",
+      title_my: "ကျောင်းစာကြည့်တိုက်မှူး",
+      type_en: "Part-time",
+      type_my: "အပိုင်းအချိန်",
+      desc_en: "Manage the school library, reading programmes and book borrowing for all grades.",
+      desc_my: "ကျောင်းစာကြည့်တိုက်ကို စီမံခန့်ခွဲပြီး အတန်းအားလုံးအတွက် ဖတ်ရှုရေးအစီအစဉ်များနှင့် စာအုပ်ငှားပြန်စနစ်ကို တာဝန်ယူမည်။",
+      requirements_en: [
+        "Bachelor's degree in any field (Library Science is an advantage)",
+        "Love of books and experience encouraging children to read",
+        "Basic computer skills for catalogue and borrowing records",
+        "Well-organised, friendly and dependable",
+        "Able to communicate politely with students, teachers and parents",
+      ],
+      requirements_my: [
+        "မည်သည့်နယ်ပယ်မဆို ဘွဲ့ရှိသူ (Library Science ဘွဲ့ရှိပါက အားသာချက်)",
+        "စာအုပ်များကို ချစ်မြတ်နိုးပြီး ကလေးများကို စာဖတ်ရန် တွန်းအားပေးတတ်သူ",
+        "စာရင်းအင်းများအတွက် ကွန်ပျူတာအခြေခံ အသုံးပြုနိုင်မှု",
+        "စနစ်တကျ စီစဉ်တတ်ပြီး ယုံကြည်ရသော စိတ်ရှိရမည်",
+        "ကျောင်းသား၊ ဆရာ၊ မိဘများနှင့် ယဉ်ကျေးစွာ ဆက်သွယ်နိုင်ရမည်",
+      ],
+      active: true,
     },
   ],
   requirements_title_en: "Job Requirements",
   requirements_title_my: "အလုပ်ခွင် လိုအပ်ချက်များ",
-  requirements_en: [
-    "Relevant Bachelor degree holder",
-    "Teaching certification or license (if applicable)",
-    "Additional qualification in ESL/EAL, Early Childhood is an advantage",
-    "Minimum 2 years of teaching experience in an international primary/elementary school",
-    "English proficiency (4 skills) at a professional teaching level",
-    "Ability to communicate clearly with students and parents",
-    "Able to use basic education technology",
-    "Willingness to attend school events, parent meetings, PD training",
-  ],
-  requirements_my: [
-    "သက်ဆိုင်ရာ ဘွဲ့ကြိုက်းရှိသူ",
-    "သင်ကြားခွင့်လက်မှတ် သို့မဟုတ် လိုင်စင် (ရှိပါက)",
-    "ESL/EAL၊ မူကြိုပညာရေးတွင် ထပ်ဆောင်းအရည်အချင်းရှိပါက အားသာချက်ဖြစ်သည်",
-    "နိုင်ငံတကာ မူလတန်းကျောင်းတွင် အနည်းဆုံး သင်ကြားရေးအတွေ့အကြုံ နှစ် ၂ ရှိရမည်",
-    "အင်္ဂလိပ်ဘာသာ ကျွမ်းကျင်မှု (စွမ်းရည် ၄ ခု) — ပညာရေးဆရာအဆင့်",
-    "ကျောင်းသားများနှင့် မိဘများနှင့် ရှင်းလင်းစွာ ဆက်သွယ်နိုင်မှု",
-    "အခြေခံပညာရေးနည်းပညာကို အသုံးပြုနိုင်မှု",
-    "ကျောင်းပွဲများ၊ မိဘအစည်းအဝေးများ၊ PD လေ့ကျင့်ရေးများတွင် တက်ရောက်ရန် ဆန္ဒရှိမှု",
-  ],
   apply_title_en: "How to Apply",
   apply_title_my: "လျှောက်ထားနည်း",
   apply_steps_en: [
