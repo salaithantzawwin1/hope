@@ -84,49 +84,49 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">
           {t("purposeEyebrow")}
         </p>
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
+        <div className="mt-6 grid gap-5 md:grid-cols-2">
           {/* Mission */}
-          <article className="group relative overflow-hidden rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+          <article className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <div
               aria-hidden
-              className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-brand/10 blur-2xl transition-colors duration-300 group-hover:bg-brand/20"
+              className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-brand/10 blur-2xl transition-colors duration-300 group-hover:bg-brand/20"
             />
             <div
               aria-hidden
-              className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-brand to-brand-light"
+              className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand to-brand-light"
             />
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-brand-light text-2xl shadow-md transition-transform duration-300 group-hover:scale-110">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand to-brand-light text-xl shadow-md transition-transform duration-300 group-hover:scale-110">
                 <span aria-hidden>🎯</span>
               </div>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
                 {pick(mv.mission_title_en, mv.mission_title_my)}
               </h2>
             </div>
-            <p className="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg">
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
               {pick(mv.mission_text_en, mv.mission_text_my)}
             </p>
           </article>
 
           {/* Vision */}
-          <article className="group relative overflow-hidden rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+          <article className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <div
               aria-hidden
-              className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-accent/10 blur-2xl transition-colors duration-300 group-hover:bg-accent/20"
+              className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-accent/10 blur-2xl transition-colors duration-300 group-hover:bg-accent/20"
             />
             <div
               aria-hidden
-              className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-accent to-accent-dark"
+              className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent to-accent-dark"
             />
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-accent-dark text-2xl shadow-md transition-transform duration-300 group-hover:scale-110">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-dark text-xl shadow-md transition-transform duration-300 group-hover:scale-110">
                 <span aria-hidden>🔭</span>
               </div>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
                 {pick(mv.vision_title_en, mv.vision_title_my)}
               </h2>
             </div>
-            <p className="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg">
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
               {pick(mv.vision_text_en, mv.vision_text_my)}
             </p>
           </article>
@@ -150,18 +150,18 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
             </h2>
           ) : null}
           <div
-            className={`grid gap-6 md:grid-cols-2 ${
+            className={`grid gap-5 md:grid-cols-2 ${
               section.title_en.trim() || section.title_my.trim() ? "mt-10" : "mt-6"
             }`}
           >
             {section.cards.map((card, ci) => (
               <article
                 key={ci}
-                className="group relative overflow-hidden rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
                 <div
                   aria-hidden
-                  className={`pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full blur-2xl transition-colors duration-300 ${
+                  className={`pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full blur-2xl transition-colors duration-300 ${
                     ci % 2 === 0
                       ? "bg-brand/10 group-hover:bg-brand/20"
                       : "bg-accent/10 group-hover:bg-accent/20"
@@ -169,15 +169,15 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
                 />
                 <div
                   aria-hidden
-                  className={`absolute inset-x-0 top-0 h-1.5 ${
+                  className={`absolute inset-x-0 top-0 h-1 ${
                     ci % 2 === 0
                       ? "bg-gradient-to-r from-brand to-brand-light"
                       : "bg-gradient-to-r from-accent to-accent-dark"
                   }`}
                 />
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <div
-                    className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl shadow-md transition-transform duration-300 group-hover:scale-110 ${
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xl shadow-md transition-transform duration-300 group-hover:scale-110 ${
                       ci % 2 === 0
                         ? "bg-gradient-to-br from-brand to-brand-light"
                         : "bg-gradient-to-br from-accent to-accent-dark"
@@ -185,11 +185,11 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
                   >
                     <span aria-hidden>{card.icon.trim() || "✨"}</span>
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900">
+                  <h3 className="text-lg font-bold text-slate-900 sm:text-xl">
                     {pick(card.title_en, card.title_my)}
                   </h3>
                 </div>
-                <p className="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg">
+                <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
                   {pick(card.text_en, card.text_my)}
                 </p>
               </article>
