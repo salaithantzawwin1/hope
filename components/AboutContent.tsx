@@ -240,7 +240,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
           aria-hidden
           className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-accent/10 blur-3xl"
         />
-        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-14 sm:px-6">
+        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
           <h2 className="text-2xl font-bold text-accent sm:text-3xl">
             {pick(why.title_en, why.title_my)}
           </h2>
@@ -316,7 +316,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
           aria-hidden
           className="pointer-events-none absolute -right-24 bottom-0 h-56 w-56 rounded-full bg-brand-dark/40 blur-3xl"
         />
-        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-14 sm:px-6">
+        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
           <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-accent">
             {t("factsEyebrow")}
           </p>
