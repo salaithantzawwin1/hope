@@ -313,54 +313,54 @@ export const FALLBACK_WHY_CHOOSE: WhyChoose = {
       title_en: "International Standards",
       title_my: "နိုင်ငံတကာ စံနှုန်းများ",
       text_en:
-        "A balanced international curriculum taught in English and Burmese, preparing students for exams and universities worldwide.",
+        "A balanced international curriculum from Early Years to Grade 12 — taught in English with Myanmar language and culture at its heart, opening doors to universities worldwide.",
       text_my:
-        "အင်္ဂလိပ်နှင့် မြန်မာဘာသာဖြင့် သင်ကြားသော နိုင်ငံတကာ သင်ရိုးညွှန်းတမ်း — ကမ္ဘာ့စာမေးပွဲများနှင့် တက္ကသိုလ်များအတွက် ကြိုပြင်ပေးပါသည်။",
+        "နို့ဆိုင်းမှ ဂရိတ် ၁၂ အထိ မျှတသော နိုင်ငံတကာ သင်ရိုးညွှန်းတမ်း — အင်္ဂလိပ်ဘာသာဖြင့် သင်ကြားပြီး မြန်မာဘာသာနှင့် ယဉ်ကျေးမှုကို အခြေခံထားကာ ကမ္ဘာ့တက္ကသိုလ်များဆီ လမ်းဖွင့်ပေးပါသည်။",
     },
     {
       icon: "👩‍🏫",
       title_en: "Experienced Teachers",
       title_my: "အတွေ့အကြုံရှိ ဆရာ ဆရာမများ",
       text_en:
-        "Our qualified teachers lead by example — caring for every student and holding high standards in and out of the classroom.",
+        "40+ qualified teachers and a 1:15 teacher–student ratio mean small classes, individual attention and role models who care about every child.",
       text_my:
-        "အရည်အချင်းပြည့်မီသော ဆရာ ဆရာမများက ကျောင်းသားတိုင်းကို ဂရုစိုက်ပြီး စံနှုန်းမြင့် ပညာရေးကို ဦးဆောင်ပေးပါသည်။",
+        "အရည်အချင်းပြည့်မီ ဆရာ ဆရာမ ၄၀ ကျော်နှင့် ဆရာ–ကျောင်းသား ၁:၁၅ အချိုးကြောင့် အတန်းငယ်များ၊ တစ်ယောက်ချင်း ဂရုစိုက်မှုနှင့် ကလေးတိုင်းကို ချစ်မြတ်နိုးသော ဆရာကောင်းများ ရရှိပါသည်။",
     },
     {
       icon: "🧠",
       title_en: "Mind Education",
       title_my: "စိတ်ပညာရေး",
       text_en:
-        "Special mind education programmes, led by expert instructors, build strong character, emotional strength and healthy attitudes for every student.",
+        "Mind education lectures by visiting experts — like Professor Dr. Gu Gyeong Hwa from Korea — and character education woven into daily learning build confidence, empathy and healthy attitudes.",
       text_my:
-        "ကျွမ်းကျင်သော ဆရာများ၏ လမ်းညွှန်မှုဖြင့် စိတ်ပညာရေး သင်တန်းများ ပြုလုပ်ပေးခြင်းအားဖြင့် ကျောင်းသားတိုင်းတွင် စရိုက်ကောင်းမှု၊ စိတ်ကျန်းမာခိုင်မာမှုနှင့် ကျန်းမာသော စိတ်သဘောထားများ ဖြစ်ပေါ်လာစေပါသည်။",
+        "ကိုရီးယားနိုင်ငံမှ ဒေါက်တာ Gu Gyeong Hwa ကဲ့သို့ ကျွမ်းကျင်သူများ၏ စိတ်ပညာရေး ဟောပြောချက်များနှင့် နေ့စဉ်သင်ကြားမှုထဲတွင် ထည့်သွင်းထားသော စရိုက်ပညာတို့က ယုံကြည်မှု၊ သနားကြင်နာမှုနှင့် ကျန်းမာသော စိတ်သဘောထားများ ဖြစ်စေပါသည်။",
     },
     {
       icon: "⚽",
       title_en: "Extra-Curricular Activities",
       title_my: "ပြင်ပလှုပ်ရှားမှုများ",
       text_en:
-        "Sports, clubs and community activities give students a holistic education and prepare them for success in all aspects of life.",
+        "Football, basketball, swimming, robotics, music and traditional Myanmar arts — a wide range of activities helps every student discover their strengths beyond the classroom.",
       text_my:
-        "အားကစား၊ ကလပ်များနှင့် လူမှုရေးလှုပ်ရှားမှုများဖြင့် ကျောင်းသားတို့၏ ဘဝအရပ်ရပ်တွင် အောင်မြင်ရေးကို ပြင်ဆင်ပေးပါသည်။",
+        "ဘောလုံး၊ ဘတ်စကက်ဘော၊ ရေကူး၊ စက်ရုပ်၊ တေးဂီတနှင့် မြန်မာရိုးရာအနုပညာ — ပြင်ပလှုပ်ရှားမှုများစွာက ကျောင်းသားတိုင်း၏ စွမ်းရည်ထူးချွန်မှုကို စာသင်ခန်းပြင်ပတွင် ရှာဖွေတွေ့ရှိစေပါသည်။",
     },
     {
       icon: "🛡️",
       title_en: "Facilities, Safety & Location",
       title_my: "အဆောက်အအုံ၊ လုံခြုံရေးနှင့် တည်နေရာ",
       text_en:
-        "Modern facilities and prioritised safety in a convenient location give parents peace of mind while upholding high educational standards.",
+        "Modern facilities, a caring culture of safety and an easy-to-reach location give families complete peace of mind every school day.",
       text_my:
-        "ခေတ်မီ အဆောက်အအုံများ၊ လုံခြုံရေးနှင့် သွားလာရလွယ်ကူသော တည်နေရာက မိဘများအတွက် စိတ်ချရသော နေရာဖြစ်စေပါသည်။",
+        "ခေတ်မီ အဆောက်အအုံများ၊ ဂရုစိုက်သော လုံခြုံရေးစနစ်နှင့် သွားလာရလွယ်ကူသော တည်နေရာက မိသားစုတိုင်းအတွက် ကျောင်းနေရသမျှ စိတ်ချမ်းသာမှု ပေးပါသည်။",
     },
     {
       icon: "🌟",
       title_en: "Quality Education for All",
       title_my: "အားလုံးအတွက် အရည်အချင်းပြည့်မီ ပညာရေး",
       text_en:
-        "We make international standard education accessible to every student, bridging the gap and opening doors to the world.",
+        "Every student is known, valued and inspired to reach their full potential — international-quality education made accessible to families in Myanmar.",
       text_my:
-        "နိုင်ငံတကာ စံနှုန်းပညာရေးကို ကျောင်းသားတိုင်းအတွက် ရရှိစေပြီး ကမ္ဘာကြီးဆီသို့ တံခါးများ ဖွင့်ပေးပါသည်။",
+        "ကျောင်းသားတိုင်းကို သိရှိနားလည်ကာ တန်ဖိုးထားပြီး မိမိ၏ အလားအလာ အပြည့်အဝ ရောက်ရှိရန် စေ့ဆော်ပေးပါသည် — နိုင်ငံတကာအရည်အသွေးမြင့် ပညာရေးကို မြန်မာမိသားစုများ ရရှိနိုင်အောင် ပြုလုပ်ပေးပါသည်။",
     },
   ],
 };
