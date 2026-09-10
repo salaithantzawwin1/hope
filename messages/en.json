@@ -239,7 +239,11 @@
     "newsTitle": "Latest News",
     "eventsTitle": "Upcoming Events",
     "noNews": "No news posts yet. Check back soon!",
-    "noEvents": "No upcoming events right now. Check back soon!"
+    "noEvents": "No upcoming events right now. Check back soon!",
+    "tabAll": "All",
+    "tabNews": "News",
+    "tabEvents": "Events",
+    "latestBadge": "Latest"
   },
   "gallery": {
     "title": "Photo Gallery",
