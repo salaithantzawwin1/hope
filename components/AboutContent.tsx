@@ -8,7 +8,9 @@ import type {
   AboutFacts,
   AboutMissionVision,
   AboutValues,
+  WhyChoose,
 } from "@/lib/types";
+import { FALLBACK_WHY_CHOOSE } from "@/lib/fallback-data";
 
 const VALUE_ICONS = ["🤝", "⚖️", "🌟", "🏘️"];
 
@@ -26,6 +28,7 @@ interface AboutData {
   values: AboutValues;
   facts: AboutFacts;
   sections: AboutCustomSection[];
+  whyChoose: WhyChoose;
 }
 
 /**
@@ -50,12 +53,14 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
       const values = parseJson<AboutValues>(map["about_values"]?.en);
       const facts = parseJson<AboutFacts>(map["about_facts"]?.en);
       const sections = parseJson<AboutCustomSection[]>(map["about_sections"]?.en);
-      if (missionVision || values || facts || sections) {
+      const whyChoose = parseJson<WhyChoose>(map["about_why_choose"]?.en);
+      if (missionVision || values || facts || sections || whyChoose) {
         setDb({
           missionVision: missionVision ?? fallback.missionVision,
           values: values ?? fallback.values,
           facts: facts ?? fallback.facts,
           sections: sections ?? fallback.sections,
+          whyChoose: whyChoose ?? fallback.whyChoose,
         });
       }
     });
@@ -76,6 +81,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
   const values = data.values;
   const facts = data.facts;
   const sections = data.sections;
+  const why = data.whyChoose ?? FALLBACK_WHY_CHOOSE;
 
   // Purpose & Direction cards: Mission + Vision + any admin-added extras.
   const purposeCards = [
@@ -223,6 +229,40 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
           </div>
         </section>
       ))}
+
+      {/* Why Choose Hope? (dark band) */}
+      <section className="relative overflow-hidden bg-brand-dark text-white">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 top-0 h-64 w-64 rounded-full bg-brand-light/20 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-accent/10 blur-3xl"
+        />
+        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-14 sm:px-6">
+          <h2 className="text-2xl font-bold text-accent sm:text-3xl">
+            {pick(why.title_en, why.title_my)}
+          </h2>
+          <div className="mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {why.items.map((item, i) => (
+              <div key={i} className="flex gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-2xl">
+                  <span aria-hidden>{item.icon.trim() || "✨"}</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-accent">
+                    {pick(item.title_en, item.title_my)}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-200">
+                    {pick(item.text_en, item.text_my)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Values */}
       <section className="bg-cream">

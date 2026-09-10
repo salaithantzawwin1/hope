@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import AboutContent from "@/components/AboutContent";
 import PageHeader from "@/components/PageHeader";
 import SiteText from "@/components/SiteText";
+import { FALLBACK_WHY_CHOOSE } from "@/lib/fallback-data";
 
 export async function generateMetadata({
   params,
@@ -74,6 +75,7 @@ export default async function AboutPage({
             })),
           },
           sections: [],
+          whyChoose: FALLBACK_WHY_CHOOSE,
         }}
       />
 

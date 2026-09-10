@@ -137,6 +137,21 @@ export interface AboutValue {
   desc_my: string;
 }
 
+/** One "Why Choose Hope?" highlight (icon + title + text). */
+export interface WhyChooseItem {
+  icon: string;
+  title_en: string;
+  title_my: string;
+  text_en: string;
+  text_my: string;
+}
+
+export interface WhyChoose {
+  title_en: string;
+  title_my: string;
+  items: WhyChooseItem[];
+}
+
 export interface AboutValues {
   title_en: string;
   title_my: string;

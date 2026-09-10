@@ -3,6 +3,7 @@ import type {
   AboutFacts,
   AboutMissionVision,
   AboutValues,
+  WhyChoose,
   AcademicsCurriculum,
   AcademicsLevels,
   AcademicsPrograms,
@@ -298,6 +299,68 @@ export const FALLBACK_ABOUT_VALUES: AboutValues = {
       desc_en: "We care for one another and work together — students, families and staff.",
       desc_my:
         "ကျောင်းသား၊ မိသားစုနှင့် ဝန်ထမ်းများ — အချင်းချင်း ဂရုစိုက်ပြီး အတူတကွ လုပ်ဆောင်ပါသည်။",
+    },
+  ],
+};
+
+/** Defaults for the "Why Choose Hope?" section, edited from the admin portal. */
+export const FALLBACK_WHY_CHOOSE: WhyChoose = {
+  title_en: "Why Choose Hope?",
+  title_my: "Hope ကို ဘာကြောင့် ရွေးချယ်သင့်သလဲ။",
+  items: [
+    {
+      icon: "🏫",
+      title_en: "International Standards",
+      title_my: "နိုင်ငံတကာ စံနှုန်းများ",
+      text_en:
+        "A balanced international curriculum taught in English and Burmese, preparing students for exams and universities worldwide.",
+      text_my:
+        "အင်္ဂလိပ်နှင့် မြန်မာဘာသာဖြင့် သင်ကြားသော နိုင်ငံတကာ သင်ရိုးညွှန်းတမ်း — ကမ္ဘာ့စာမေးပွဲများနှင့် တက္ကသိုလ်များအတွက် ကြိုပြင်ပေးပါသည်။",
+    },
+    {
+      icon: "👩‍🏫",
+      title_en: "Experienced Teachers",
+      title_my: "အတွေ့အကြုံရှိ ဆရာ ဆရာမများ",
+      text_en:
+        "Our qualified teachers lead by example — caring for every student and holding high standards in and out of the classroom.",
+      text_my:
+        "အရည်အချင်းပြည့်မီသော ဆရာ ဆရာမများက ကျောင်းသားတိုင်းကို ဂရုစိုက်ပြီး စံနှုန်းမြင့် ပညာရေးကို ဦးဆောင်ပေးပါသည်။",
+    },
+    {
+      icon: "🎓",
+      title_en: "One Stop Education",
+      title_my: "တစ်နေရာတည်း ပညာရေး",
+      text_en:
+        "From Early Years to High School on one campus — inclusive guidance and support remove the need for costly external tuition.",
+      text_my:
+        "နို့ဆိုင်းကနေ အထက်တန်းအထိ တစ်ကျောင်းတည်း — အခမဲ့ လမ်းညွှန်မှုများဖြင့် အခကြေးငွေကြီးမားသော အပြင်သင်တန်းများ မလိုအပ်တော့ပါ။",
+    },
+    {
+      icon: "⚽",
+      title_en: "Extra-Curricular Activities",
+      title_my: "ပြင်ပလှုပ်ရှားမှုများ",
+      text_en:
+        "Sports, clubs and community activities give students a holistic education and prepare them for success in all aspects of life.",
+      text_my:
+        "အားကစား၊ ကလပ်များနှင့် လူမှုရေးလှုပ်ရှားမှုများဖြင့် ကျောင်းသားတို့၏ ဘဝအရပ်ရပ်တွင် အောင်မြင်ရေးကို ပြင်ဆင်ပေးပါသည်။",
+    },
+    {
+      icon: "🛡️",
+      title_en: "Facilities, Safety & Location",
+      title_my: "အဆောက်အအုံ၊ လုံခြုံရေးနှင့် တည်နေရာ",
+      text_en:
+        "Modern facilities and prioritised safety in a convenient location give parents peace of mind while upholding high educational standards.",
+      text_my:
+        "ခေတ်မီ အဆောက်အအုံများ၊ လုံခြုံရေးနှင့် သွားလာရလွယ်ကူသော တည်နေရာက မိဘများအတွက် စိတ်ချရသော နေရာဖြစ်စေပါသည်။",
+    },
+    {
+      icon: "🌟",
+      title_en: "Quality Education for All",
+      title_my: "အားလုံးအတွက် အရည်အချင်းပြည့်မီ ပညာရေး",
+      text_en:
+        "We make international standard education accessible to every student, bridging the gap and opening doors to the world.",
+      text_my:
+        "နိုင်ငံတကာ စံနှုန်းပညာရေးကို ကျောင်းသားတိုင်းအတွက် ရရှိစေပြီး ကမ္ဘာကြီးဆီသို့ တံခါးများ ဖွင့်ပေးပါသည်။",
     },
   ],
 };

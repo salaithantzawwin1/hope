@@ -7,6 +7,7 @@ import {
   FALLBACK_ABOUT_MISSION_VISION,
   FALLBACK_ABOUT_SECTIONS,
   FALLBACK_ABOUT_VALUES,
+  FALLBACK_WHY_CHOOSE,
 } from "@/lib/fallback-data";
 import type {
   AboutCustomCard,
@@ -16,6 +17,8 @@ import type {
   AboutMissionVision,
   AboutValue,
   AboutValues,
+  WhyChoose,
+  WhyChooseItem,
 } from "@/lib/types";
 import { LangRow } from "./bilingual";
 import { Button, Card, Field, Notice, SubTabs, TextInput } from "./ui";
@@ -24,6 +27,7 @@ const MISSION_VISION_KEY = "about_mission_vision";
 const VALUES_KEY = "about_values";
 const FACTS_KEY = "about_facts";
 const SECTIONS_KEY = "about_sections";
+const WHY_CHOOSE_KEY = "about_why_choose";
 
 function parseJson<T>(raw: string | undefined | null): T | null {
   if (!raw || !raw.trim()) return null;
@@ -34,10 +38,11 @@ function parseJson<T>(raw: string | undefined | null): T | null {
   }
 }
 
-type AboutSection = "mission" | "values" | "sections" | "facts";
+type AboutSection = "mission" | "why" | "values" | "sections" | "facts";
 
 const ABOUT_SECTIONS: { id: AboutSection; label: string }[] = [
   { id: "mission", label: "Purpose & Direction" },
+  { id: "why", label: "Why Choose Hope" },
   { id: "values", label: "Core Values" },
   { id: "sections", label: "Additional Sections" },
   { id: "facts", label: "School Facts" },
@@ -54,6 +59,7 @@ export default function AdminAbout() {
   const [sections, setSections] = useState<AboutCustomSection[]>(
     FALLBACK_ABOUT_SECTIONS,
   );
+  const [whyChoose, setWhyChoose] = useState<WhyChoose>(FALLBACK_WHY_CHOOSE);
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -66,13 +72,20 @@ export default function AdminAbout() {
       const { data } = await supabase
         .from("site_content")
         .select("key, value_en")
-        .in("key", [MISSION_VISION_KEY, VALUES_KEY, FACTS_KEY, SECTIONS_KEY]);
+        .in("key", [
+          MISSION_VISION_KEY,
+          VALUES_KEY,
+          FACTS_KEY,
+          SECTIONS_KEY,
+          WHY_CHOOSE_KEY,
+        ]);
       if (!active) return;
       const map = new Map<string, string>((data ?? []).map((r) => [r.key, r.value_en]));
       const mv = parseJson<AboutMissionVision>(map.get(MISSION_VISION_KEY));
       const v = parseJson<AboutValues>(map.get(VALUES_KEY));
       const f = parseJson<AboutFacts>(map.get(FACTS_KEY));
       const s = parseJson<AboutCustomSection[]>(map.get(SECTIONS_KEY));
+      const w = parseJson<WhyChoose>(map.get(WHY_CHOOSE_KEY));
       if (mv) {
         // Rows saved before extra_cards existed lack the field.
         mv.extra_cards ??= [];
@@ -81,6 +94,7 @@ export default function AdminAbout() {
       setValues(v ?? FALLBACK_ABOUT_VALUES);
       setFacts(f ?? FALLBACK_ABOUT_FACTS);
       setSections(s ?? FALLBACK_ABOUT_SECTIONS);
+      setWhyChoose(w ?? FALLBACK_WHY_CHOOSE);
       setLoaded(true);
     })();
     return () => {
@@ -100,6 +114,7 @@ export default function AdminAbout() {
         { key: VALUES_KEY, value_en: JSON.stringify(values), value_my: JSON.stringify(values) },
         { key: FACTS_KEY, value_en: JSON.stringify(facts), value_my: JSON.stringify(facts) },
         { key: SECTIONS_KEY, value_en: JSON.stringify(sections), value_my: JSON.stringify(sections) },
+        { key: WHY_CHOOSE_KEY, value_en: JSON.stringify(whyChoose), value_my: JSON.stringify(whyChoose) },
       ];
       for (const row of rows) {
         const { error } = await supabase
@@ -148,6 +163,12 @@ export default function AdminAbout() {
       extra_cards: (missionVision.extra_cards ?? []).map((c, k) =>
         k === ci ? { ...c, ...patch } : c,
       ),
+    });
+
+  const updateWhyItem = (i: number, patch: Partial<WhyChooseItem>) =>
+    setWhyChoose({
+      ...whyChoose,
+      items: whyChoose.items.map((item, j) => (j === i ? { ...item, ...patch } : item)),
     });
 
   if (!supabase) return null;
@@ -278,6 +299,87 @@ export default function AdminAbout() {
           }
         >
           + Add extra card
+        </Button>
+      </Card>
+      )}
+
+      {section === "why" && (
+      <Card className="space-y-4 p-5">
+        <div>
+          <p className="text-sm font-bold text-slate-900">Why Choose Hope</p>
+          <p className="text-xs text-slate-500">
+            The dark &quot;Why Choose Hope?&quot; band on the About page —
+            icon + title + text items in a 3-column grid (2 on tablet, 1 on
+            mobile).
+          </p>
+        </div>
+        <LangRow
+          label="Section title"
+          en={whyChoose.title_en}
+          my={whyChoose.title_my}
+          onEn={(v) => setWhyChoose({ ...whyChoose, title_en: v })}
+          onMy={(v) => setWhyChoose({ ...whyChoose, title_my: v })}
+        />
+        <div className="space-y-3">
+          {whyChoose.items.map((item, i) => (
+            <div key={i} className="space-y-3 rounded-lg border border-slate-200 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Item {i + 1}
+                </p>
+                <Button
+                  type="button"
+                  variant="danger"
+                  onClick={() =>
+                    setWhyChoose({
+                      ...whyChoose,
+                      items: whyChoose.items.filter((_, j) => j !== i),
+                    })
+                  }
+                >
+                  Remove
+                </Button>
+              </div>
+              <Field label="Icon (emoji)" hint="e.g. 🏫, 👩‍🏫, 🎓, ⚽, 🛡️, 🌟">
+                <TextInput
+                  value={item.icon}
+                  onChange={(e) => updateWhyItem(i, { icon: e.target.value })}
+                  placeholder="✨"
+                  className="max-w-40"
+                />
+              </Field>
+              <LangRow
+                label="Title"
+                en={item.title_en}
+                my={item.title_my}
+                onEn={(v) => updateWhyItem(i, { title_en: v })}
+                onMy={(v) => updateWhyItem(i, { title_my: v })}
+              />
+              <LangRow
+                label="Text"
+                en={item.text_en}
+                my={item.text_my}
+                textarea
+                onEn={(v) => updateWhyItem(i, { text_en: v })}
+                onMy={(v) => updateWhyItem(i, { text_my: v })}
+              />
+            </div>
+          ))}
+        </div>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() =>
+            setWhyChoose({
+              ...whyChoose,
+              items: [
+                ...whyChoose.items,
+                { icon: "✨", title_en: "", title_my: "", text_en: "", text_my: "" },
+              ],
+            })
+          }
+        >
+          + Add item
         </Button>
       </Card>
       )}
