@@ -165,8 +165,19 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
         </div>
       </section>
 
-      {/* Extra admin-added sections (two-card blocks like Mission & Vision) */}
-      {sections.map((section, si) => (
+      {/* Extra admin-added sections (two-card blocks like Mission & Vision).
+          Fully empty sections (added in the portal but never filled in) are
+          skipped so they don't render as blank padded gaps. */}
+      {sections
+        .filter(
+          (section) =>
+            section.eyebrow_en.trim() ||
+            section.eyebrow_my.trim() ||
+            section.title_en.trim() ||
+            section.title_my.trim() ||
+            section.cards.length > 0,
+        )
+        .map((section, si) => (
         <section
           key={si}
           className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6"
