@@ -34,8 +34,10 @@ export default function NewsEventsHome() {
         <div className="grid gap-10 lg:grid-cols-5">
           {/* News */}
           <div className="lg:col-span-3">
-            <div className="flex items-end justify-between gap-4">
-              <div>
+            {/* Row on tablet/desktop; stacked on phones so the "View all"
+                link never collides with the heading. */}
+            <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+              <div className="min-w-0">
                 <span className="text-xs font-bold uppercase tracking-widest text-brand">
                   {t("newsEyebrow")}
                 </span>
@@ -72,16 +74,14 @@ export default function NewsEventsHome() {
 
           {/* Events */}
           <div className="lg:col-span-2">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-brand">
-                  {t("eventsEyebrow")}
-                </span>
-                <h2 className="mt-1.5 text-2xl font-bold text-slate-900 sm:text-3xl">
-                  {t("eventsTitle")}
-                </h2>
-                <p className="mt-1 text-slate-500">{t("eventsSubtitle")}</p>
-              </div>
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-brand">
+                {t("eventsEyebrow")}
+              </span>
+              <h2 className="mt-1.5 text-2xl font-bold text-slate-900 sm:text-3xl">
+                {t("eventsTitle")}
+              </h2>
+              <p className="mt-1 text-slate-500">{t("eventsSubtitle")}</p>
             </div>
             <div className="mt-6">
               <EventsList events={events} />

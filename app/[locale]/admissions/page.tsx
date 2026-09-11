@@ -86,7 +86,7 @@ export default async function AdmissionsPage({
               {t("feesTitle")}
             </h2>
             <p className="mt-2 text-sm text-slate-500">{t("feesSubtitle")}</p>
-            <div className="mt-5 overflow-hidden rounded-xl border border-slate-200">
+            <div className="mt-5 overflow-x-auto rounded-xl border border-slate-200">
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="bg-brand text-white">

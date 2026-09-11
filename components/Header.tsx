@@ -90,13 +90,16 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 lg:flex">
+        {/* Desktop nav — only from xl (1280px) up: with 7 links plus the
+            locale switcher and CTA the row needs ~1100px, so at lg (1024px
+            laptops) it overflows. Below xl the hamburger menu is used.
+            Slightly denser at xl, roomier from 2xl. */}
+        <nav className="hidden items-center gap-0.5 xl:flex 2xl:gap-1">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-medium transition-colors 2xl:px-3 ${
                 isActive(link.href)
                   ? "bg-brand/10 text-brand"
                   : "text-slate-600 hover:bg-slate-100 hover:text-brand"
@@ -110,25 +113,25 @@ export default function Header() {
         <div className="flex items-center gap-2">        {/* Locale switcher */}
         <a
           href={otherHref}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:border-brand hover:text-brand"
+          className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-brand hover:text-brand"
         >
           {otherLabel}
         </a>
 
           <Link
             href="/admissions"
-            className="hidden rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-dark sm:block"
+            className="hidden rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-dark sm:block"
           >
             {t("admissions")}
           </Link>
 
-          {/* Mobile menu button */}
+          {/* Mobile menu button (shown below xl — see desktop nav note) */}
           <button
             type="button"
             aria-label="Menu"
             aria-expanded={open}
             onClick={() => setOpen(!open)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 lg:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 xl:hidden"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               {open ? (
@@ -141,9 +144,10 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile nav */}
+      {/* Mobile / tablet nav — a capped, scrollable sheet so 7+ links plus
+          the CTA never push the page content down on small screens. */}
       {open && (
-        <nav className="border-t border-slate-100 bg-white px-4 pb-4 pt-2 lg:hidden">
+        <nav className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-slate-100 bg-white px-4 pb-4 pt-2 xl:hidden">
           {links.map((link) => (
             <Link
               key={link.href}

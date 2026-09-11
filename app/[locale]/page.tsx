@@ -52,7 +52,7 @@ export default async function HomePage({
               en={t("heroTitle")}
               my={t("heroTitle")}
               as="h1"
-              className="mt-5 text-4xl font-bold leading-tight tracking-tight sm:text-5xl"
+              className="mt-5 text-4xl font-bold leading-tight tracking-tight text-balance sm:text-5xl"
             />
             <SiteText
               k="home_hero_subtitle"

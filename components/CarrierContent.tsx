@@ -68,7 +68,7 @@ export default function CarrierPageContent() {
             <span className="inline-block rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-accent">
               Hope International School
             </span>
-            <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+            <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-balance sm:text-5xl">
               {pick(data.hero_title_en, data.hero_title_my)}
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-slate-200">

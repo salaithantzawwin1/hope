@@ -263,11 +263,11 @@ export default function NewsEventsPage() {
         {/* Event details modal */}
         {selectedEvent && (
           <div
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm max-md:items-end max-md:p-0"
             onClick={closeEvent}
           >
             <div
-              className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+              className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl max-md:max-w-full max-md:rounded-b-none max-md:rounded-t-2xl"
               onClick={(e) => e.stopPropagation()}
               role="dialog"
               aria-modal="true"
@@ -324,11 +324,11 @@ export default function NewsEventsPage() {
         {/* Article modal */}
         {selected && (
           <div
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm max-md:items-end max-md:p-0"
             onClick={close}
           >
             <div
-              className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+              className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl max-md:max-w-full max-md:rounded-b-none max-md:rounded-t-2xl"
               onClick={(e) => e.stopPropagation()}
               role="dialog"
               aria-modal="true"

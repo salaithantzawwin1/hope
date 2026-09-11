@@ -142,7 +142,7 @@ export default function ApplyModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 max-md:items-end max-md:p-0"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -154,7 +154,7 @@ export default function ApplyModal({
         aria-modal="true"
         aria-label={f("title")}
         tabIndex={-1}
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl outline-none sm:p-8"
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl outline-none max-md:max-w-full max-md:rounded-b-none max-md:rounded-t-2xl sm:p-8"
       >
         <div className="flex items-start justify-between gap-4">
           <div>

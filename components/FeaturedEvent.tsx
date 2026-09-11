@@ -46,13 +46,14 @@ export default function FeaturedEvent() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        {/* 1 col on phones (flyer on top), 2 cols from tablet up. */}
         <div className="grid md:grid-cols-[2fr_3fr]">
           {/* Flyer */}
           <a
             href={event.image_url}
             target="_blank"
             rel="noreferrer"
-            className="group flex items-center justify-center bg-slate-100 p-6 sm:p-8"
+            className="group flex items-center justify-center bg-slate-100 p-6 sm:p-8 max-md:rounded-b-none max-md:border-b max-md:border-slate-200"
             aria-label={title}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -16,6 +16,22 @@ body {
   background: #ffffff;
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
+  /* Long admin-entered strings (URLs, emails) must never force a
+     horizontal page scroll — especially on phones. */
+  overflow-wrap: break-word;
+}
+
+/* Touch devices: iOS and iPadOS Safari auto-zoom the page when focusing
+   any input with font-size < 16px (our inputs are text-sm = 14px). Bump
+   form controls to 16px below the laptop breakpoint — matching the
+   header's touch-nav threshold — to stop the jarring zoom-jump, while
+   keeping the compact 14px look on desktop. */
+@media (max-width: 1279px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 ::selection {

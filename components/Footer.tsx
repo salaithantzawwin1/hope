@@ -45,8 +45,9 @@ export default function Footer() {
   return (
     <footer className="mt-auto bg-brand-dark text-slate-400">
       <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-5 sm:px-6">
-        {/* Row 1: brand (left) + contact strip (right) */}
-        <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
+        {/* Row 1: brand (left) + contact strip (right). Stacked on phones,
+            inline from tablet up (the strip wraps between md and lg). */}
+        <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-between">
           {/* Brand */}
           <div className="flex shrink-0 items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -63,8 +64,9 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Contact strip: address + phone + email + hours inline */}
-          <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-[11px]">
+          {/* Contact strip: address + phone + email + hours inline.
+              A subtle separator keeps wrapped items readable. */}
+          <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-[11px] md:justify-end">
             <span className="flex items-center gap-1.5">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
