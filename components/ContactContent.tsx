@@ -87,7 +87,9 @@ export default function ContactContent() {
       ),
       title: pick(data.address_title_en, data.address_title_my),
       lines: pick(data.address_en, data.address_my),
-      href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pick(data.address_en, data.address_my))}`,
+      href:
+        data.map_link_url?.trim() ||
+        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pick(data.address_en, data.address_my))}`,
       linkLabel: isMy ? "မြေပုံတွင် ကြည့်ရန်" : "View on map",
     },
     {
@@ -241,7 +243,10 @@ export default function ContactContent() {
           </div>
           <div className="mt-4 text-center">
             <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pick(data.address_en, data.address_my))}`}
+              href={
+                data.map_link_url?.trim() ||
+                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pick(data.address_en, data.address_my))}`
+              }
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-dark"

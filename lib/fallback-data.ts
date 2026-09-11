@@ -203,7 +203,7 @@ export const FALLBACK_CONTACT: ContactContent = {
   address_title_en: "Visit Us",
   address_title_my: "လာရောက်လည်ပတ်ရန်",
   address_en:
-    "No. 514(B), near Kyauk Gyi Taw Field, Bodo Dote Kone Village, Hlaing Tharyar Township, Yangon, Myanmar",
+    "No. 514(B), near Kyauk Gyi Taw Field, Bodo Dote Kone Village, Hmawbi Township, Yangon, Myanmar",
   address_my:
     "အမှတ် ၅၁၄ (ဘီ)၊ ကျောင်းကြီးတောကွင်းအနီး၊ ဘိုးဒေါနကုန်းကျေးရွာ၊ မှော်ဘီမြို့နယ်။",
   phone_title_en: "Call Us",
@@ -239,9 +239,10 @@ export const FALLBACK_CONTACT: ContactContent = {
     },
   ],
   map_embed_url:
-    "https://maps.google.com/maps?q=Hlaing%20Tharyar%20Township%2C%20Yangon%2C%20Myanmar&z=14&output=embed",
+    "https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d4537.5621763608515!2d96.092716!3d17.133990999999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTfCsDA4JzAyLjQiTiA5NsKwMDUnMzMuOCJF!5e1!3m2!1sen!2sth!4v1789099323608!5m2!1sen!2sth",
   map_title_en: "Find Us on the Map",
   map_title_my: "မြေပုံပေါ်တွင် ရှာဖွေပါ",
+  map_link_url: "https://www.google.com/maps/place/17%C2%B008'02.4%22N+96%C2%B005'33.8%22E/@17.133991,96.092716,1042m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d17.133991!4d96.092716",
 };
 
 /** Defaults for the Home page sections, edited from the admin portal. */

@@ -294,6 +294,16 @@ export default function AdminContact() {
             placeholder="https://www.google.com/maps?q=…&output=embed"
           />
         </Field>
+        <Field
+          label="Open-in-Maps button link"
+          hint="Where the “Open in Google Maps” / “View on map” buttons point. Paste the Share → Copy link URL of your pin, or leave empty to search by the address text."
+        >
+          <TextInput
+            value={data.map_link_url ?? ""}
+            onChange={(e) => update({ map_link_url: e.target.value })}
+            placeholder="https://maps.app.goo.gl/… or https://www.google.com/maps/place/…"
+          />
+        </Field>
         <LangRow
           label="Map section title"
           en={data.map_title_en}

@@ -103,6 +103,8 @@ export interface ContactContent {
   /** Optional bilingual caption shown above the map. */
   map_title_en: string;
   map_title_my: string;
+  /** Link opened by the "Open in Google Maps" buttons (defaults to an address search). */
+  map_link_url: string;
 }
 
 export interface GalleryImage {
