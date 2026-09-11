@@ -239,7 +239,7 @@ export const FALLBACK_CONTACT: ContactContent = {
     },
   ],
   map_embed_url:
-    "https://www.google.com/maps?q=16.0374,96.0297&hl=en&z=15&output=embed",
+    "https://maps.google.com/maps?q=Hlaing%20Tharyar%20Township%2C%20Yangon%2C%20Myanmar&z=14&output=embed",
   map_title_en: "Find Us on the Map",
   map_title_my: "မြေပုံပေါ်တွင် ရှာဖွေပါ",
 };

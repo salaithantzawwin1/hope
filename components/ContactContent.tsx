@@ -129,28 +129,31 @@ export default function ContactContent() {
 
   return (
     <>
-      {/* Hero */}
-      <section className="bg-brand-dark text-white">
-        <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6 sm:py-14">
-          <p className="text-xs font-bold uppercase tracking-widest text-accent">
-            {isMy ? "Hope အပြည်ပြည်ဆိုင်ရာ ကျောင်း" : "Hope International School"}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold sm:text-3xl">
-            {pick(data.hero_title_en, data.hero_title_my)}
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-100 sm:text-base">
-            {pick(data.hero_subtitle_en, data.hero_subtitle_my)}
-          </p>
+      {/* Hero — matches the Carrier hero treatment (gradient + pill badge). */}
+      <section className="relative overflow-hidden bg-brand-dark text-white">
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-dark via-brand to-brand-light opacity-90" />
+        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-16 sm:px-6 sm:py-20">
+          <div className="max-w-3xl">
+            <span className="inline-block rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-accent">
+              {isMy ? "Hope အပြည်ပြည်ဆိုင်ရာ ကျောင်း" : "Hope International School"}
+            </span>
+            <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+              {pick(data.hero_title_en, data.hero_title_my)}
+            </h1>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-slate-200">
+              {pick(data.hero_subtitle_en, data.hero_subtitle_my)}
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Contact info cards */}
-      <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6 sm:py-14">
+      <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6 sm:py-16">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((card, i) => (
             <div
               key={i}
-              className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
             >
               <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10 text-brand">
                 {card.icon}
@@ -235,6 +238,20 @@ export default function ContactContent() {
               allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"
             />
+          </div>
+          <div className="mt-4 text-center">
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pick(data.address_en, data.address_my))}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-dark"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1118 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              {isMy ? "Google Maps တွင် ဖွင့်ရန်" : "Open in Google Maps"}
+            </a>
           </div>
         </section>
       )}
