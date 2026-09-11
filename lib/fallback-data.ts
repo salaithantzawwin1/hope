@@ -8,6 +8,7 @@ import type {
   AcademicsLevels,
   AcademicsPrograms,
   CarrierContent,
+  AdmissionsContent,
   ContactContent,
   EventItem,
   FooterContent,
@@ -257,6 +258,85 @@ export const FALLBACK_HOME_HERO: HomeHero = {
   ],
   hero_image_url: "",
   welcome_image_url: "",
+};
+
+/**
+ * Defaults for the Admissions page (steps, documents, fees), edited from
+ * the admin portal. Mirrors messages/en.json + messages/my.json.
+ */
+export const FALLBACK_ADMISSIONS: AdmissionsContent = {
+  intro_en:
+    "We welcome applications throughout the year. Our team will guide you through every step — from your first campus tour to your child's first day.",
+  intro_my:
+    "တစ်နှစ်ပတ်လုံး လျှောက်လွှာများကို လက်ခံပါသည်။ ပထမဆုံး ကျောင်းဝင်း လေ့လာခြင်းမှ သင့်ကလေး၏ ပထမဆုံးနေ့အထိ အဆင့်တိုင်းတွင် ကျွန်ုပ်တို့၏ အဖွဲ့က လမ်းညွှန်ပေးပါမည်။",
+  steps_title_en: "How to Apply",
+  steps_title_my: "လျှောက်ထားနည်း",
+  steps: [
+    {
+      title_en: "Visit or Contact Us",
+      title_my: "လာရောက် လေ့လာပါ သို့မဟုတ် ဆက်သွယ်ပါ",
+      desc_en: "Book a campus tour or get in touch with our admissions office.",
+      desc_my: "ကျောင်းဝင်းလေ့လာခြင်း စာရင်းသွင်းပါ သို့မဟုတ် ကျွန်ုပ်တို့၏ ဝင်ခွင့်ရုံးကို ဆက်သွယ်ပါ။",
+    },
+    {
+      title_en: "Submit Application",
+      title_my: "လျှောက်လွှာ တင်သွင်းပါ",
+      desc_en: "Complete the application form with your child's details and documents.",
+      desc_my: "သင့်ကလေး၏ အချက်အလက်နှင့် စာရွက်စာတမ်းများဖြင့် လျှောက်လွှာပုံစံကို ဖြည့်စွက်ပါ။",
+    },
+    {
+      title_en: "Assessment & Interview",
+      title_my: "အကဲဖြတ်ခြင်းနှင့် တွေ့ဆုံမေးမြန်းခြင်း",
+      desc_en: "Your child joins a friendly assessment and a family interview with our team.",
+      desc_my: "သင့်ကလေးသည် ခင်မင်ရင်းနှီးသော အကဲဖြတ်မှုတစ်ခုနှင့် ကျွန်ုပ်တို့၏ အဖွဲ့နှင့် မိသားစု တွေ့ဆုံပွဲတွင် ပါဝင်ရပါမည်။",
+    },
+    {
+      title_en: "Offer of Place",
+      title_my: "နေရာကမ်းလှမ်းခြင်း",
+      desc_en: "Successful applicants receive an offer letter and enrolment pack.",
+      desc_my: "အောင်မြင်သော လျှောက်ထားသူများသည် လက်ခံစာနှင့် စာရင်းသွင်းရေး အထုပ်ကို လက်ခံရရှိပါသည်။",
+    },
+    {
+      title_en: "Enrolment",
+      title_my: "စာရင်းသွင်းခြင်း",
+      desc_en: "Complete the paperwork, pay the fees, and welcome to Hope!",
+      desc_my: "စာရွက်စာတမ်းများ ပြီးမြောက်ပါ၊ ကျောင်းလခ ပေးဆောင်ပါ — Hope သို့ ကြိုဆိုပါသည်!",
+    },
+  ],
+  requirements_title_en: "Required Documents",
+  requirements_title_my: "လိုအပ်သော စာရွက်စာတမ်းများ",
+  requirements_en: [
+    "Completed application form",
+    "Copy of the child's birth certificate",
+    "Copy of the child's passport (photo page)",
+    "Recent school reports or transcripts (if applicable)",
+    "Two passport-sized photos",
+    "Immunisation / health records",
+  ],
+  requirements_my: [
+    "ဖြည့်စွက်ပြီးသော လျှောက်လွှာပုံစံ",
+    "ကလေး၏ မွေးစာရင်း မိတ္တူ",
+    "ကလေး၏ နိုင်ငံကူးလက်မှတ် မိတ္တူ (ဓာတ်ပုံစာမျက်နှာ)",
+    "မကြာသေးမီက ကျောင်းအစီရင်ခံစာများ (ရှိလျှင်)",
+    "ဓာတ်ပုံ ၂ ပုံ (passport size)",
+    "ကာကွယ်ဆေးထိုးနှံမှု / ကျန်းမာရေး မှတ်တမ်းများ",
+  ],
+  fees_title_en: "Fees & Tuition",
+  fees_title_my: "ကျောင်းလခနှင့် သင်တန်းကြေး",
+  fees_subtitle_en:
+    "Annual tuition fees per programme. Please contact the admissions office for the full fee schedule, including registration and other charges.",
+  fees_subtitle_my:
+    "အစီအစဉ်အလိုက် နှစ်စဉ် ကျောင်းလခများ။ စာရင်းသွင်းခ နှင့် အခြားကုန်ကျစရိတ်များ ပါဝင်သည့် အပြည့်အစုံကို ဝင်ခွင့်ရုံးကို ဆက်သွယ်ပါ။",
+  fees_note_en:
+    "* Fees shown are indicative annual tuition fees and may change. Contact the school for the latest schedule.",
+  fees_note_my:
+    "* ဖော်ပြထားသော နှုန်းထားများသည် ခန့်မှန်း နှစ်စဉ် ကျောင်းလခများဖြစ်ပြီး ပြောင်းလဲနိုင်ပါသည်။ နောက်ဆုံးစာရင်းအတွက် ကျောင်းကို ဆက်သွယ်ပါ။",
+  fees: [
+    { level_en: "Early Years", level_my: "မူကြိုပညာရေး", fee_en: "MMK 4,500,000", fee_my: "ကျပ် ၄၅,၀၀,၀၀၀" },
+    { level_en: "Primary School", level_my: "မူလတန်း", fee_en: "MMK 6,000,000", fee_my: "ကျပ် ၆၀,၀၀,၀၀၀" },
+    { level_en: "Middle School", level_my: "အလယ်တန်း", fee_en: "MMK 7,000,000", fee_my: "ကျပ် ၇၀,၀၀,၀၀၀" },
+    { level_en: "High School", level_my: "အထက်တန်း", fee_en: "MMK 8,500,000", fee_my: "ကျပ် ၈၅,၀၀,၀၀၀" },
+  ],
 };
 
 /** Defaults for the Home page sections, edited from the admin portal. */

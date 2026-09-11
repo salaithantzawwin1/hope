@@ -241,6 +241,45 @@ export interface HomeCta {
   secondary_my: string;
 }
 
+/** One "How to apply" step on the Admissions page. */
+export interface AdmissionStep {
+  title_en: string;
+  title_my: string;
+  desc_en: string;
+  desc_my: string;
+}
+
+/** One fee row (level → annual tuition) on the Admissions page. */
+export interface AdmissionFee {
+  level_en: string;
+  level_my: string;
+  fee_en: string;
+  fee_my: string;
+}
+
+/**
+ * Admissions page content stored as JSON in the `admissions_content`
+ * site_content row and edited from the admin portal (Admissions tab).
+ */
+export interface AdmissionsContent {
+  intro_en: string;
+  intro_my: string;
+  steps_title_en: string;
+  steps_title_my: string;
+  steps: AdmissionStep[];
+  requirements_title_en: string;
+  requirements_title_my: string;
+  requirements_en: string[];
+  requirements_my: string[];
+  fees_title_en: string;
+  fees_title_my: string;
+  fees_subtitle_en: string;
+  fees_subtitle_my: string;
+  fees_note_en: string;
+  fees_note_my: string;
+  fees: AdmissionFee[];
+}
+
 /** One of the large buttons under the hero banner. */
 export interface HomeHeroButton {
   label_en: string;
