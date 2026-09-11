@@ -7,7 +7,9 @@
  *    never deploy the service key anywhere.
  * 2. Emits `scripts/d1-import.sql` with idempotent SQLite inserts
  *    (`insert or replace`; ids are preserved so /register?event=<id> links
- *    keep working).
+ *    keep working). No explicit transaction: D1 rejects `BEGIN TRANSACTION`
+ *    ("use state.storage.transaction() instead"), so atomicity comes from
+ *    `insert or replace` being safe to re-run instead.
  * 3. Prints the exact `wrangler d1 execute` commands to run next.
  *
  * Usage:
@@ -87,7 +89,6 @@ const lines = [
   "-- Apply with: npx wrangler d1 execute hope-db --remote --file scripts/d1-import.sql",
   "-- (or add --local to load a dev database). Safe to re-run: insert or replace.",
   "",
-  "begin;",
 ];
 
 let total = 0;
@@ -103,7 +104,7 @@ for (const { name, order } of TABLES) {
   }
 }
 
-lines.push("commit;", "");
+lines.push("");
 
 writeFileSync(outPath, lines.join("\n"));
 console.log(`Wrote ${total} rows across ${TABLES.length} tables to ${outPath}`);
