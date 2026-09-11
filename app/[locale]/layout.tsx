@@ -2,22 +2,25 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Inter, Noto_Sans_Myanmar } from "next/font/google";
+import localFont from "next/font/local";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+// Fonts are self-hosted (downloaded into public/fonts/ from Fontsource) so the
+// build never needs to reach fonts.googleapis.com — which is unreachable on
+// this network — and Myanmar visitors don't depend on Google either.
+const inter = localFont({
+  src: "../../public/fonts/inter-var.woff2",
   variable: "--font-inter",
   display: "swap",
 });
 
-const notoMyanmar = Noto_Sans_Myanmar({
-  weight: ["400", "500", "600", "700"],
-  subsets: ["myanmar"],
+const notoMyanmar = localFont({
+  src: "../../public/fonts/noto-sans-myanmar-var.woff2",
   variable: "--font-noto-myanmar",
+  weight: "100 900",
   display: "swap",
 });
 
