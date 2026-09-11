@@ -84,7 +84,10 @@ export function HomePrograms({ fallback }: { fallback: HomePrograms }) {
     <section className="bg-cream">
       <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6 sm:py-16">
         <div className="max-w-2xl">
-          <h2 className="text-3xl font-bold text-slate-900">
+          <span className="text-xs font-bold uppercase tracking-widest text-brand">
+            {isMy ? "ကျွန်ုပ်တို့၏ အစီအစဉ်များ" : "Our Programs"}
+          </span>
+          <h2 className="mt-1.5 text-2xl font-bold text-slate-900 sm:text-3xl">
             {pick(data.title_en, data.title_my)}
           </h2>
           <p className="mt-3 text-slate-500">
@@ -95,7 +98,7 @@ export function HomePrograms({ fallback }: { fallback: HomePrograms }) {
           {data.programs.map((program, i) => (
             <div
               key={i}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10 text-xl font-bold text-brand">
                 {PROGRAM_ICONS[i % PROGRAM_ICONS.length]}

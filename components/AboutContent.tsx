@@ -188,7 +188,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
             </p>
           )}
           {section.title_en.trim() || section.title_my.trim() ? (
-            <h2 className="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">
+            <h2 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
               {pick(section.title_en, section.title_my)}
             </h2>
           ) : null}
@@ -281,7 +281,7 @@ export default function AboutContent({ fallback }: { fallback: AboutData }) {
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent-dark">
             {t("valuesEyebrow")}
           </p>
-          <h2 className="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">
+          <h2 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
             {pick(values.title_en, values.title_my)}
           </h2>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

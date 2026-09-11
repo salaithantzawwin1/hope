@@ -118,12 +118,15 @@ export default async function HomePage({
       <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
           <div>
+            <span className="text-xs font-bold uppercase tracking-widest text-brand">
+              {locale === "my" ? "ကျွန်ုပ်တို့အကြောင်း" : "About Us"}
+            </span>
             <SiteText
               k="home_welcome_title"
               en={t("welcomeTitle")}
               my={t("welcomeTitle")}
               as="h2"
-              className="text-3xl font-bold text-slate-900"
+              className="mt-1.5 text-2xl font-bold text-slate-900 sm:text-3xl"
             />
             <SiteText
               k="home_welcome_text"

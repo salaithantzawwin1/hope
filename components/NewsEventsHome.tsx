@@ -36,14 +36,17 @@ export default function NewsEventsHome() {
           <div className="lg:col-span-3">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+                <span className="text-xs font-bold uppercase tracking-widest text-brand">
+                  {t("newsEyebrow")}
+                </span>
+                <h2 className="mt-1.5 text-2xl font-bold text-slate-900 sm:text-3xl">
                   {t("newsTitle")}
                 </h2>
                 <p className="mt-1 text-slate-500">{t("newsSubtitle")}</p>
               </div>
               <Link
                 href="/news"
-                className="shrink-0 text-sm font-semibold text-brand hover:underline"
+                className="shrink-0 self-end text-sm font-semibold text-brand hover:underline"
               >
                 {common("viewAll")} →
               </Link>
@@ -71,7 +74,10 @@ export default function NewsEventsHome() {
           <div className="lg:col-span-2">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+                <span className="text-xs font-bold uppercase tracking-widest text-brand">
+                  {t("eventsEyebrow")}
+                </span>
+                <h2 className="mt-1.5 text-2xl font-bold text-slate-900 sm:text-3xl">
                   {t("eventsTitle")}
                 </h2>
                 <p className="mt-1 text-slate-500">{t("eventsSubtitle")}</p>
