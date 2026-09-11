@@ -40,8 +40,8 @@
     {
       "binding": "DB",
       "database_name": "hope-db",
-      // TODO(phase-0): replace with the id returned by `npx wrangler d1 create hope-db`
-      "database_id": "PLACEHOLDER_RUN_WRANGLER_D1_CREATE"
+      // Created with `npx wrangler d1 create hope-db` (region APAC).
+      "database_id": "a8d7dec9-b137-46b1-ace8-c56497380a27"
     }
   ],
   // Photo storage — Phase 1 of the migration plan. No credentials needed in

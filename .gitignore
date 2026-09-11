@@ -28,6 +28,9 @@
 # generated data migration dump (contains site content)
 /scripts/d1-import.sql
 
+# generated local seed for D1 (regenerate with scripts/generate-local-sample-data.mjs)
+/worker/seed-local.sql
+
 # production
 /build
 
