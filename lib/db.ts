@@ -6,9 +6,31 @@ import {
 } from "./fallback-data";
 import type { EventItem, GalleryImage, NewsItem, SiteContentRow } from "./types";
 
-/** Public URL for an image stored in the "images" bucket. */
-export function publicImageUrl(supabaseUrl: string, path: string): string {
-  return `${supabaseUrl}/storage/v1/object/public/images/${path}`;
+/**
+ * Public URL for a stored image.
+ *
+ * Phase 1 of the Cloudflare migration: images live in R2, exposed through a
+ * custom domain on the school's zone (set NEXT_PUBLIC_IMAGE_BASE_URL in
+ * .env.local, e.g. https://images.hopeinternationalschool.com).
+ *
+ * Pass-through cases (returned unchanged):
+ *  - absolute URLs (older Supabase URLs keep working until the data migration
+ *    rewrites them — see plan §4, and the Supabase bucket stays up as rollback)
+ *  - root-relative paths (static assets shipped in /public, e.g. /Bunner/…)
+ * Everything else is treated as a bare R2 key and prefixed with the base URL;
+ * without a configured base URL the key itself is returned.
+ */
+export function publicImageUrl(path: string): string {
+  if (
+    !path ||
+    path.startsWith("/") ||
+    /^(https?:)?\/\//i.test(path) ||
+    /^(data|blob):/i.test(path)
+  ) {
+    return path;
+  }
+  const base = process.env.NEXT_PUBLIC_IMAGE_BASE_URL?.replace(/\/+$/, "");
+  return base ? `${base}/${path}` : path;
 }
 
 export async function fetchNews(): Promise<NewsItem[]> {

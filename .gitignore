@@ -23,6 +23,7 @@
 # wrangler
 /.wrangler/
 .env.local
+.dev.vars
 
 # production
 /build

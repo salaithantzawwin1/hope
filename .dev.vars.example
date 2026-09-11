@@ -1,0 +1,11 @@
+# Local development only (wrangler dev reads this automatically; do not commit
+# the real file — it is git-ignored). Format mirrors .env.local.
+#
+# Used by the Worker's staff write routes (PUT/DELETE /api/images) to verify
+# the Supabase access token the admin portal sends. Find the value in
+# supabase.com → Project Settings → API → JWT Secret.
+SUPABASE_JWT_SECRET=replace-with-your-supabase-jwt-secret
+
+# Optional: custom domain the R2 bucket is served from. When unset, uploads
+# return the bare R2 key instead of a full URL.
+#IMAGE_PUBLIC_BASE_URL=https://images.hopeinternationalschool.com

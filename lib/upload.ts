@@ -1,3 +1,17 @@
+/**
+ * Client-side image upload.
+ *
+ * Phase 1 of the Cloudflare migration (docs/cloudflare-migration-plan.md §4):
+ * images now live in Cloudflare R2. The browser PUTs the resized bytes to the
+ * same-origin Worker route `/api/images`, which stores the object and returns
+ * its public URL. Staff authorization reuses the Supabase access token the
+ * admin portal already holds — the Worker verifies it with the project's JWT
+ * secret (see worker/auth.ts).
+ *
+ * The client-side resize (max 1600px JPEG) is unchanged: it is still the
+ * right first line of defense for storage and bandwidth.
+ */
+
 import { getSupabase } from "./supabase";
 
 /** Downscale an image file client-side (max 1600px wide, JPEG) to keep uploads light. */
@@ -31,22 +45,38 @@ function resizeImage(file: File): Promise<Blob> {
   });
 }
 
-/** Upload an image to the public "images" bucket and return its public URL. */
+/** Upload an image via the Worker to R2 and return its public URL. */
 export async function uploadImage(
   file: File,
   folder: "news" | "gallery" | "events",
 ): Promise<string> {
-  const supabase = getSupabase();
-  if (!supabase) throw new Error("Supabase is not configured");
-
   const resized = await resizeImage(file);
-  const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
 
-  const { error } = await supabase.storage
-    .from("images")
-    .upload(path, resized, { contentType: "image/jpeg", upsert: false });
-  if (error) throw error;
+  const supabase = getSupabase();
+  const { data } = (await supabase?.auth.getSession()) ?? { data: null };
+  const token = data?.session?.access_token;
+  if (!token) {
+    throw new Error("Sign in again to upload images");
+  }
 
-  const { data } = supabase.storage.from("images").getPublicUrl(path);
-  return data.publicUrl;
+  const response = await fetch(`/api/images?folder=${encodeURIComponent(folder)}`, {
+    method: "PUT",
+    headers: {
+      authorization: `Bearer ${token}`,
+      "content-type": "image/jpeg",
+    },
+    body: resized,
+  });
+
+  if (!response.ok) {
+    const message = await response
+      .json()
+      .then((body) => (body as { message?: string }).message)
+      .catch(() => undefined);
+    throw new Error(message ?? `Upload failed (${response.status})`);
+  }
+
+  const { url } = (await response.json()) as { url: string };
+  if (!url) throw new Error("Upload succeeded but no URL was returned");
+  return url;
 }
