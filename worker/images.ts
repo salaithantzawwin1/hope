@@ -7,10 +7,11 @@
  *   DELETE /api/images?key=…    → staff only; deletes one object
  *   GET    /api/img/<key>       → serve one object (public)
  *
- * Until a custom domain is attached to the bucket, uploaded objects are
- * served from this same-origin route, so the { url } returned by PUT works
- * with no extra configuration. If IMAGE_PUBLIC_BASE_URL is set (custom
- * domain), PUT returns that instead and /api/img stays as a fallback.
+ * Uploaded objects are always served from this same-origin route, so the
+ * { url } returned by PUT works on whatever domain the site is deployed to —
+ * workers.dev, a future custom domain, or localhost — with no configuration.
+ * If IMAGE_PUBLIC_BASE_URL is set (R2 custom domain), PUT returns that
+ * instead and /api/img stays as a fallback.
  */
 
 import { badRequest, requireStaff, unauthorized } from "./auth";
@@ -109,15 +110,26 @@ async function putImage(request: Request, env: Env): Promise<Response> {
   }
 
   const body = await request.arrayBuffer();
-  const key = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
+
+  // Callers normally let the Worker mint a fresh key. The migration script
+  // (scripts/migrate-images-to-r2.mjs) passes ?key= to preserve the original
+  // object key, so URLs stored in D1 keep working after the copy.
+  const requestedKey = url.searchParams.get("key");
+  const key =
+    requestedKey && /^[a-z0-9-]+\/[\w.-]+$/.test(requestedKey)
+      ? requestedKey
+      : `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
+
   await env.IMAGES.put(key, body, {
     httpMetadata: { contentType: "image/jpeg" },
   });
 
+  // Root-relative by default so URLs keep working across domains (the site
+  // may be reached via workers.dev AND a custom domain). lib/db.ts passes
+  // root-relative paths through unchanged and browsers resolve them against
+  // the page origin, which is exactly where /api/img lives.
   const base = env.IMAGE_PUBLIC_BASE_URL?.replace(/\/+$/, "") ?? "";
-  const publicUrl = base
-    ? `${base}/${key}`
-    : `${new URL(request.url).origin}/api/img/${key}`;
+  const publicUrl = base ? `${base}/${key}` : `/api/img/${key}`;
   return json({ url: publicUrl, key }, 201);
 }
 
