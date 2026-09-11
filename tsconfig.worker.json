@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Workers runtime types instead of DOM — for the /api Worker entry built
+    // by wrangler. Kept as a separate project so the Next.js app keeps its
+    // own lib/types (root tsconfig excludes worker/).
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["@cloudflare/workers-types/experimental"],
+    "noEmit": true
+  },
+  "include": ["worker/**/*.ts"],
+  // Override the root config's `exclude: ["node_modules", "worker"]`, which
+  // would otherwise filter out this project's only inputs.
+  "exclude": ["node_modules"]
+}

@@ -30,5 +30,8 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  // The Worker entry (worker/index.ts) typechecks with Workers runtime types
+  // via tsconfig.worker.json; the root Next.js project keeps DOM lib and
+  // excludes the worker/ directory.
+  "exclude": ["node_modules", "worker"]
 }

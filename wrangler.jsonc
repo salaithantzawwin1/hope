@@ -1,19 +1,59 @@
-// This site is a fully static Next.js export (`npm run build` → `out/`),
-// so we deploy it as a Cloudflare static-assets Worker — no OpenNext,
-// no server runtime needed.
+// This site is a fully static Next.js export (`npm run build` → `out/`) served
+// from Cloudflare static assets. As part of the Supabase → Cloudflare migration
+// (docs/cloudflare-migration-plan.md), the same Worker now also exposes the
+// `/api/*` routes that talk to D1 (relational data) and R2 (images):
+//
+//   /api/images  → R2 binding (IMAGES)   Phase 1
+//   /api/news    → D1 binding (DB)       Phase 2
+//   /api/events  → D1 binding (DB)       Phase 2
+//   /api/gallery → D1 binding (DB)       Phase 2
+//   /api/content → D1 binding (DB)       Phase 2
+//
+// every non-`/api` request still goes to static assets, so the site's behavior
+// is unchanged until real route handlers are added to worker/index.ts.
 //
 // Cloudflare Workers Builds runs:
 //   build:  npm run build      → produces ./out
-//   deploy: npx wrangler deploy → uploads ./out as static assets
+//   deploy: npx wrangler deploy → uploads ./out as static assets + worker/index.ts
+//
+// Before first deploy (or after `npx wrangler login`):
+//   npx wrangler d1 create hope-db       # put the returned id in database_id below
+//   npx wrangler r2 bucket create hope-images
+//   npx wrangler d1 execute hope-db --remote --file worker/schema.sql
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "hope",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-09-08",
+  // Relational data (news / events / site_content / gallery) — Phase 2 of the
+  // migration plan. Fill in database_id after `npx wrangler d1 create hope-db`.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hope-db",
+      // TODO(phase-0): replace with the id returned by `npx wrangler d1 create hope-db`
+      "database_id": "PLACEHOLDER_RUN_WRANGLER_D1_CREATE"
+    }
+  ],
+  // Photo storage — Phase 1 of the migration plan. No credentials needed in
+  // this file; the binding works as soon as the bucket exists.
+  "r2_buckets": [
+    {
+      "binding": "IMAGES",
+      "bucket_name": "hope-images"
+    }
+  ],
   "assets": {
     "directory": "./out",
     // Serve out/404.html for unknown routes (Next.js static export generates it).
     "not_found_handling": "404-page",
     // Directory-style output (en/index.html): /en → /en/ → en/index.html
-    "html_handling": "auto-trailing-slash"
+    "html_handling": "auto-trailing-slash",
+    // Only /api/* hits the Worker code; everything else is served as static
+    // assets and does not count against the 100k Worker requests/day quota.
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": {
+    "enabled": true
   }
 }
