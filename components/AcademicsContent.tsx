@@ -11,6 +11,9 @@ import type {
 
 const LEVEL_ICONS = ["🧸", "📖", "🔬", "🎓"];
 
+/** Letter chips on the Beyond the Classroom cards (matches the Home page). */
+const PROGRAM_ICONS = ["A", "B", "C", "D"];
+
 function parseJson<T>(raw: string | undefined): T | null {
   if (!raw || !raw.trim()) return null;
   try {
@@ -70,7 +73,10 @@ export default function AcademicsContent({ fallback }: { fallback: AcademicsData
       <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-center">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+            <span className="text-xs font-bold uppercase tracking-widest text-brand">
+              {isMy ? "သင်ရိုးညွှန်းတမ်း" : "Curriculum"}
+            </span>
+            <h2 className="mt-1.5 text-2xl font-bold text-slate-900 sm:text-3xl">
               {pick(data.curriculum.title_en, data.curriculum.title_my)}
             </h2>
             <p className="mt-4 leading-relaxed text-slate-600">
@@ -95,7 +101,7 @@ export default function AcademicsContent({ fallback }: { fallback: AcademicsData
             {data.levels.levels.map((level, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
               >
                 <div className="flex items-center justify-between">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-lg font-bold text-brand">
@@ -121,7 +127,10 @@ export default function AcademicsContent({ fallback }: { fallback: AcademicsData
       <section className="bg-cream">
         <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
           <div className="max-w-2xl">
-            <h2 className="text-3xl font-bold text-slate-900">
+            <span className="text-xs font-bold uppercase tracking-widest text-brand">
+              {isMy ? "အပြင်ဘက် လုပ်ငန်းများ" : "Beyond the Classroom"}
+            </span>
+            <h2 className="mt-1.5 text-2xl font-bold text-slate-900 sm:text-3xl">
               {pick(data.programs.title_en, data.programs.title_my)}
             </h2>
             <p className="mt-3 text-slate-500">
@@ -132,9 +141,12 @@ export default function AcademicsContent({ fallback }: { fallback: AcademicsData
             {data.programs.programs.map((program, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
               >
-                <h3 className="text-lg font-bold text-slate-900">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10 text-xl font-bold text-brand">
+                  {PROGRAM_ICONS[i % PROGRAM_ICONS.length]}
+                </div>
+                <h3 className="mt-4 text-lg font-bold text-slate-900">
                   {pick(program.title_en, program.title_my)}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">
