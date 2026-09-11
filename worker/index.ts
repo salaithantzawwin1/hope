@@ -22,7 +22,7 @@ import {
   handleLogout,
 } from "./auth";
 import { handleContent, handleEvents, handleGallery, handleNews } from "./data";
-import { handleImages } from "./images";
+import { handleImages, serveImage } from "./images";
 
 export interface Env {
   /** D1 database (news, events, site_content, gallery) — schema: worker/schema.sql */
@@ -58,6 +58,9 @@ export default {
     if (pathname === "/api/auth/check") return handleAuthCheck(request, env);
 
     if (pathname === "/api/images") return handleImages(request, env);
+    if (pathname.startsWith("/api/img/")) {
+      return serveImage(request, env, pathname.slice("/api/img/".length));
+    }
     if (pathname === "/api/news") return handleNews(request, env);
     if (pathname === "/api/events") return handleEvents(request, env);
     if (pathname === "/api/gallery") return handleGallery(request, env);
