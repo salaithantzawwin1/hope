@@ -20,6 +20,18 @@ export async function handleImages(
   request: Request,
   env: Env,
 ): Promise<Response> {
+  // R2 may be unbound (bucket not yet enabled/created in the account).
+  // Fail softly so the rest of the site and admin portal keep working.
+  if (!env.IMAGES) {
+    return json(
+      {
+        error: "storage_unavailable",
+        detail: "R2 is not configured — enable R2 in the Cloudflare dashboard, create the hope-images bucket, and redeploy.",
+      },
+      503,
+    );
+  }
+
   const { method } = request;
   const url = new URL(request.url);
 
