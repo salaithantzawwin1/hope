@@ -13,6 +13,7 @@ import type {
   FooterContent,
   HeaderContent,
   HomeCta,
+  HomeHero,
   HomePrograms,
   HomeStats,
   NewsItem,
@@ -243,6 +244,19 @@ export const FALLBACK_CONTACT: ContactContent = {
   map_title_en: "Find Us on the Map",
   map_title_my: "မြေပုံပေါ်တွင် ရှာဖွေပါ",
   map_link_url: "https://www.google.com/maps/place/17%C2%B008'02.4%22N+96%C2%B005'33.8%22E/@17.133991,96.092716,1042m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d17.133991!4d96.092716",
+};
+
+/**
+ * Defaults for the Home hero extras (buttons + images), edited from the
+ * admin portal. Empty image URLs mean "use the built-in /Bunner/01.jpg".
+ */
+export const FALLBACK_HOME_HERO: HomeHero = {
+  buttons: [
+    { label_en: "Apply for Admission", label_my: "ဝင်ခွင့် လျှောက်ထားရန်", href: "/admissions" },
+    { label_en: "Explore Academics", label_my: "ပညာရေး စနစ်ကို ကြည့်ရှုရန်", href: "/academics" },
+  ],
+  hero_image_url: "",
+  welcome_image_url: "",
 };
 
 /** Defaults for the Home page sections, edited from the admin portal. */

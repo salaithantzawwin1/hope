@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import SiteText from "@/components/SiteText";
-import { HomeCta, HomePrograms, HomeStats } from "@/components/HomeContent";
+import { HomeCta, HomeHeroButtons, HomeHeroImage, HomePrograms, HomeStats } from "@/components/HomeContent";
 import NewsEventsHome from "@/components/NewsEventsHome";
 import FeaturedEvent from "@/components/FeaturedEvent";
 
@@ -18,11 +18,9 @@ export default async function HomePage({
     <>
       {/* Hero */}
       <section className="relative overflow-hidden bg-brand-dark text-white">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/Bunner/01.jpg"
+        <HomeHeroImage
+          slot="hero_image_url"
           alt=""
-          aria-hidden
           fetchPriority="high"
           className="absolute inset-0 h-full w-full object-cover"
         />
@@ -61,20 +59,12 @@ export default async function HomePage({
               as="p"
               className="mt-5 max-w-2xl text-lg leading-relaxed text-slate-200"
             />
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/admissions"
-                className="rounded-xl bg-accent px-6 py-3 text-sm font-bold text-brand-dark shadow-lg transition-colors hover:bg-accent-dark"
-              >
-                {t("heroCta1")}
-              </Link>
-              <Link
-                href="/academics"
-                className="rounded-xl border border-white/30 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-              >
-                {t("heroCta2")}
-              </Link>
-            </div>
+            <HomeHeroButtons
+              fallback={[
+                { label_en: t("heroCta1"), label_my: t("heroCta1"), href: "/admissions" },
+                { label_en: t("heroCta2"), label_my: t("heroCta2"), href: "/academics" },
+              ]}
+            />
           </div>
 
           {/* Stats (editable) */}
@@ -141,17 +131,15 @@ export default async function HomePage({
             >
               {t("welcomeLink")} →
             </Link>
-          </div>
-          <div className="relative">
-            <div className="aspect-[4/3] overflow-hidden rounded-3xl border border-slate-200 shadow-sm">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/Bunner/01.jpg"
-                alt={t("welcomeTitle")}
-                loading="lazy"
-                className="h-full w-full object-cover"
-              />
-            </div>
+          </div>            <div className="relative">
+              <div className="aspect-[4/3] overflow-hidden rounded-3xl border border-slate-200 shadow-sm">
+                <HomeHeroImage
+                  slot="welcome_image_url"
+                  alt={t("welcomeTitle")}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
+              </div>
             <div className="absolute -bottom-5 -left-5 hidden rounded-2xl bg-accent px-6 py-4 shadow-xl sm:block">
               <div className="text-3xl font-bold text-brand-dark">+12</div>
               <div className="text-sm font-medium text-brand-dark/80">

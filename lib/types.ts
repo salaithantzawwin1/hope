@@ -241,6 +241,24 @@ export interface HomeCta {
   secondary_my: string;
 }
 
+/** One of the large buttons under the hero banner. */
+export interface HomeHeroButton {
+  label_en: string;
+  label_my: string;
+  href: string;
+}
+
+/**
+ * Home hero extras stored as JSON in the `home_hero` site_content row:
+ * the call-to-action buttons and the two page images. Empty image URLs
+ * mean "use the built-in default" (/Bunner/01.jpg).
+ */
+export interface HomeHero {
+  buttons: HomeHeroButton[];
+  hero_image_url: string;
+  welcome_image_url: string;
+}
+
 export interface AboutFact {
   number_en: string;
   number_my: string;

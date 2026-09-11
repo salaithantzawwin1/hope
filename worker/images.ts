@@ -18,7 +18,7 @@ import { badRequest, requireStaff, unauthorized } from "./auth";
 import type { Env } from "./index";
 
 /** Only known upload folders are accepted, so keys stay predictable. */
-const ALLOWED_FOLDERS = new Set(["news", "gallery", "events"]);
+const ALLOWED_FOLDERS = new Set(["news", "gallery", "events", "site"]);
 
 export async function handleImages(
   request: Request,

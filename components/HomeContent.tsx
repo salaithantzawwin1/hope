@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { fetchSiteContent } from "@/lib/db";
-import type { HomeCta, HomePrograms, HomeStats } from "@/lib/types";
+import type { HomeCta, HomeHero, HomeHeroButton, HomePrograms, HomeStats } from "@/lib/types";
 
 const PROGRAM_ICONS = ["A", "B", "C", "D"];
+
+/** Built-in default for both Home images before anything is uploaded. */
+export const DEFAULT_HOME_IMAGE = "/Bunner/01.jpg";
 
 function parseJson<T>(raw: string | undefined): T | null {
   if (!raw || !raw.trim()) return null;
@@ -39,6 +42,73 @@ function useBlock<T>(key: string, fallback: T): T {
  * stored as JSON in a single site_content row; until a row exists the
  * `fallback` prop (from the message catalogs) is shown.
  */
+
+/**
+ * The call-to-action buttons under the hero banner. Stored in the same
+ * `home_hero` JSON block the admin portal edits (AdminHome → Hero tab).
+ */
+export function HomeHeroButtons({ fallback }: { fallback: HomeHeroButton[] }) {
+  const locale = useLocale();
+  const data = useBlock<HomeHero>("home_hero", {
+    buttons: fallback,
+    hero_image_url: "",
+    welcome_image_url: "",
+  });
+  const isMy = locale === "my";
+  if (!data.buttons.length) return null;
+  return (
+    <div className="mt-8 flex flex-wrap gap-3">
+      {data.buttons.map((button, i) => (
+        <Link
+          key={i}
+          href={button.href || "/admissions"}
+          className={
+            i === 0
+              ? "rounded-xl bg-accent px-6 py-3 text-sm font-bold text-brand-dark shadow-lg transition-colors hover:bg-accent-dark"
+              : "rounded-xl border border-white/30 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+          }
+        >
+          {(isMy && button.label_my.trim()) || button.label_en}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * One of the two Home images (hero background or welcome photo), editable
+ * from the admin portal. `slot` picks which URL inside the home_hero block;
+ * empty value = built-in default.
+ */
+export function HomeHeroImage({
+  slot,
+  alt,
+  className,
+  loading,
+  fetchPriority,
+}: {
+  slot: "hero_image_url" | "welcome_image_url";
+  alt: string;
+  className: string;
+  loading?: "eager" | "lazy";
+  fetchPriority?: "high" | "low" | "auto";
+}) {
+  const data = useBlock<HomeHero>("home_hero", {
+    buttons: [],
+    hero_image_url: "",
+    welcome_image_url: "",
+  });
+  const url = data[slot]?.trim() || DEFAULT_HOME_IMAGE;
+  return (
+    <img
+      src={url}
+      alt={alt}
+      loading={loading}
+      fetchPriority={fetchPriority}
+      className={className}
+    />
+  );
+}
 
 /** The stat numbers under the hero banner. */
 export function HomeStats({ fallback }: { fallback: HomeStats }) {

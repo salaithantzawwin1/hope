@@ -44,7 +44,7 @@ function resizeImage(file: File): Promise<Blob> {
 /** Upload an image via the Worker to R2 and return its public URL. */
 export async function uploadImage(
   file: File,
-  folder: "news" | "gallery" | "events",
+  folder: "news" | "gallery" | "events" | "site",
 ): Promise<string> {
   const resized = await resizeImage(file);
 
