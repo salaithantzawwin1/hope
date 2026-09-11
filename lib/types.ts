@@ -61,6 +61,50 @@ export interface FooterContent {
   links: NavLink[];
 }
 
+/** A social/contact channel link (Facebook, Telegram, Viber, …). */
+export interface SocialLink {
+  /** Channel identifier: "facebook" | "telegram" | "viber" | "custom". */
+  kind: string;
+  /** Full URL, e.g. "https://facebook.com/<page>" or "viber://chat?number=%2B959…". */
+  href: string;
+  /** Optional label shown next to the icon on the Contact page. */
+  label_en: string;
+  label_my: string;
+}
+
+/** Contact page content (editable from the admin portal). */
+export interface ContactContent {
+  /** Hero banner. */
+  hero_title_en: string;
+  hero_title_my: string;
+  hero_subtitle_en: string;
+  hero_subtitle_my: string;
+  /** Contact info cards. */
+  address_title_en: string;
+  address_title_my: string;
+  address_en: string;
+  address_my: string;
+  phone_title_en: string;
+  phone_title_my: string;
+  phone_en: string;
+  phone_my: string;
+  email_title_en: string;
+  email_title_my: string;
+  email_en: string;
+  email_my: string;
+  hours_title_en: string;
+  hours_title_my: string;
+  hours_en: string;
+  hours_my: string;
+  /** Social channel links (Facebook, Telegram, Viber, …). */
+  socials: SocialLink[];
+  /** Google Maps embed. Empty = the map section is hidden. */
+  map_embed_url: string;
+  /** Optional bilingual caption shown above the map. */
+  map_title_en: string;
+  map_title_my: string;
+}
+
 export interface GalleryImage {
   id: string;
   image_url: string;

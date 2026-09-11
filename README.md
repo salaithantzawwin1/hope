@@ -18,6 +18,8 @@ admin portal appear on the public site immediately — no rebuild or re-upload.
 - 🗞️ **News & Events**: managed from the admin portal (English + Burmese
   fields), with an article reader modal.
 - 🖼️ **Photo gallery**: upload photos from the admin portal (auto-resized).
+- 📞 **Contact page**: contact cards, Facebook/Telegram/Viber icon links and
+  a Google Map — all editable from the portal.
 - ✍️ **Editable site text**: hero, welcome and about intro editable from the
   portal.
 - 🔐 **Admin portal** at `/admin` (Supabase Auth login, staff accounts).
@@ -129,10 +131,14 @@ Locally you can deploy or preview with `npm run deploy` / `npm run preview`
    panel renames or re-describes an album in one go (applied to every photo
    in it). Existing photos can be edited in place (captions and album) from
    the per-photo fields, and the list can be filtered by album or searched.
-9. **Footer** — edit the footer tagline, contact details (address, phone,
-   email, opening hours) and the quick links navigation, in English and
-   Burmese. Shown on every page.
-10. **Header** — edit the logo image URL and the nav menu items (each with a
+9. **Contact** — edit the Contact page (`/en/contact`): hero, the four
+   contact cards (address, phone, email, opening hours), the social links
+   (Facebook / Telegram / Viber / custom, each shown with its brand icon)
+   and the **Google Map** embed URL (empty = map hidden).
+10. **Footer** — edit the footer tagline, contact details (address, phone,
+    email, opening hours) and the quick links navigation, in English and
+    Burmese. Shown on every page.
+11. **Header** — edit the logo image URL and the nav menu items (each with a
     URL and a bilingual label). The blue Admissions button is fixed. Shown
     on every page.
 

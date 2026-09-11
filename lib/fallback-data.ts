@@ -8,6 +8,7 @@ import type {
   AcademicsLevels,
   AcademicsPrograms,
   CarrierContent,
+  ContactContent,
   EventItem,
   FooterContent,
   HeaderContent,
@@ -149,10 +150,8 @@ export const FALLBACK_SITE_CONTENT: Record<string, { en: string; my: string }> =
   academics_intro: {
     en: "Our curriculum blends international teaching standards with the best of Myanmar culture. Students learn to think deeply, ask questions and apply their knowledge to real life.",
     my: "ကျွန်ုပ်တို့၏ သင်ရိုးညွှန်းတမ်းသည် နိုင်ငံတကာ သင်ကြားရေး စံနှုန်းများနှင့် မြန်မာ့ယဉ်ကျေးမှု၏ အကောင်းဆုံးအရာများကို ပေါင်းစပ်ထားသည်။ ကျောင်းသားများသည် နက်နက်ရှိုင်းရှိုင်း တွေးခေါ်တတ်ရန်၊ မေးခွန်းထုတ်တတ်ရန်နှင့် မိမိတို့၏ အသိပညာကို လက်တွေ့ဘဝတွင် အသုံးချတတ်ရန် သင်ယူကြသည်။",
-  },
-};
+  },};
 
-/** Defaults for the header, edited from the admin portal (Header tab). */
 export const FALLBACK_HEADER: HeaderContent = {
   logo_url: "/Logo.jpg",
   links: [
@@ -162,6 +161,7 @@ export const FALLBACK_HEADER: HeaderContent = {
     { href: "/news", label_en: "News & Events", label_my: "သတင်းနှင့် ပွဲများ" },
     { href: "/gallery", label_en: "Gallery", label_my: "ဓာတ်ပုံပြခန်း" },
     { href: "/carrier", label_en: "Carrier", label_my: "အလုပ်အကိုင်" },
+    { href: "/contact", label_en: "Contact", label_my: "ဆက်သွယ်ရန်" },
   ],
 };
 
@@ -188,7 +188,60 @@ export const FALLBACK_FOOTER: FooterContent = {
     { href: "/news", label_en: "News & Events", label_my: "သတင်းနှင့် ပွဲများ" },
     { href: "/gallery", label_en: "Gallery", label_my: "ဓာတ်ပုံပြခန်း" },
     { href: "/carrier", label_en: "Carrier", label_my: "အလုပ်အကိုင်" },
+    { href: "/contact", label_en: "Contact", label_my: "ဆက်သွယ်ရန်" },
   ],
+};
+
+/** Defaults for the Contact page, edited from the admin portal (Contact tab). */
+export const FALLBACK_CONTACT: ContactContent = {
+  hero_title_en: "Contact Us",
+  hero_title_my: "ဆက်သွယ်ရန်",
+  hero_subtitle_en:
+    "We would love to hear from you. Visit us, call, message or send an email — our team replies within one working day.",
+  hero_subtitle_my:
+    "သင့်၏ အသံကို ကြားနာချင်ပါသည်။ လာရောက်လည်ပတ်ပါ၊ ဖုန်းခေါ်ပါ၊ မက်ဆေ့ပို့ပါ သို့မဟုတ် အီးမေးလ်ပို့ပါ — ကျွန်ုပ်တို့အဖွဲ့မှ တစ်ရက်အတွင်း ပြန်ကြားပေးပါမည်။",
+  address_title_en: "Visit Us",
+  address_title_my: "လာရောက်လည်ပတ်ရန်",
+  address_en:
+    "No. 514(B), near Kyauk Gyi Taw Field, Bodo Dote Kone Village, Hlaing Tharyar Township, Yangon, Myanmar",
+  address_my:
+    "အမှတ် ၅၁၄ (ဘီ)၊ ကျောင်းကြီးတောကွင်းအနီး၊ ဘိုးဒေါနကုန်းကျေးရွာ၊ မှော်ဘီမြို့နယ်။",
+  phone_title_en: "Call Us",
+  phone_title_my: "ဖုန်းဆက်ရန်",
+  phone_en: "+95 9 944 188 288",
+  phone_my: "+95 9 944 188 288",
+  email_title_en: "Email Us",
+  email_title_my: "အီးမေးလ်ပို့ရန်",
+  email_en: "info@hopeinternationalschool.com",
+  email_my: "info@hopeinternationalschool.com",
+  hours_title_en: "Opening Hours",
+  hours_title_my: "ဖွင့်လှစ်ချိန်",
+  hours_en: "Mon – Fri: 8:00 AM – 4:30 PM",
+  hours_my: "တနင်္လာ – သောကြာ: နံနက် ၈:၀၀ – ညနေ ၄:၃၀",
+  socials: [
+    {
+      kind: "facebook",
+      href: "https://www.facebook.com/",
+      label_en: "Follow us on Facebook",
+      label_my: "Facebook တွင် စောင့်ကြည့်ပါ",
+    },
+    {
+      kind: "telegram",
+      href: "https://t.me/",
+      label_en: "Chat on Telegram",
+      label_my: "Telegram ဖြင့် စကားပြောပါ",
+    },
+    {
+      kind: "viber",
+      href: "viber://chat?number=%2B959944188288",
+      label_en: "Chat on Viber",
+      label_my: "Viber ဖြင့် စကားပြောပါ",
+    },
+  ],
+  map_embed_url:
+    "https://www.google.com/maps?q=16.0374,96.0297&hl=en&z=15&output=embed",
+  map_title_en: "Find Us on the Map",
+  map_title_my: "မြေပုံပေါ်တွင် ရှာဖွေပါ",
 };
 
 /** Defaults for the Home page sections, edited from the admin portal. */
