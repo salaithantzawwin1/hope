@@ -25,6 +25,9 @@
 .env.local
 .dev.vars
 
+# generated data migration dump (contains site content)
+/scripts/d1-import.sql
+
 # production
 /build
 

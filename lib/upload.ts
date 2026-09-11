@@ -1,18 +1,14 @@
 /**
  * Client-side image upload.
  *
- * Phase 1 of the Cloudflare migration (docs/cloudflare-migration-plan.md §4):
- * images now live in Cloudflare R2. The browser PUTs the resized bytes to the
+ * Images live in Cloudflare R2. The browser PUTs the resized bytes to the
  * same-origin Worker route `/api/images`, which stores the object and returns
- * its public URL. Staff authorization reuses the Supabase access token the
- * admin portal already holds — the Worker verifies it with the project's JWT
- * secret (see worker/auth.ts).
+ * its public URL. Staff authorization rides on the admin portal's signed
+ * session cookie (worker/auth.ts) — set `credentials: "same-origin"`.
  *
  * The client-side resize (max 1600px JPEG) is unchanged: it is still the
  * right first line of defense for storage and bandwidth.
  */
-
-import { getSupabase } from "./supabase";
 
 /** Downscale an image file client-side (max 1600px wide, JPEG) to keep uploads light. */
 function resizeImage(file: File): Promise<Blob> {
@@ -52,17 +48,10 @@ export async function uploadImage(
 ): Promise<string> {
   const resized = await resizeImage(file);
 
-  const supabase = getSupabase();
-  const { data } = (await supabase?.auth.getSession()) ?? { data: null };
-  const token = data?.session?.access_token;
-  if (!token) {
-    throw new Error("Sign in again to upload images");
-  }
-
   const response = await fetch(`/api/images?folder=${encodeURIComponent(folder)}`, {
     method: "PUT",
+    credentials: "same-origin",
     headers: {
-      authorization: `Bearer ${token}`,
       "content-type": "image/jpeg",
     },
     body: resized,

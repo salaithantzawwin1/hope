@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { apiSiteContent, contentApi } from "@/lib/api";
 import { FALLBACK_HEADER } from "@/lib/fallback-data";
 import type { HeaderContent } from "@/lib/types";
 import { LinksEditor } from "./bilingual";
@@ -19,7 +19,6 @@ function parseJson<T>(raw: string | undefined | null): T | null {
 }
 
 export default function AdminHeader() {
-  const supabase = getSupabase();
   const [header, setHeader] = useState<HeaderContent>(FALLBACK_HEADER);
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -29,14 +28,10 @@ export default function AdminHeader() {
   useEffect(() => {
     let active = true;
     (async () => {
-      if (!supabase) return;
-      const { data } = await supabase
-        .from("site_content")
-        .select("value_en")
-        .eq("key", HEADER_KEY)
-        .maybeSingle();
+      const rows = await apiSiteContent();
       if (!active) return;
-      const parsed = parseJson<HeaderContent>(data?.value_en);
+      const row = rows.find((r) => r.key === HEADER_KEY);
+      const parsed = parseJson<HeaderContent>(row?.value_en);
       // Merge with defaults so older saved rows still have every field.
       if (parsed) {
         // Merge links using fallback order as source of truth
@@ -45,28 +40,25 @@ export default function AdminHeader() {
         setHeader({ ...FALLBACK_HEADER, ...parsed, links: mergedLinks });
       }
       setLoaded(true);
-    })();
+    })().catch(() => {
+      if (active) setLoaded(true);
+    });
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const save = async () => {
-    if (!supabase) return;
     setBusy(true);
     setError("");
     setSaved(false);
     try {
-      const { error } = await supabase.from("site_content").upsert(
-        {
-          key: HEADER_KEY,
-          value_en: JSON.stringify(header),
-          value_my: JSON.stringify(header),
-        },
-        { onConflict: "key" },
-      );
-      if (error) throw error;
+      await contentApi.save({
+        key: HEADER_KEY,
+        value_en: JSON.stringify(header),
+        value_my: JSON.stringify(header),
+      });
       setSaved(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save");
@@ -75,7 +67,6 @@ export default function AdminHeader() {
     }
   };
 
-  if (!supabase) return null;
   if (!loaded) {
     return <p className="text-sm text-slate-500">Loading…</p>;
   }

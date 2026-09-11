@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { apiNews, newsApi, type NewsInput } from "@/lib/api";
 import { uploadImage } from "@/lib/upload";
 import type { NewsItem } from "@/lib/types";
 import { Button, Card, Field, Notice, SubTabs, TextArea, TextInput } from "./ui";
@@ -38,16 +38,12 @@ export default function AdminNews() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  const supabase = getSupabase();
-
   const load = async (): Promise<NewsItem[]> => {
-    if (!supabase) return [];
-    const { data, error } = await supabase
-      .from("news")
-      .select("*")
-      .order("published_at", { ascending: false });
-    if (error) return [];
-    return (data ?? []) as NewsItem[];
+    try {
+      return await apiNews();
+    } catch {
+      return [];
+    }
   };
 
   useEffect(() => {
@@ -59,7 +55,7 @@ export default function AdminNews() {
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const startEdit = (item?: NewsItem) => {
@@ -82,7 +78,6 @@ export default function AdminNews() {
   };
 
   const save = async () => {
-    if (!supabase) return;
     setBusy(true);
     setError("");
     try {
@@ -91,7 +86,7 @@ export default function AdminNews() {
         setUploading(true);
         imageUrl = await uploadImage(imageFile, "news");
       }
-      const payload = {
+      const input: NewsInput = {
         title_en: form.title_en.trim(),
         title_my: form.title_my.trim(),
         body_en: form.body_en.trim(),
@@ -99,12 +94,10 @@ export default function AdminNews() {
         image_url: imageUrl || null,
         published_at: form.published_at,
       };
-      if (!payload.title_en) throw new Error("English title is required");
+      if (!input.title_en) throw new Error("English title is required");
 
-      const { error } = form.id
-        ? await supabase.from("news").update(payload).eq("id", form.id)
-        : await supabase.from("news").insert(payload);
-      if (error) throw error;
+      if (form.id) await newsApi.update(form.id, input);
+      else await newsApi.create(input);
 
       setEditing(false);
       setForm(EMPTY);
@@ -119,13 +112,14 @@ export default function AdminNews() {
   };
 
   const remove = async (item: NewsItem) => {
-    if (!supabase) return;
     if (!window.confirm(`Delete "${item.title_en}"?`)) return;
-    const { error } = await supabase.from("news").delete().eq("id", item.id);
-    if (!error) setItems(await load());
+    try {
+      await newsApi.remove(item.id);
+      setItems(await load());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete");
+    }
   };
-
-  if (!supabase) return null;
 
   // Group posts by publication year so staff can browse the archive.
   const years = Array.from(

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { apiSiteContent, contentApi } from "@/lib/api";
 import {
   FALLBACK_CARRIER,
   normalizeCarrier,
@@ -35,7 +35,6 @@ function positionLabel(pos: CarrierPosition, index: number) {
 }
 
 export default function AdminCarrier() {
-  const supabase = getSupabase();
   const [data, setData] = useState<CarrierContent>(FALLBACK_CARRIER);
   const [jobTab, setJobTab] = useState(0);
   const [loaded, setLoaded] = useState(false);
@@ -46,38 +45,31 @@ export default function AdminCarrier() {
   useEffect(() => {
     let active = true;
     (async () => {
-      if (!supabase) return;
-      const { data: row } = await supabase
-        .from("site_content")
-        .select("value_en")
-        .eq("key", CARRIER_KEY)
-        .maybeSingle();
+      const rows = await apiSiteContent();
       if (!active) return;
+      const row = rows.find((r) => r.key === CARRIER_KEY);
       const parsed = parseJson<CarrierContent>(row?.value_en);
       if (parsed) setData(normalizeCarrier(parsed));
       setLoaded(true);
-    })();
+    })().catch(() => {
+      if (active) setLoaded(true);
+    });
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const save = async () => {
-    if (!supabase) return;
     setBusy(true);
     setError("");
     setSaved(false);
     try {
-      const { error } = await supabase.from("site_content").upsert(
-        {
-          key: CARRIER_KEY,
-          value_en: JSON.stringify(data),
-          value_my: JSON.stringify(data),
-        },
-        { onConflict: "key" },
-      );
-      if (error) throw error;
+      await contentApi.save({
+        key: CARRIER_KEY,
+        value_en: JSON.stringify(data),
+        value_my: JSON.stringify(data),
+      });
       setSaved(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save");
@@ -201,7 +193,6 @@ export default function AdminCarrier() {
     setData({ ...data, [key]: steps });
   };
 
-  if (!supabase) return null;
   if (!loaded) {
     return <p className="text-sm text-slate-500">Loading…</p>;
   }

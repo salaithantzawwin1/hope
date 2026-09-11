@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { apiSiteContent, contentApi } from "@/lib/api";
 import {
   FALLBACK_ACADEMICS_CURRICULUM,
   FALLBACK_ACADEMICS_LEVELS,
@@ -39,7 +39,6 @@ const ACADEMICS_SECTIONS: { id: AcademicsSection; label: string }[] = [
 ];
 
 export default function AdminAcademics() {
-  const supabase = getSupabase();
   const [section, setSection] = useState<AcademicsSection>("curriculum");
   const [curriculum, setCurriculum] = useState<AcademicsCurriculum>(
     FALLBACK_ACADEMICS_CURRICULUM,
@@ -56,13 +55,9 @@ export default function AdminAcademics() {
   useEffect(() => {
     let active = true;
     (async () => {
-      if (!supabase) return;
-      const { data } = await supabase
-        .from("site_content")
-        .select("key, value_en")
-        .in("key", [CURRICULUM_KEY, LEVELS_KEY, PROGRAMS_KEY]);
+      const rows = await apiSiteContent();
       if (!active) return;
-      const map = new Map<string, string>((data ?? []).map((r) => [r.key, r.value_en]));
+      const map = new Map<string, string>(rows.map((r) => [r.key, r.value_en]));
       const c = parseJson<AcademicsCurriculum>(map.get(CURRICULUM_KEY));
       const l = parseJson<AcademicsLevels>(map.get(LEVELS_KEY));
       const p = parseJson<AcademicsPrograms>(map.get(PROGRAMS_KEY));
@@ -70,30 +65,25 @@ export default function AdminAcademics() {
       setLevels(l ?? FALLBACK_ACADEMICS_LEVELS);
       setPrograms(p ?? FALLBACK_ACADEMICS_PROGRAMS);
       setLoaded(true);
-    })();
+    })().catch(() => {
+      if (active) setLoaded(true);
+    });
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const saveAll = async () => {
-    if (!supabase) return;
     setBusy(true);
     setError("");
     setSaved(false);
     try {
-      const rows = [
+      await contentApi.save([
         { key: CURRICULUM_KEY, value_en: JSON.stringify(curriculum), value_my: JSON.stringify(curriculum) },
         { key: LEVELS_KEY, value_en: JSON.stringify(levels), value_my: JSON.stringify(levels) },
         { key: PROGRAMS_KEY, value_en: JSON.stringify(programs), value_my: JSON.stringify(programs) },
-      ];
-      for (const row of rows) {
-        const { error } = await supabase
-          .from("site_content")
-          .upsert(row, { onConflict: "key" });
-        if (error) throw error;
-      }
+      ]);
       setSaved(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save");
@@ -114,7 +104,6 @@ export default function AdminAcademics() {
       programs: programs.programs.map((p, j) => (j === i ? { ...p, ...patch } : p)),
     });
 
-  if (!supabase) return null;
   if (!loaded) {
     return <p className="text-sm text-slate-500">Loading…</p>;
   }

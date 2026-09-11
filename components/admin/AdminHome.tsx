@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { apiSiteContent, contentApi } from "@/lib/api";
 import {
   FALLBACK_HOME_CTA,
   FALLBACK_HOME_PROGRAMS,
@@ -39,7 +39,6 @@ const HOME_SECTIONS: { id: HomeSection; label: string }[] = [
 ];
 
 export default function AdminHome() {
-  const supabase = getSupabase();
   const [section, setSection] = useState<HomeSection>("stats");
   const [stats, setStats] = useState<HomeStats>(FALLBACK_HOME_STATS);
   const [programs, setPrograms] = useState<HomePrograms>(
@@ -54,13 +53,9 @@ export default function AdminHome() {
   useEffect(() => {
     let active = true;
     (async () => {
-      if (!supabase) return;
-      const { data } = await supabase
-        .from("site_content")
-        .select("key, value_en")
-        .in("key", [STATS_KEY, PROGRAMS_KEY, CTA_KEY]);
+      const rows = await apiSiteContent();
       if (!active) return;
-      const map = new Map<string, string>((data ?? []).map((r) => [r.key, r.value_en]));
+      const map = new Map<string, string>(rows.map((r) => [r.key, r.value_en]));
       const s = parseJson<HomeStats>(map.get(STATS_KEY));
       const p = parseJson<HomePrograms>(map.get(PROGRAMS_KEY));
       const c = parseJson<HomeCta>(map.get(CTA_KEY));
@@ -68,30 +63,25 @@ export default function AdminHome() {
       setPrograms(p ?? FALLBACK_HOME_PROGRAMS);
       setCta(c ?? FALLBACK_HOME_CTA);
       setLoaded(true);
-    })();
+    })().catch(() => {
+      if (active) setLoaded(true);
+    });
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const saveAll = async () => {
-    if (!supabase) return;
     setBusy(true);
     setError("");
     setSaved(false);
     try {
-      const rows = [
+      await contentApi.save([
         { key: STATS_KEY, value_en: JSON.stringify(stats), value_my: JSON.stringify(stats) },
         { key: PROGRAMS_KEY, value_en: JSON.stringify(programs), value_my: JSON.stringify(programs) },
         { key: CTA_KEY, value_en: JSON.stringify(cta), value_my: JSON.stringify(cta) },
-      ];
-      for (const row of rows) {
-        const { error } = await supabase
-          .from("site_content")
-          .upsert(row, { onConflict: "key" });
-        if (error) throw error;
-      }
+      ]);
       setSaved(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save");
@@ -112,7 +102,6 @@ export default function AdminHome() {
       programs: programs.programs.map((p, j) => (j === i ? { ...p, ...patch } : p)),
     });
 
-  if (!supabase) return null;
   if (!loaded) {
     return <p className="text-sm text-slate-500">Loading…</p>;
   }

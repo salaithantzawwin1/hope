@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { apiSiteContent, contentApi } from "@/lib/api";
 import { FALLBACK_SITE_CONTENT } from "@/lib/fallback-data";
 import { Button, Card, Field, Notice, SubTabs, TextArea } from "./ui";
 
@@ -36,12 +36,10 @@ export default function AdminSiteContent() {
   const [error, setError] = useState("");
   const [savedKey, setSavedKey] = useState<string | null>(null);
 
-  const supabase = getSupabase();
-
   const load = async (): Promise<Row[]> => {
-    if (!supabase) return [];
-    const { data, error } = await supabase.from("site_content").select("*");
-    const dbRows = new Map<string, Row>((data ?? []).map((r) => [r.key, r]));
+    try {
+      const data = await apiSiteContent();
+    const dbRows = new Map<string, Row>(data.map((r) => [r.key, r]));
     const merged: Row[] = Object.keys(FALLBACK_SITE_CONTENT).map((key) => {
       const db = dbRows.get(key);
       return db
@@ -52,8 +50,10 @@ export default function AdminSiteContent() {
             value_my: FALLBACK_SITE_CONTENT[key].my,
           };
     });
-    if (error) return [];
-    return merged;
+      return merged;
+    } catch {
+      return [];
+    }
   };
 
   useEffect(() => {
@@ -65,22 +65,15 @@ export default function AdminSiteContent() {
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const saveAll = async () => {
-    if (!supabase) return;
     setBusy(true);
     setError("");
     setSavedKey(null);
     try {
-      for (const row of rows) {
-        const { error } = await supabase.from("site_content").upsert(
-          { key: row.key, value_en: row.value_en, value_my: row.value_my },
-          { onConflict: "key" },
-        );
-        if (error) throw error;
-      }
+      await contentApi.save(rows);
       setSavedKey("All changes saved");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save");
@@ -88,8 +81,6 @@ export default function AdminSiteContent() {
       setBusy(false);
     }
   };
-
-  if (!supabase) return null;
 
   return (
     <div className="space-y-6">

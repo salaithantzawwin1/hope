@@ -10,7 +10,7 @@
  * IMAGE_PUBLIC_BASE_URL.
  */
 
-import { badRequest, isAuthed, requireStaff } from "./auth";
+import { badRequest, requireStaff, unauthorized } from "./auth";
 import type { Env } from "./index";
 
 /** Only known upload folders are accepted, so keys stay predictable. */
@@ -28,8 +28,7 @@ export async function handleImages(
   if (method === "PUT") return putImage(request, env);
 
   if (method === "DELETE") {
-    const auth = await requireStaff(request, env.SUPABASE_JWT_SECRET);
-    if (!isAuthed(auth)) return auth;
+    if (!(await requireStaff(request, env))) return unauthorized();
     const key = url.searchParams.get("key");
     if (!key) return badRequest("Missing ?key= (the R2 object key)");
     await env.IMAGES.delete(key);
@@ -55,8 +54,7 @@ async function listImages(env: Env): Promise<Response> {
 }
 
 async function putImage(request: Request, env: Env): Promise<Response> {
-  const auth = await requireStaff(request, env.SUPABASE_JWT_SECRET);
-  if (!isAuthed(auth)) return auth;
+  if (!(await requireStaff(request, env))) return unauthorized();
 
   const url = new URL(request.url);
   const folder = url.searchParams.get("folder") ?? "gallery";

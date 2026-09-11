@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import type { Session } from "@supabase/supabase-js";
-import { getSupabase } from "@/lib/supabase";
+import { checkAuth, login, logout } from "@/lib/api";
 import AdminEvents from "@/components/admin/AdminEvents";
 import AdminGallery from "@/components/admin/AdminGallery";
 import AdminNews from "@/components/admin/AdminNews";
@@ -68,27 +67,25 @@ const GROUPS: {
 ];
 
 function LoginForm({ onSuccess }: { onSuccess: () => void }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [passphrase, setPassphrase] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    const supabase = getSupabase();
-    if (!supabase) return;
     setBusy(true);
     setError("");
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
-    if (error) {
-      setError(error.message);
+    try {
+      await login(passphrase);
+      onSuccess();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Sign-in failed — is the Worker's STAFF_PASSPHRASE secret configured?",
+      );
       setBusy(false);
-      return;
     }
-    onSuccess();
   };
 
   return (
@@ -109,28 +106,15 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
         </div>
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div>
-            <label htmlFor="admin-email" className="mb-1.5 block text-sm font-medium text-slate-700">
-              Email
+            <label htmlFor="admin-passphrase" className="mb-1.5 block text-sm font-medium text-slate-700">
+              Staff passphrase
             </label>
             <input
-              id="admin-email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-            />
-          </div>
-          <div>
-            <label htmlFor="admin-password" className="mb-1.5 block text-sm font-medium text-slate-700">
-              Password
-            </label>
-            <input
-              id="admin-password"
+              id="admin-passphrase"
               type="password"
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={passphrase}
+              onChange={(e) => setPassphrase(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
             />
           </div>
@@ -145,85 +129,28 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
 }
 
 export default function AdminPage() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [checking, setChecking] = useState(getSupabase() !== null);
+  const [authed, setAuthed] = useState(false);
+  const [checking, setChecking] = useState(true);
   const [tab, setTab] = useState<Tab>("news");
 
   useEffect(() => {
-    const supabase = getSupabase();
-    if (!supabase) return;
     let active = true;
-
-    // Never leave the "Checking session…" screen hanging: if the session
-    // check fails or takes too long (e.g. Supabase unreachable), fall
-    // through to the login form instead of getting stuck forever.
-    const check = Promise.race([
-      supabase.auth.getSession(),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Session check timed out")), 10000),
-      ),
-    ]);
-    check
-      .then(({ data }) => {
-        if (active) setSession(data.session);
+    // Never leave the "Checking session…" screen hanging: treat any failure
+    // as signed-out so the login form is shown.
+    checkAuth()
+      .then((ok) => {
+        if (active) setAuthed(ok);
       })
       .catch(() => {
-        // Treat any failure as signed-out; the login form is shown.
-        if (active) setSession(null);
+        if (active) setAuthed(false);
       })
       .finally(() => {
         if (active) setChecking(false);
       });
-
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
-        if (!active) return;
-        setSession(newSession);
-        // A session event (including right after signing in) means the
-        // check is done — never flip back to the checking screen.
-        setChecking(false);
-      },
-    );
-
     return () => {
       active = false;
-      sub.subscription.unsubscribe();
     };
   }, []);
-
-  const supabase = getSupabase();
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-slate-50 px-4 py-16">
-        <div className="mx-auto max-w-2xl">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-            <h1 className="text-xl font-bold text-slate-900">Admin Portal</h1>
-            <div className="mt-4 space-y-4">
-              <Notice kind="info">
-                <strong>Supabase is not configured yet.</strong> The admin
-                portal activates once you add your project credentials.
-              </Notice>
-              <ol className="list-decimal space-y-1.5 pl-5 text-sm text-slate-600">
-                <li>Create a free project at supabase.com</li>
-                <li>Run the SQL from <code className="rounded bg-slate-100 px-1">supabase/schema.sql</code> in the SQL editor</li>
-                <li>Add users under Authentication → Users</li>
-                <li>
-                  Create <code className="rounded bg-slate-100 px-1">.env.local</code> with{" "}
-                  <code className="rounded bg-slate-100 px-1">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
-                  <code className="rounded bg-slate-100 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>
-                </li>
-                <li>Rebuild the site (<code className="rounded bg-slate-100 px-1">npm run build</code>)</li>
-              </ol>
-              <p className="text-sm text-slate-500">
-                Full instructions: README.md → “Supabase setup”.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (checking) {
     return (
@@ -233,10 +160,10 @@ export default function AdminPage() {
     );
   }
 
-  if (!session) {
+  if (!authed) {
     return (
       <div className="flex min-h-screen items-center bg-slate-50 px-4 py-16">
-        <LoginForm onSuccess={() => setChecking(false)} />
+        <LoginForm onSuccess={() => setAuthed(true)} />
       </div>
     );
   }
@@ -251,12 +178,15 @@ export default function AdminPage() {
             </span>
             <div>
               <h1 className="text-base font-bold text-slate-900">Admin Portal</h1>
-              <p className="text-xs text-slate-500">{session.user.email}</p>
+              <p className="text-xs text-slate-500">Signed in with the staff passphrase</p>
             </div>
           </div>
           <Button
             variant="secondary"
-            onClick={() => supabase.auth.signOut()}
+            onClick={() => {
+              void logout();
+              setAuthed(false);
+            }}
           >
             Sign Out
           </Button>

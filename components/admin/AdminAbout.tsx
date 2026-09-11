@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { apiSiteContent, contentApi } from "@/lib/api";
 import {
   FALLBACK_ABOUT_FACTS,
   FALLBACK_ABOUT_MISSION_VISION,
@@ -49,7 +49,6 @@ const ABOUT_SECTIONS: { id: AboutSection; label: string }[] = [
 ];
 
 export default function AdminAbout() {
-  const supabase = getSupabase();
   const [section, setSection] = useState<AboutSection>("mission");
   const [missionVision, setMissionVision] = useState<AboutMissionVision>(
     FALLBACK_ABOUT_MISSION_VISION,
@@ -68,19 +67,9 @@ export default function AdminAbout() {
   useEffect(() => {
     let active = true;
     (async () => {
-      if (!supabase) return;
-      const { data } = await supabase
-        .from("site_content")
-        .select("key, value_en")
-        .in("key", [
-          MISSION_VISION_KEY,
-          VALUES_KEY,
-          FACTS_KEY,
-          SECTIONS_KEY,
-          WHY_CHOOSE_KEY,
-        ]);
+      const rows = await apiSiteContent();
       if (!active) return;
-      const map = new Map<string, string>((data ?? []).map((r) => [r.key, r.value_en]));
+      const map = new Map<string, string>(rows.map((r) => [r.key, r.value_en]));
       const mv = parseJson<AboutMissionVision>(map.get(MISSION_VISION_KEY));
       const v = parseJson<AboutValues>(map.get(VALUES_KEY));
       const f = parseJson<AboutFacts>(map.get(FACTS_KEY));
@@ -96,32 +85,27 @@ export default function AdminAbout() {
       setSections(s ?? FALLBACK_ABOUT_SECTIONS);
       setWhyChoose(w ?? FALLBACK_WHY_CHOOSE);
       setLoaded(true);
-    })();
+    })().catch(() => {
+      if (active) setLoaded(true);
+    });
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const saveAll = async () => {
-    if (!supabase) return;
     setBusy(true);
     setError("");
     setSaved(false);
     try {
-      const rows = [
+      await contentApi.save([
         { key: MISSION_VISION_KEY, value_en: JSON.stringify(missionVision), value_my: JSON.stringify(missionVision) },
         { key: VALUES_KEY, value_en: JSON.stringify(values), value_my: JSON.stringify(values) },
         { key: FACTS_KEY, value_en: JSON.stringify(facts), value_my: JSON.stringify(facts) },
         { key: SECTIONS_KEY, value_en: JSON.stringify(sections), value_my: JSON.stringify(sections) },
         { key: WHY_CHOOSE_KEY, value_en: JSON.stringify(whyChoose), value_my: JSON.stringify(whyChoose) },
-      ];
-      for (const row of rows) {
-        const { error } = await supabase
-          .from("site_content")
-          .upsert(row, { onConflict: "key" });
-        if (error) throw error;
-      }
+      ]);
       setSaved(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save");
@@ -171,7 +155,6 @@ export default function AdminAbout() {
       items: whyChoose.items.map((item, j) => (j === i ? { ...item, ...patch } : item)),
     });
 
-  if (!supabase) return null;
   if (!loaded) {
     return <p className="text-sm text-slate-500">Loading…</p>;
   }

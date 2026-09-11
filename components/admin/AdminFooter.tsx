@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { apiSiteContent, contentApi } from "@/lib/api";
 import { FALLBACK_FOOTER } from "@/lib/fallback-data";
 import type { FooterContent } from "@/lib/types";
 import { LangRow } from "./bilingual";
@@ -19,7 +19,6 @@ function parseJson<T>(raw: string | undefined | null): T | null {
 }
 
 export default function AdminFooter() {
-  const supabase = getSupabase();
   const [footer, setFooter] = useState<FooterContent>(FALLBACK_FOOTER);
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -29,40 +28,33 @@ export default function AdminFooter() {
   useEffect(() => {
     let active = true;
     (async () => {
-      if (!supabase) return;
-      const { data } = await supabase
-        .from("site_content")
-        .select("value_en")
-        .eq("key", FOOTER_KEY)
-        .maybeSingle();
+      const rows = await apiSiteContent();
       if (!active) return;
-      const parsed = parseJson<FooterContent>(data?.value_en);
+      const row = rows.find((r) => r.key === FOOTER_KEY);
+      const parsed = parseJson<FooterContent>(row?.value_en);
       // Merge with defaults so older saved rows (e.g. without quick links)
       // still have sensible values for every field.
       if (parsed) setFooter({ ...FALLBACK_FOOTER, ...parsed });
       setLoaded(true);
-    })();
+    })().catch(() => {
+      if (active) setLoaded(true);
+    });
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const save = async () => {
-    if (!supabase) return;
     setBusy(true);
     setError("");
     setSaved(false);
     try {
-      const { error } = await supabase.from("site_content").upsert(
-        {
-          key: FOOTER_KEY,
-          value_en: JSON.stringify(footer),
-          value_my: JSON.stringify(footer),
-        },
-        { onConflict: "key" },
-      );
-      if (error) throw error;
+      await contentApi.save({
+        key: FOOTER_KEY,
+        value_en: JSON.stringify(footer),
+        value_my: JSON.stringify(footer),
+      });
       setSaved(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save");
@@ -74,7 +66,6 @@ export default function AdminFooter() {
   const update = (patch: Partial<FooterContent>) =>
     setFooter({ ...footer, ...patch });
 
-  if (!supabase) return null;
   if (!loaded) {
     return <p className="text-sm text-slate-500">Loading…</p>;
   }

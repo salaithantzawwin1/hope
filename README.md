@@ -6,8 +6,9 @@ on any hosting (cPanel, shared hosting, GitHub Pages, Netlify, Vercel free
 tier, …). No Node.js server is required on the host.
 
 Editable content (news, events, gallery photos, hero/about text) is stored in
-a free **Supabase** cloud project and loaded by the site. Changes made in the
-admin portal appear on the public site immediately — no rebuild or re-upload.
+**Cloudflare D1** (SQLite) with photos in **Cloudflare R2**, served by the
+same-origin Worker that hosts the static site. Changes made in the admin
+portal appear on the public site immediately — no rebuild or re-upload.
 
 ## Features
 
@@ -22,14 +23,14 @@ admin portal appear on the public site immediately — no rebuild or re-upload.
   a Google Map — all editable from the portal.
 - ✍️ **Editable site text**: hero, welcome and about intro editable from the
   portal.
-- 🔐 **Admin portal** at `/admin` (Supabase Auth login, staff accounts).
-- 📦 **Static export**: works on any hosting; Supabase is optional — without
-  it the site shows sample content.
+- 🔐 **Admin portal** at `/admin` (staff passphrase login, signed session cookie).
+- 📦 **Static export**: pages are plain static assets; the Worker serves the
+  `/api/*` backend. Without D1/R2 configured the site still shows sample content.
 
 ## Tech stack
 
 Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · next-intl ·
-Supabase (@supabase/supabase-js)
+Cloudflare Workers (D1 + R2)
 
 ## Development
 
@@ -52,31 +53,48 @@ To preview the production build locally:
 npx serve out     # or: python -m http.server 8080 -d out
 ```
 
-## Supabase setup (free)
+## Cloudflare backend setup (free tier)
 
-The site shows sample content until you connect Supabase. Steps:
+The site shows sample content until the backend is connected. One-time setup:
 
-1. Create a free project at <https://supabase.com> (no credit card needed).
-2. In **SQL Editor**, paste the contents of `supabase/schema.sql` and run it.
-   This creates the `news`, `events`, `site_content` and `gallery` tables,
-   the public `images` storage bucket, row-level security, and seed text.
-3. In **Authentication → Users**, click **Add user** → **Create new user**
-   and create each staff account (email + password).
-4. In **Project Settings → API**, copy the **Project URL** and the **anon
-   public** key.
-5. Create a file named `.env.local` in the project root (see
-   `.env.local.example`):
+1. `npx wrangler login`, then create the resources:
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR-ANON-KEY
+   ```bash
+   npx wrangler d1 create hope-db        # put the returned id in wrangler.jsonc
+   npx wrangler r2 bucket create hope-images
+   npx wrangler d1 execute hope-db --remote --file worker/schema.sql
    ```
 
-6. Rebuild: `npm run build`.
+2. Set the admin secrets (`.dev.vars.example` documents local equivalents):
 
-> Security note: only the anon (public) key is used by the site. Row-level
-> security means visitors can read content but only signed-in staff can
-> create or edit it.
+   ```bash
+   npx wrangler secret put STAFF_PASSPHRASE   # shared /admin passphrase
+   npx wrangler secret put SESSION_SECRET     # openssl rand -hex 32
+   ```
+
+3. Optional: connect a custom domain to the R2 bucket (dashboard → R2 →
+   bucket → Settings → Public access) and set `IMAGE_PUBLIC_BASE_URL` in
+   `wrangler.jsonc` `[vars]` (and `NEXT_PUBLIC_IMAGE_BASE_URL` in `.env.local`
+   before a rebuild) so uploads return full URLs.
+
+> Security note: all `/api/*` reads are public (like the old row-level
+> security); every write requires the staff session cookie the Worker issues
+> after a correct passphrase.
+
+### Migrating existing content from Supabase (one-time)
+
+If the old Supabase project still has data:
+
+```bash
+SUPABASE_URL=https://<proj>.supabase.co \
+SUPABASE_SERVICE_ROLE_KEY=eyJ... \
+node scripts/export-supabase-to-d1.mjs            # writes scripts/d1-import.sql
+npx wrangler d1 execute hope-db --remote --file scripts/d1-import.sql
+```
+
+Old photo URLs keep working (they still point at the Supabase bucket) until
+you copy the objects to R2 and rewrite the URLs — see
+`docs/cloudflare-migration-plan.md` §4.
 
 ## Deploying to cPanel / shared hosting
 
@@ -106,8 +124,8 @@ Locally you can deploy or preview with `npm run deploy` / `npm run preview`
 
 ## Using the admin portal
 
-1. Open `https://your-school.com/admin` and sign in with a staff account
-   created in Supabase.
+1. Open `https://your-school.com/admin` and sign in with the staff
+   passphrase (the `STAFF_PASSPHRASE` Worker secret).
 2. **News** — add/edit/delete posts (title + body in English and Burmese,
    optional cover photo). New posts appear on the Home page and News page
    immediately.
@@ -255,19 +273,22 @@ app/
 components/
   admin/             portal editor components
   Header, Footer, ...i18n/                 next-intl routing + request config
-lib/                  supabase client, db helpers, uploads, types
+lib/                  api client, db helpers, uploads, types
+worker/               Worker entry, auth, /api routes, D1 schema
 messages/             en.json + my.json (all UI copy)
 registration-emailer/ Google Apps Script for the registration form
 application-emailer/  Google Apps Script for the job application form
-supabase/schema.sql  one-click Supabase setup
 ```
 
 ## Troubleshooting
 
 - **Burmese looks broken on Windows/Android** — the Noto Sans Myanmar font is
   bundled at build time; hard-refresh (Ctrl+F5) after deploying.
-- **News/events not loading** — check the browser console for Supabase
-  errors, confirm the SQL ran, and that `.env.local` was set *before* the
-  build (env vars are baked in at build time).
-- **Login fails** — the staff user must exist under Supabase
-  Authentication → Users, and email/password must match.
+- **News/events not loading** — the Worker API is unreachable: check the
+  deploy logs, confirm `wrangler.jsonc` has the real `database_id`, and that
+  `worker/schema.sql` was applied (`wrangler d1 execute hope-db --remote
+  --file worker/schema.sql`). Without the API the pages fall back to sample
+  content.
+- **Login fails** — the `STAFF_PASSPHRASE` secret must be set on the Worker
+  (`npx wrangler secret put STAFF_PASSPHRASE`); the passphrase is
+  case-sensitive.

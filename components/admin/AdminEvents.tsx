@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { apiEvents, eventsApi, type EventInput } from "@/lib/api";
 import { uploadImage } from "@/lib/upload";
 import type { EventItem } from "@/lib/types";
 import { Button, Card, Field, Notice, SubTabs, TextArea, TextInput } from "./ui";
@@ -49,16 +49,12 @@ export default function AdminEvents() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  const supabase = getSupabase();
-
   const load = async (): Promise<EventItem[]> => {
-    if (!supabase) return [];
-    const { data, error } = await supabase
-      .from("events")
-      .select("*")
-      .order("date", { ascending: true });
-    if (error) return [];
-    return (data ?? []) as EventItem[];
+    try {
+      return await apiEvents();
+    } catch {
+      return [];
+    }
   };
 
   useEffect(() => {
@@ -70,7 +66,7 @@ export default function AdminEvents() {
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const startEdit = (item?: EventItem) => {
@@ -96,7 +92,6 @@ export default function AdminEvents() {
   };
 
   const save = async () => {
-    if (!supabase) return;
     setBusy(true);
     setError("");
     try {
@@ -119,10 +114,8 @@ export default function AdminEvents() {
       if (!payload.title_en || !payload.date)
         throw new Error("English title and date are required");
 
-      const { error } = form.id
-        ? await supabase.from("events").update(payload).eq("id", form.id)
-        : await supabase.from("events").insert(payload);
-      if (error) throw error;
+      if (form.id) await eventsApi.update(form.id, payload as EventInput);
+      else await eventsApi.create(payload as EventInput);
 
       setEditing(false);
       setForm(EMPTY);
@@ -137,13 +130,14 @@ export default function AdminEvents() {
   };
 
   const remove = async (item: EventItem) => {
-    if (!supabase) return;
     if (!window.confirm(`Delete "${item.title_en}"?`)) return;
-    const { error } = await supabase.from("events").delete().eq("id", item.id);
-    if (!error) setItems(await load());
+    try {
+      await eventsApi.remove(item.id);
+      setItems(await load());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete");
+    }
   };
-
-  if (!supabase) return null;
 
   // Split by date so staff can focus on what is coming up vs. what has
   // already happened (past is shown most-recent-first).

@@ -1,17 +1,17 @@
-import { getSupabase } from "./supabase";
+import { apiEvents, apiGallery, apiNews, apiSiteContent } from "./api";
 import {
   FALLBACK_EVENTS,
   FALLBACK_NEWS,
   FALLBACK_SITE_CONTENT,
 } from "./fallback-data";
-import type { EventItem, GalleryImage, NewsItem, SiteContentRow } from "./types";
+import type { EventItem, GalleryImage, NewsItem } from "./types";
 
 /**
  * Public URL for a stored image.
  *
- * Phase 1 of the Cloudflare migration: images live in R2, exposed through a
- * custom domain on the school's zone (set NEXT_PUBLIC_IMAGE_BASE_URL in
- * .env.local, e.g. https://images.hopeinternationalschool.com).
+ * Images live in R2, exposed through a custom domain on the school's zone
+ * (set NEXT_PUBLIC_IMAGE_BASE_URL in .env.local, e.g.
+ * https://images.hopeinternationalschool.com).
  *
  * Pass-through cases (returned unchanged):
  *  - absolute URLs (older Supabase URLs keep working until the data migration
@@ -34,66 +34,35 @@ export function publicImageUrl(path: string): string {
 }
 
 export async function fetchNews(): Promise<NewsItem[]> {
-  const supabase = getSupabase();
-  if (!supabase) return FALLBACK_NEWS;
   try {
-    const { data, error } = await supabase
-      .from("news")
-      .select("*")
-      .order("published_at", { ascending: false })
-      .limit(20);
-    if (error) throw error;
-    return (data ?? []) as NewsItem[];
+    return await apiNews();
   } catch {
     return FALLBACK_NEWS;
   }
 }
 
 export async function fetchEvents(): Promise<EventItem[]> {
-  const supabase = getSupabase();
-  if (!supabase) {
+  try {
+    return await apiEvents();
+  } catch {
     const today = new Date().toISOString().slice(0, 10);
     return FALLBACK_EVENTS.filter((e) => e.date >= today);
-  }
-  try {
-    const today = new Date().toISOString().slice(0, 10);
-    const { data, error } = await supabase
-      .from("events")
-      .select("*")
-      .gte("date", today)
-      .order("date", { ascending: true })
-      .limit(20);
-    if (error) throw error;
-    return (data ?? []) as EventItem[];
-  } catch {
-    return FALLBACK_EVENTS;
   }
 }
 
 export async function fetchGallery(): Promise<GalleryImage[]> {
-  const supabase = getSupabase();
-  if (!supabase) return [];
   try {
-    const { data, error } = await supabase
-      .from("gallery")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(50);
-    if (error) throw error;
-    return (data ?? []) as GalleryImage[];
+    return await apiGallery();
   } catch {
     return [];
   }
 }
 
 export async function fetchSiteContent(): Promise<Record<string, { en: string; my: string }>> {
-  const supabase = getSupabase();
-  if (!supabase) return FALLBACK_SITE_CONTENT;
   try {
-    const { data, error } = await supabase.from("site_content").select("*");
-    if (error) throw error;
+    const rows = await apiSiteContent();
     const map: Record<string, { en: string; my: string }> = { ...FALLBACK_SITE_CONTENT };
-    for (const row of (data ?? []) as SiteContentRow[]) {
+    for (const row of rows) {
       map[row.key] = { en: row.value_en, my: row.value_my };
     }
     return map;

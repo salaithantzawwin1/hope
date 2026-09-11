@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { apiSiteContent, contentApi } from "@/lib/api";
 import { FALLBACK_CONTACT } from "@/lib/fallback-data";
 import type { ContactContent, SocialLink } from "@/lib/types";
 import { LangRow } from "./bilingual";
@@ -26,7 +26,6 @@ function parseJson<T>(raw: string | undefined | null): T | null {
 }
 
 export default function AdminContact() {
-  const supabase = getSupabase();
   const [data, setData] = useState<ContactContent>(FALLBACK_CONTACT);
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -36,39 +35,32 @@ export default function AdminContact() {
   useEffect(() => {
     let active = true;
     (async () => {
-      if (!supabase) return;
-      const { data: row } = await supabase
-        .from("site_content")
-        .select("value_en")
-        .eq("key", CONTACT_KEY)
-        .maybeSingle();
+      const rows = await apiSiteContent();
       if (!active) return;
+      const row = rows.find((r) => r.key === CONTACT_KEY);
       const parsed = parseJson<ContactContent>(row?.value_en);
       // Merge with defaults so older saved rows still have every field.
       if (parsed) setData({ ...FALLBACK_CONTACT, ...parsed });
       setLoaded(true);
-    })();
+    })().catch(() => {
+      if (active) setLoaded(true);
+    });
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const save = async () => {
-    if (!supabase) return;
     setBusy(true);
     setError("");
     setSaved(false);
     try {
-      const { error } = await supabase.from("site_content").upsert(
-        {
-          key: CONTACT_KEY,
-          value_en: JSON.stringify(data),
-          value_my: JSON.stringify(data),
-        },
-        { onConflict: "key" },
-      );
-      if (error) throw error;
+      await contentApi.save({
+        key: CONTACT_KEY,
+        value_en: JSON.stringify(data),
+        value_my: JSON.stringify(data),
+      });
       setSaved(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save");
@@ -87,7 +79,6 @@ export default function AdminContact() {
       ),
     });
 
-  if (!supabase) return null;
   if (!loaded) {
     return <p className="text-sm text-slate-500">Loading…</p>;
   }

@@ -1,34 +1,32 @@
 /**
- * Auth helpers for the Worker's staff-only write routes (Phases 1–2).
+ * Auth for the Worker's staff-only routes (Phase 3).
  *
- * Supabase access tokens are HS256 JWTs signed with the project's JWT secret.
- * The admin portal already holds the token in memory, so we verify it here
- * with WebCrypto and accept `HS256` (typical for Supabase projects; the
- * algorithm is pinned below, never taken from the token header).
+ * Staff sign in with a shared passphrase (the `STAFF_PASSPHRASE` secret);
+ * the Worker issues an HMAC-signed session cookie (the `SESSION_SECRET`
+ * secret signs it). No third-party auth dependency, no database rows —
+ * the signed cookie is the entire session.
  *
- * Phase 3 replaces this with Cloudflare Access JWT verification
- * (docs/cloudflare-migration-plan.md §6).
+ *   POST /api/auth/login    { passphrase } → Set-Cookie hope_session=…
+ *   POST /api/auth/logout   → clears the cookie
+ *   GET  /api/auth/check    → { authed: boolean }
+ *
+ * Cookie value: `<expiresAtMs>.<hex hmac of expiresAtMs>` — verified by
+ * re-computing the HMAC (constant-time compare) and checking expiry.
+ * Flags: HttpOnly, Secure, SameSite=Strict, 7-day Max-Age.
+ *
+ * Replacing this with Cloudflare Access later (plan §6) means swapping the
+ * three auth routes and `requireStaff` for `Cf-Access-Jwt-Assertion`
+ * verification — every route handler keeps calling `requireStaff`.
  */
 
-const EXPECTED_ALG = "HS256";
+const SESSION_COOKIE = "hope_session";
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-interface JwtParts {
-  header: JwtHeader;
-  payload: JwtPayload;
-  signingInput: string;
-  signatureBytes: Uint8Array;
-}
-
-interface JwtHeader {
-  alg?: string;
-  typ?: string;
-}
-
-interface JwtPayload {
-  sub?: string;
-  email?: string;
-  role?: string;
-  exp?: number;
+interface SessionEnv {
+  /** Secret used to sign session cookies (e.g. `openssl rand -hex 32`). */
+  SESSION_SECRET: string;
+  /** Shared staff passphrase for the admin portal. */
+  STAFF_PASSPHRASE: string;
 }
 
 /** 401 response with a short cache lifetime so browsers don't retry blindly. */
@@ -46,93 +44,142 @@ export function badRequest(message: string): Response {
   });
 }
 
-/**
- * Verify a Supabase HS256 access token without dependencies.
- * Returns the payload on success, null on any failure (bad format, wrong
- * algorithm, bad signature, expired, or missing secret).
- */
-export async function verifySupabaseJwt(
-  token: string,
-  secret: string,
-): Promise<JwtPayload | null> {
-  const parts = splitJwt(token);
-  if (!parts || parts.header.alg !== EXPECTED_ALG) return null;
+function json(data: unknown, status = 200, headers: HeadersInit = {}): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "content-type": "application/json; charset=utf-8", ...headers },
+  });
+}
 
+/** HMAC-SHA256 of a message, hex-encoded. */
+async function hmacHex(message: string, secret: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["verify"],
+    ["sign"],
   );
-  const signatureOk = await crypto.subtle.verify(
-    { name: "HMAC", hash: "SHA-256" },
+  const mac = await crypto.subtle.sign(
+    "HMAC",
     key,
-    parts.signatureBytes,
-    new TextEncoder().encode(parts.signingInput),
+    new TextEncoder().encode(message),
   );
-  if (!signatureOk) return null;
+  return [...new Uint8Array(mac)]
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
 
-  // Reject long-expired tokens (Supabase default access-token TTL is 1h;
-  // this is a safety net for clock skew, not the primary expiry check).
-  const now = Math.floor(Date.now() / 1000);
-  if (typeof parts.payload.exp === "number" && parts.payload.exp < now - 60) {
-    return null;
+/** Length-independent constant-time string comparison. */
+function timingSafeEqual(a: string, b: string): boolean {
+  const aBytes = new TextEncoder().encode(a);
+  const bBytes = new TextEncoder().encode(b);
+  const len = Math.max(aBytes.length, bBytes.length);
+  let diff = aBytes.length ^ bBytes.length;
+  for (let i = 0; i < len; i += 1) {
+    diff |= (aBytes[i] ?? 0) ^ (bBytes[i] ?? 0);
   }
-  return parts.payload;
+  return diff === 0;
+}
+
+function buildCookieValue(expiresAtMs: number, secret: string): Promise<string> {
+  return hmacHex(String(expiresAtMs), secret).then(
+    (mac) => `${expiresAtMs}.${mac}`,
+  );
+}
+
+async function isValidSession(
+  value: string | undefined,
+  secret: string,
+): Promise<boolean> {
+  if (!value) return false;
+  const dot = value.indexOf(".");
+  if (dot <= 0) return false;
+  const expiresAtMs = Number(value.slice(0, dot));
+  const mac = value.slice(dot + 1);
+  if (!Number.isFinite(expiresAtMs) || expiresAtMs < Date.now()) return false;
+  const expected = await hmacHex(String(expiresAtMs), secret);
+  return timingSafeEqual(mac, expected);
+}
+
+function readSessionCookie(request: Request): string | undefined {
+  const cookie = request.headers.get("cookie") ?? "";
+  for (const part of cookie.split(/;\s*/)) {
+    const eq = part.indexOf("=");
+    if (eq > 0 && part.slice(0, eq) === SESSION_COOKIE) {
+      return decodeURIComponent(part.slice(eq + 1));
+    }
+  }
+  return undefined;
+}
+
+/** True when the request carries a valid, unexpired session cookie. */
+export async function isStaff(
+  request: Request,
+  env: SessionEnv,
+): Promise<boolean> {
+  return isValidSession(readSessionCookie(request), env.SESSION_SECRET);
 }
 
 /**
- * Extract and verify the bearer token from a request.
- * Returns the payload on success, or a 401 Response to return directly.
+ * Guard for write routes. Returns true when authenticated; the caller should
+ * return `unauthorized()` otherwise.
  */
 export async function requireStaff(
   request: Request,
-  secret: string,
-): Promise<JwtPayload | Response> {
-  const header = request.headers.get("authorization") ?? "";
-  const [scheme, token] = header.split(" ");
-  if (!token || scheme.toLowerCase() !== "bearer") return unauthorized();
-  const payload = await verifySupabaseJwt(token, secret);
-  return payload ?? unauthorized("Invalid or expired token");
+  env: SessionEnv,
+): Promise<boolean> {
+  return isStaff(request, env);
 }
 
-/** Type guard: true when requireStaff returned a payload (not a Response). */
-export function isAuthed(value: unknown): value is JwtPayload {
-  return typeof value === "object" && value !== null && !("status" in value);
-}
+// ---------------------------------------------------------------------------
+// Auth routes
+// ---------------------------------------------------------------------------
 
-function splitJwt(token: string): JwtParts | null {
-  const segments = token.split(".");
-  if (segments.length !== 3) return null;
-  const [headerSeg, payloadSeg, signatureSeg] = segments;
+export async function handleLogin(
+  request: Request,
+  env: SessionEnv,
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
+  }
+  let passphrase = "";
   try {
-    const header = JSON.parse(base64UrlDecodeToString(headerSeg)) as JwtHeader;
-    const payload = JSON.parse(
-      base64UrlDecodeToString(payloadSeg),
-    ) as JwtPayload;
-    return {
-      header,
-      payload,
-      signingInput: `${headerSeg}.${payloadSeg}`,
-      signatureBytes: base64UrlDecodeToBytes(signatureSeg),
-    };
+    const body = (await request.json()) as { passphrase?: unknown };
+    if (typeof body.passphrase === "string") passphrase = body.passphrase;
   } catch {
-    return null;
+    return badRequest("Expected a JSON body");
   }
+  if (!passphrase || !timingSafeEqual(passphrase, env.STAFF_PASSPHRASE)) {
+    // Same message for wrong passphrase so errors don't leak config state.
+    return unauthorized("Incorrect passphrase");
+  }
+
+  const expiresAtMs = Date.now() + SESSION_TTL_MS;
+  const value = await buildCookieValue(expiresAtMs, env.SESSION_SECRET);
+  return json(
+    { authed: true },
+    200,
+    {
+      "set-cookie":
+        `${SESSION_COOKIE}=${encodeURIComponent(value)}; Max-Age=${SESSION_TTL_MS / 1000}; ` +
+        "Path=/; HttpOnly; Secure; SameSite=Strict",
+    },
+  );
 }
 
-function base64UrlDecodeToBytes(segment: string): Uint8Array {
-  const base64 = segment.replace(/-/g, "+").replace(/_/g, "/");
-  const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
-  const binary = atob(padded);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) {
-    bytes[i] = binary.charCodeAt(i);
+export async function handleLogout(request: Request): Promise<Response> {
+  if (request.method !== "POST") {
+    return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
   }
-  return bytes;
+  return json({ authed: false }, 200, {
+    "set-cookie": `${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict`,
+  });
 }
 
-function base64UrlDecodeToString(segment: string): string {
-  return new TextDecoder().decode(base64UrlDecodeToBytes(segment));
+export async function handleAuthCheck(
+  request: Request,
+  env: SessionEnv,
+): Promise<Response> {
+  return json({ authed: await isStaff(request, env) });
 }

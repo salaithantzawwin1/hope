@@ -21,8 +21,9 @@
 //   npx wrangler r2 bucket create hope-images
 //   npx wrangler d1 execute hope-db --remote --file worker/schema.sql
 //
-// Secrets / vars (Phase 1+):
-//   npx wrangler secret put SUPABASE_JWT_SECRET   # supabase.com → Project Settings → API → JWT Secret
+// Secrets / vars:
+//   npx wrangler secret put STAFF_PASSPHRASE   # shared passphrase for the /admin portal
+//   npx wrangler secret put SESSION_SECRET     # signs admin session cookies (openssl rand -hex 32)
 //
 //   # optional: the custom domain R2 is served from (dashboard → R2 → bucket →
 //   # Settings → Public access). Without it, PUT /api/images returns bare keys.

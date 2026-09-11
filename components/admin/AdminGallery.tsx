@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { apiGallery, galleryApi } from "@/lib/api";
 import { uploadImage } from "@/lib/upload";
 import type { GalleryImage } from "@/lib/types";
 import { Button, Card, Field, Notice, Select, SubTabs, TextInput } from "./ui";
@@ -82,16 +82,12 @@ export default function AdminGallery() {
   const [filterAlbum, setFilterAlbum] = useState("");
   const [search, setSearch] = useState("");
 
-  const supabase = getSupabase();
-
   const load = async (): Promise<GalleryImage[]> => {
-    if (!supabase) return [];
-    const { data, error } = await supabase
-      .from("gallery")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) return [];
-    return (data ?? []) as GalleryImage[];
+    try {
+      return await apiGallery();
+    } catch {
+      return [];
+    }
   };
 
   useEffect(() => {
@@ -103,11 +99,10 @@ export default function AdminGallery() {
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const upload = async () => {
-    if (!supabase) return;
     if (files.length === 0) {
       setError("Choose at least one image first.");
       return;
@@ -117,7 +112,7 @@ export default function AdminGallery() {
     try {
       for (const file of files) {
         const image_url = await uploadImage(file, "gallery");
-        const { error } = await supabase.from("gallery").insert({
+        await galleryApi.create({
           image_url,
           caption_en: captionEn.trim() || null,
           caption_my: captionMy.trim() || null,
@@ -126,7 +121,6 @@ export default function AdminGallery() {
           album_desc_en: albumDescEn.trim() || null,
           album_desc_my: albumDescMy.trim() || null,
         });
-        if (error) throw error;
       }
       setFiles([]);
       setCaptionEn("");
@@ -144,30 +138,29 @@ export default function AdminGallery() {
   };
 
   const savePhoto = async (item: GalleryImage) => {
-    if (!supabase) return;
-    const { error } = await supabase
-      .from("gallery")
-      .update({
+    try {
+      await galleryApi.update(item.id, {
         caption_en: item.caption_en?.trim() || null,
         caption_my: item.caption_my?.trim() || null,
         album_en: item.album_en?.trim() || null,
         album_my: item.album_my?.trim() || null,
-      })
-      .eq("id", item.id);
-    if (error) {
-      setError(error.message);
-    } else {
+      });
       setError("");
       setSavedId(item.id);
       setItems(await load());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to save");
     }
   };
 
   const remove = async (item: GalleryImage) => {
-    if (!supabase) return;
     if (!window.confirm("Delete this photo?")) return;
-    const { error } = await supabase.from("gallery").delete().eq("id", item.id);
-    if (!error) setItems(await load());
+    try {
+      await galleryApi.remove(item.id);
+      setItems(await load());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete");
+    }
   };
 
   const toggleSelected = (id: string) =>
@@ -179,55 +172,58 @@ export default function AdminGallery() {
     });
 
   const moveSelected = async () => {
-    if (!supabase || selected.size === 0) return;
-    const { error } = await supabase
-      .from("gallery")
-      .update({
+    if (selected.size === 0) return;
+    try {
+      await galleryApi.update(Array.from(selected), {
         album_en: batchAlbumEn.trim() || null,
         album_my: batchAlbumMy.trim() || null,
-      })
-      .in("id", Array.from(selected));
-    if (error) {
-      setError(error.message);
-    } else {
+      });
       setError("");
       setSelected(new Set());
       setBatchAlbumEn("");
       setBatchAlbumMy("");
       setItems(await load());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to move");
     }
   };
 
   const deleteSelected = async () => {
-    if (!supabase || selected.size === 0) return;
+    if (selected.size === 0) return;
     if (!window.confirm(`Delete ${selected.size} selected photo(s)?`)) return;
-    const { error } = await supabase
-      .from("gallery")
-      .delete()
-      .in("id", Array.from(selected));
-    if (!error) {
+    try {
+      await galleryApi.remove(Array.from(selected));
       setSelected(new Set());
       setItems(await load());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete");
     }
   };
 
   /** Removes an album entirely; optionally deletes its photos too. */
   const deleteAlbum = async (key: string) => {
-    if (!supabase) return;
     const ids = items
       .filter((i) => `${i.album_en ?? ""}\u0000${i.album_my ?? ""}` === key)
       .map((i) => i.id);
     const name = key.split("\u0000").filter(Boolean).join(" / ") || "this album";
     if (!window.confirm(`Delete album "${name}"?`)) return;
     if (window.confirm("Also delete the photos themselves? OK = delete photos, Cancel = keep them as uncategorized")) {
-      const { error } = await supabase.from("gallery").delete().in("id", ids);
-      if (error) setError(error.message);
+      try {
+        await galleryApi.remove(ids);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to delete");
+      }
     } else {
-      const { error } = await supabase
-        .from("gallery")
-        .update({ album_en: null, album_my: null, album_desc_en: null, album_desc_my: null })
-        .in("id", ids);
-      if (error) setError(error.message);
+      try {
+        await galleryApi.update(ids, {
+          album_en: null,
+          album_my: null,
+          album_desc_en: null,
+          album_desc_my: null,
+        });
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to update");
+      }
     }
     setSelected(new Set());
     setItems(await load());
@@ -261,24 +257,18 @@ export default function AdminGallery() {
     }));
 
   const saveAlbum = async (key: string) => {
-    if (!supabase) return;
     const edit = albumEdits[key];
     if (!edit) return;
     const ids = items
       .filter((i) => `${i.album_en ?? ""}\u0000${i.album_my ?? ""}` === key)
       .map((i) => i.id);
-    const { error } = await supabase
-      .from("gallery")
-      .update({
+    try {
+      await galleryApi.update(ids, {
         album_en: edit.titleEn.trim() || null,
         album_my: edit.titleMy.trim() || null,
         album_desc_en: edit.descEn.trim() || null,
         album_desc_my: edit.descMy.trim() || null,
-      })
-      .in("id", ids);
-    if (error) {
-      setError(error.message);
-    } else {
+      });
       setError("");
       setItems(await load());
       // Clear the draft so the editor shows the saved values.
@@ -287,6 +277,8 @@ export default function AdminGallery() {
         delete next[key];
         return next;
       });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to save");
     }
   };
 
@@ -323,8 +315,6 @@ export default function AdminGallery() {
     filtered.length > 0 && filtered.every((i) => selected.has(i.id));
   const toggleSelectAll = () =>
     setSelected(allFilteredSelected ? new Set() : new Set(filtered.map((i) => i.id)));
-
-  if (!supabase) return null;
 
   return (
     <div className="space-y-6">
