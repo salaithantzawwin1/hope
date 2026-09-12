@@ -137,7 +137,17 @@ database — git never sees it. Nightly snapshots fix that:
 Photos are **not** in these snapshots — they live in R2 and the SQL only
 references them by key/URL, so a restore never touches R2 objects.
 
-### Restoring content from a snapshot
+### Restoring content into a local project (after `git pull`)
+
+```bash
+npm run restore:d1
+```
+
+Loads `backups/latest.sql` into the **local** D1 (drops and recreates the
+four content tables), so the local admin portal shows the same content the
+production site serves. Production is never touched by this command.
+
+### Restoring content into PRODUCTION
 
 ```bash
 # 1. Overwrite-in-place (safe: rows with the same ids are replaced, existing

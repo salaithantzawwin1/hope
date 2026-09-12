@@ -9,7 +9,8 @@
     "lint": "eslint",
     "deploy": "next build && npx wrangler deploy",
     "preview": "next build && npx wrangler dev",
-    "backup:d1": "node scripts/backup-d1.mjs"
+    "backup:d1": "node scripts/backup-d1.mjs",
+    "restore:d1": "node scripts/restore-d1-local.mjs"
   },
   "dependencies": {
     "next": "16.3.4",
