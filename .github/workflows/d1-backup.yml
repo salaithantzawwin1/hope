@@ -44,6 +44,10 @@ jobs:
         id: export
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # The backup token only has D1 permissions (no account listing),
+          # so wrangler can't auto-discover the account — pin it here.
+          # (Account IDs are identifiers, not secrets.)
+          CLOUDFLARE_ACCOUNT_ID: 86fc1d9daa48cb30d0ba712be21a3f20
         run: |
           set -euo pipefail
           STAMP=$(date -u +%Y%m%d-%H%M%S)
