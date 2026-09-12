@@ -203,18 +203,40 @@ The snapshot also contains `create table` statements — run
 
 ## Inquiry form
 
-The admissions form opens the visitor's email app with a pre-filled message
-to `admissions@hopeinternationalschool.com` — no backend needed, works everywhere.
+The **Send Us an Inquiry** form on the Admissions page sends automatically to
+**iyfmyanmar.admin@gmail.com** through the same free **Google Apps Script**
+pattern as the registration and job-application forms: each inquiry is logged
+in a **Google Sheet** *and* emailed to the admin address (reply-to the
+visitor, so staff can answer directly).
 
-For automatic delivery to your inbox (or a form database), replace it with a
-free form service such as:
+### One-time setup (≈5 minutes, free)
 
-- **FormSubmit** — add `https://formsubmit.co/ajax/your@email.com` as the form
-  action; see <https://formsubmit.co> for the one-line setup.
-- **Formspree** — create a free form at <https://formspree.io> and point the
-  form's `action` to its endpoint.
+1. Open <https://sheets.new> and create a spreadsheet (any name).
+2. **Extensions → Apps Script**, delete the sample code, paste the whole
+   contents of `inquiry-emailer/Code.gs`, and save (💾).
+3. At the top of the script, confirm `ADMIN_EMAIL` — this is the address
+   that receives the inquiries (`iyfmyanmar.admin@gmail.com` by default).
+4. **Deploy → New deployment → Web app**:
+   - *Execute as*: **Me**
+   - *Who has access*: **Anyone**
+   - Click **Deploy**, authorise the requested Google permissions, and copy
+     the `/exec` URL it shows.
+5. Paste that URL into `lib/inquiry.ts` as `INQUIRY_ENDPOINT`, then rebuild
+   (`npm run build`) and deploy.
 
-The form lives in `components/InquiryForm.tsx`.
+> Until `INQUIRY_ENDPOINT` is set, the form still works: it opens the
+> visitor's email app with a pre-filled message addressed to
+> `iyfmyanmar.admin@gmail.com` (the `INQUIRY_EMAIL` constant in
+> `lib/inquiry.ts`).
+
+### What happens on each submission
+
+- A row is appended to the **Inquiries** sheet (time, locale, parent/guardian,
+  email, phone, grade, message).
+- An email with the inquiry is sent to `ADMIN_EMAIL` (reply-to the visitor's
+  email address).
+- If the email fails (daily Gmail quota), the inquiry is still saved in the
+  Sheet — nothing is lost.
 
 ## Registration form
 

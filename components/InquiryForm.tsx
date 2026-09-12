@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { GRADE_LEVELS } from "@/lib/db";
+import { INQUIRY_EMAIL, submitInquiry } from "@/lib/inquiry";
 
 type Errors = { name?: string; email?: string; message?: string };
 
-const CONTACT_EMAIL = "admissions@hopeinternationalschool.com";
+/** The address the mailto fallback opens (kept in sync with lib/inquiry.ts). */
+const FALLBACK_EMAIL = INQUIRY_EMAIL;
 
 export default function InquiryForm() {
   const t = useTranslations("admissions");
+  const locale = useLocale();
   const f = (key: string) => t(`form.${key}`);
 
   const [name, setName] = useState("");
@@ -29,7 +32,7 @@ export default function InquiryForm() {
     return next;
   };
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const next = validate();
     setErrors(next);
@@ -37,30 +40,49 @@ export default function InquiryForm() {
       setStatus("error");
       return;
     }
-
     setStatus("sending");
+    const payload = {
+      name: name.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      grade: grade.trim(),
+      message: message.trim(),
+      locale,
+      submittedAt: new Date().toISOString(),
+    };    // Preferred path: automatic delivery via the Apps Script emailer
+    // (Sheet + email to INQUIRY_EMAIL). Fallback: open the visitor's mail
+    // app with a pre-filled message.
+    const result = await submitInquiry(payload);
+    if (result.ok) {
+      setStatus("success");
+      setName("");
+      setEmail("");
+      setPhone("");
+      setGrade("");
+      setMessage("");
+      return;
+    }
+    // notConfigured (Apps Script not deployed yet) or network/server error →
+    // open the visitor's mail app as a dependable fallback.
     const subject = encodeURIComponent(
-      `[Inquiry] ${name} — ${grade || "General"}`,
+      `[Inquiry] ${payload.name} — ${payload.grade || "General"}`,
     );
     const body = encodeURIComponent(
       [
         "New inquiry from the Hope International School website:",
         "",
-        `Name: ${name}`,
-        `Email: ${email}`,
-        phone ? `Phone: ${phone}` : "",
-        grade ? `Grade interested in: ${grade}` : "",
+        `Name: ${payload.name}`,
+        `Email: ${payload.email}`,
+        payload.phone ? `Phone: ${payload.phone}` : "",
+        payload.grade ? `Grade interested in: ${payload.grade}` : "",
         "",
         "Message:",
-        message,
+        payload.message,
       ]
         .filter(Boolean)
         .join("\n"),
     );
-
-    // Opens the visitor's mail app with a pre-filled message. For automatic
-    // delivery, swap this for a form service (see README → "Inquiry form").
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${FALLBACK_EMAIL}?subject=${subject}&body=${body}`;
     setStatus("success");
   };
 
