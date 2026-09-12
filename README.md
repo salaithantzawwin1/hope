@@ -122,6 +122,37 @@ when the Workers build runs:
 Locally you can deploy or preview with `npm run deploy` / `npm run preview`
 (after `npx wrangler login`).
 
+## Backing up site content (admin saves → git history)
+
+Content saved from the admin portal lives **only** in the production D1
+database — git never sees it. Nightly snapshots fix that:
+
+- **Automated:** `.github/workflows/d1-backup.yml` exports the production D1
+  every night and commits the SQL to `backups/` (only when content actually
+  changed). One-time setup: add a repo secret `CLOUDFLARE_API_TOKEN`
+  (Account → Workers D1 → Edit) at GitHub → Settings → Secrets → Actions.
+- **Manual:** `npm run backup:d1` writes `backups/d1-<timestamp>.sql` from
+  your own machine (needs `npx wrangler login`).
+
+Photos are **not** in these snapshots — they live in R2 and the SQL only
+references them by key/URL, so a restore never touches R2 objects.
+
+### Restoring content from a snapshot
+
+```bash
+# 1. Overwrite-in-place (safe: rows with the same ids are replaced, existing
+#    rows not in the snapshot are kept):
+npx wrangler d1 execute hope-db --remote --file backups/latest.sql
+
+# 2. Exact point-in-time restore (wipe, then reload — DESTRUCTIVE):
+npx wrangler d1 execute hope-db --remote --command \
+  "delete from news; delete from events; delete from gallery; delete from site_content;"
+npx wrangler d1 execute hope-db --remote --file backups/latest.sql
+```
+
+The snapshot also contains `create table` statements — run
+`worker/schema.sql` first only if the tables are missing entirely.
+
 ## Using the admin portal
 
 1. Open `https://your-school.com/admin` and sign in with the staff

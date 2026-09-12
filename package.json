@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "deploy": "next build && npx wrangler deploy",
-    "preview": "next build && npx wrangler dev"
+    "preview": "next build && npx wrangler dev",
+    "backup:d1": "node scripts/backup-d1.mjs"
   },
   "dependencies": {
     "next": "16.3.4",
