@@ -376,8 +376,14 @@ export async function handleContent(
   if (request.method === "PUT") {
     const body = await readJson(request);
     if (!body) return badRequest("Expected a JSON body");
-    const rows = Array.isArray(body.rows) ? body.rows : [body];
-    const clean = rows
+    // Accept {rows:[...]}, {rows:{...}} (legacy admin build), or a bare
+    // {...} row object — normalize everything to an array of rows.
+    const rawRows = Array.isArray(body.rows)
+      ? body.rows
+      : body.rows !== undefined && typeof body.rows === "object"
+        ? [body.rows]
+        : [body];
+    const clean = rawRows
       .map((row) => row as Record<string, unknown>)
       .filter((row) => str(row.key))
       .map((row) => ({

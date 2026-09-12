@@ -216,5 +216,12 @@ export const contentApi = {
     rows:
       | { key: string; value_en: string; value_my: string }
       | { key: string; value_en: string; value_my: string }[],
-  ) => apiWrite<{ saved: number }>("/api/content", "PUT", { rows }),
+  ) =>
+    apiWrite<{ saved: number }>(
+      "/api/content",
+      "PUT",
+      // Always send a rows array — the Worker only accepts arrays, and a bare
+      // object here once produced a confusing 400 "key is required".
+      { rows: Array.isArray(rows) ? rows : [rows] },
+    ),
 };
