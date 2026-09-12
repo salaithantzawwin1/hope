@@ -19,6 +19,14 @@ import {
 
 const CARRIER_KEY = "carrier_content";
 
+type Section = "hero" | "positions" | "defaults";
+
+const SECTIONS: { id: Section; label: string }[] = [
+  { id: "hero", label: "Hero & Why Join" },
+  { id: "positions", label: "Job Positions" },
+  { id: "defaults", label: "Apply & Contact Defaults" },
+];
+
 function parseJson<T>(raw: string | undefined | null): T | null {
   if (!raw || !raw.trim()) return null;
   try {
@@ -37,6 +45,7 @@ function positionLabel(pos: CarrierPosition, index: number) {
 export default function AdminCarrier() {
   const [data, setData] = useState<CarrierContent>(FALLBACK_CARRIER);
   const [jobTab, setJobTab] = useState(0);
+  const [section, setSection] = useState<Section>("hero");
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -206,12 +215,17 @@ export default function AdminCarrier() {
 
       <p className="text-sm text-slate-500">
         Edit the Carrier (We Are Hiring) page content. Each job has its own tab
-        with its own requirements — use Active/Inactive to show or hide a job
-        from the public page. Leave Burmese fields empty to fall back to
-        English. Save to publish immediately.
+        with its own requirements — use Active/Inactive to show or hide a job        from the public page. Leave Burmese fields empty to fall back to
+        English. Save to publish immediately (every tab is saved together).
       </p>
-
-      {/* Hero */}
+      <SubTabs
+        tabs={SECTIONS}
+        active={section}
+        onChange={(id) => setSection(id as Section)}
+      />
+      {/* Hero */}
+      {section === "hero" && (
+      <>
       <Card className="space-y-4 p-5">
         <p className="text-sm font-bold text-slate-900">Hero Section</p>
         <div className="grid gap-3 lg:grid-cols-2">
@@ -262,8 +276,7 @@ export default function AdminCarrier() {
               onChange={(e) => updateField("why_title_my", e.target.value)}
             />
           </Field>
-        </div>
-        <div className="grid gap-3 lg:grid-cols-2">
+        </div>        <div className="grid gap-3 lg:grid-cols-2">
           <Field label="Text (EN)">
             <TextArea
               rows={3}
@@ -280,8 +293,10 @@ export default function AdminCarrier() {
           </Field>
         </div>
       </Card>
-
-      {/* Job Positions */}
+      </>
+      )}
+      {/* Job Positions */}
+      {section === "positions" && (
       <Card className="space-y-4 p-5">
         <p className="text-sm font-bold text-slate-900">Job Positions</p>
         <div className="grid gap-3 lg:grid-cols-2">
@@ -499,8 +514,11 @@ export default function AdminCarrier() {
           </Button>
         </div>
       </Card>
+      )}
 
       {/* How to Apply */}
+      {section === "defaults" && (
+      <>
       <Card className="space-y-4 p-5">
         <div className="flex items-center justify-between">
           <p className="text-sm font-bold text-slate-900">How to Apply (Global Defaults)</p>
@@ -636,6 +654,8 @@ export default function AdminCarrier() {
           </Field>
         </div>
       </Card>
+      </>
+      )}
 
       <Button onClick={save} disabled={busy}>
         {busy ? "Saving…" : "Save All Changes"}

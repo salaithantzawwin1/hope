@@ -81,16 +81,21 @@ export function SubTabs({
   onChange: (id: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div
+      className="flex flex-wrap gap-1 rounded-xl border border-slate-200 bg-slate-100/70 p-1"
+      role="tablist"
+    >
       {tabs.map((t) => (
         <button
           key={t.id}
           type="button"
+          role="tab"
+          aria-selected={active === t.id}
           onClick={() => onChange(t.id)}
-          className={`rounded-lg px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+          className={`rounded-lg px-3.5 py-1.5 text-sm font-semibold transition-all ${
             active === t.id
-              ? "bg-slate-900 text-white"
-              : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
+              ? "bg-white text-brand shadow-sm ring-1 ring-slate-900/5"
+              : "text-slate-500 hover:bg-white/60 hover:text-slate-700"
           }`}
         >
           <span className="inline-flex items-center gap-1.5">

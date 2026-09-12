@@ -9,9 +9,17 @@ import type {
   AdmissionStep,
 } from "@/lib/types";
 import { LangRow } from "./bilingual";
-import { Button, Card, Field, Notice, TextArea, TextInput } from "./ui";
+import { Button, Card, Field, Notice, SubTabs, TextArea, TextInput } from "./ui";
 
 const KEY = "admissions_content";
+
+type Section = "apply" | "documents" | "fees";
+
+const SECTIONS: { id: Section; label: string }[] = [
+  { id: "apply", label: "How to Apply — Steps" },
+  { id: "documents", label: "Required Documents" },
+  { id: "fees", label: "Fees Table" },
+];
 
 function parseJson<T>(raw: string | undefined | null): T | null {
   if (!raw || !raw.trim()) return null;
@@ -24,6 +32,7 @@ function parseJson<T>(raw: string | undefined | null): T | null {
 
 export default function AdminAdmissions() {
   const [data, setData] = useState<AdmissionsContent>(FALLBACK_ADMISSIONS);
+  const [section, setSection] = useState<Section>("apply");
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -97,15 +106,13 @@ export default function AdminAdmissions() {
   return (
     <div className="space-y-6">
       {error && <Notice kind="error">{error}</Notice>}
-      {saved && <Notice kind="info">All changes saved ✓</Notice>}
-
-      <p className="text-sm text-slate-500">
+      {saved && <Notice kind="info">All changes saved ✓</Notice>}      <p className="text-sm text-slate-500">
         The Admissions page: intro, &quot;How to Apply&quot; steps, required
-        documents and the fees table. Leave the Burmese field empty to fall
-        back to English. Save to publish immediately.
+        documents and the fees table — organised into tabs. Leave the Burmese
+        field empty to fall back to English. Save to publish immediately
+        (every tab is saved together).
       </p>
-
-      {/* Intro */}
+      {/* Intro (shared across tabs) */}
       <Card className="space-y-4 p-5">
         <p className="text-sm font-bold text-slate-900">Intro</p>
         <LangRow
@@ -117,8 +124,13 @@ export default function AdminAdmissions() {
           onMy={(v) => patch({ intro_my: v })}
         />
       </Card>
-
-      {/* Steps */}
+      <SubTabs
+        tabs={SECTIONS}
+        active={section}
+        onChange={(id) => setSection(id as Section)}
+      />
+      {/* Steps */}
+      {section === "apply" && (
       <Card className="space-y-4 p-5">
         <p className="text-sm font-bold text-slate-900">How to Apply — steps</p>
         <LangRow
@@ -182,8 +194,7 @@ export default function AdminAdmissions() {
               />
             </div>
           ))}
-        </div>
-        <Button
+        </div>        <Button
           type="button"
           variant="secondary"
           onClick={() =>
@@ -198,8 +209,9 @@ export default function AdminAdmissions() {
           + Add step
         </Button>
       </Card>
-
-      {/* Requirements */}
+      )}
+      {/* Requirements */}
+      {section === "documents" && (
       <Card className="space-y-4 p-5">
         <p className="text-sm font-bold text-slate-900">Required documents</p>
         <LangRow
@@ -252,8 +264,7 @@ export default function AdminAdmissions() {
               </Button>
             </div>
           ))}
-        </div>
-        <Button
+        </div>        <Button
           type="button"
           variant="secondary"
           onClick={() =>
@@ -266,8 +277,9 @@ export default function AdminAdmissions() {
           + Add document
         </Button>
       </Card>
-
-      {/* Fees */}
+      )}
+      {/* Fees */}
+      {section === "fees" && (
       <Card className="space-y-4 p-5">
         <p className="text-sm font-bold text-slate-900">Fees table</p>
         <LangRow
@@ -352,8 +364,7 @@ export default function AdminAdmissions() {
           }
         >
           + Add fee row
-        </Button>
-        <LangRow
+        </Button>        <LangRow
           label="Note under the table"
           en={data.fees_note_en}
           my={data.fees_note_my}
@@ -362,8 +373,8 @@ export default function AdminAdmissions() {
           onMy={(v) => patch({ fees_note_my: v })}
         />
       </Card>
-
-      <Button onClick={saveAll} disabled={busy}>
+      )}
+      <Button onClick={saveAll} disabled={busy}>
         {busy ? "Saving…" : "Save All Changes"}
       </Button>
     </div>

@@ -5,9 +5,17 @@ import { apiSiteContent, contentApi } from "@/lib/api";
 import { FALLBACK_CONTACT } from "@/lib/fallback-data";
 import type { ContactContent, SocialLink } from "@/lib/types";
 import { LangRow } from "./bilingual";
-import { Button, Card, Field, Notice, Select, TextInput } from "./ui";
+import { Button, Card, Field, Notice, Select, SubTabs, TextInput } from "./ui";
 
 const CONTACT_KEY = "contact_content";
+
+type Section = "details" | "social" | "map";
+
+const SECTIONS: { id: Section; label: string }[] = [
+  { id: "details", label: "Contact Details" },
+  { id: "social", label: "Social Links" },
+  { id: "map", label: "Google Map" },
+];
 
 const SOCIAL_KINDS = [
   { value: "facebook", label: "Facebook" },
@@ -27,6 +35,7 @@ function parseJson<T>(raw: string | undefined | null): T | null {
 
 export default function AdminContact() {
   const [data, setData] = useState<ContactContent>(FALLBACK_CONTACT);
+  const [section, setSection] = useState<Section>("details");
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -113,10 +122,14 @@ export default function AdminContact() {
           textarea
           onEn={(v) => update({ hero_subtitle_en: v })}
           onMy={(v) => update({ hero_subtitle_my: v })}
-        />
-      </Card>
-
-      {/* Contact info cards */}
+        />      </Card>
+      <SubTabs
+        tabs={SECTIONS}
+        active={section}
+        onChange={(id) => setSection(id as Section)}
+      />
+      {/* Contact info cards */}
+      {section === "details" && (
       <Card className="space-y-4 p-5">
         <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
           Contact details
@@ -175,8 +188,7 @@ export default function AdminContact() {
             my={data.hours_title_my}
             onEn={(v) => update({ hours_title_en: v })}
             onMy={(v) => update({ hours_title_my: v })}
-          />
-          <LangRow
+          />          <LangRow
             label="Opening hours"
             en={data.hours_en}
             my={data.hours_my}
@@ -185,8 +197,9 @@ export default function AdminContact() {
           />
         </div>
       </Card>
-
-      {/* Social links */}
+      )}
+      {/* Social links */}
+      {section === "social" && (
       <Card className="space-y-4 p-5">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
@@ -253,8 +266,7 @@ export default function AdminContact() {
               onMy={(v) => updateSocial(i, { label_my: v })}
             />
           </div>
-        ))}
-        <Button
+        ))}        <Button
           type="button"
           variant="secondary"
           onClick={() =>
@@ -269,8 +281,9 @@ export default function AdminContact() {
           + Add social link
         </Button>
       </Card>
-
-      {/* Google Map */}
+      )}
+      {/* Google Map */}
+      {section === "map" && (
       <Card className="space-y-4 p-5">
         <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
           Google Map
@@ -294,8 +307,7 @@ export default function AdminContact() {
             onChange={(e) => update({ map_link_url: e.target.value })}
             placeholder="https://maps.app.goo.gl/… or https://www.google.com/maps/place/…"
           />
-        </Field>
-        <LangRow
+        </Field>        <LangRow
           label="Map section title"
           en={data.map_title_en}
           my={data.map_title_my}
@@ -303,8 +315,8 @@ export default function AdminContact() {
           onMy={(v) => update({ map_title_my: v })}
         />
       </Card>
-
-      <Button onClick={save} disabled={busy}>
+      )}
+      <Button onClick={save} disabled={busy}>
         {busy ? "Saving…" : "Save All Changes"}
       </Button>
     </div>
