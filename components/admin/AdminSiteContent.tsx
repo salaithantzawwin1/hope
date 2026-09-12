@@ -6,9 +6,6 @@ import { FALLBACK_SITE_CONTENT } from "@/lib/fallback-data";
 import { Button, Card, Field, Notice, SubTabs, TextArea } from "./ui";
 
 const LABELS: Record<string, string> = {
-  home_hero_badge: "Home — hero badge",
-  home_hero_title: "Home — hero title",
-  home_hero_subtitle: "Home — hero subtitle",
   home_welcome_title: "Home — welcome title",
   home_welcome_text: "Home — welcome text",
   about_intro: "About — intro paragraph",

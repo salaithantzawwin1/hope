@@ -125,18 +125,6 @@ export const FALLBACK_GALLERY: { image_url: string; caption_en: string; caption_
 ];
 
 export const FALLBACK_SITE_CONTENT: Record<string, { en: string; my: string }> = {
-  home_hero_badge: {
-    en: "Hope International School",
-    my: "Hope အပြည်ပြည်ဆိုင်ရာ ကျောင်း",
-  },
-  home_hero_title: {
-    en: "Nurturing Global Citizens, One Student at a Time",
-    my: "ကမ္ဘာ့နိုင်ငံသားကောင်းများကို ပြုစုပျိုးထောင်ခြင်း",
-  },
-  home_hero_subtitle: {
-    en: "A world-class international education in Myanmar — from Early Years to High School, where students learn in English and Burmese, grow in confidence, and become caring leaders of tomorrow.",
-    my: "မြန်မာနိုင်ငံရှိ ကမ္ဘာ့အဆင့်မီ နိုင်ငံတကာပညာရေး — မူကြိုမှ အထက်တန်းအထိ၊ အင်္ဂလိပ်နှင့် မြန်မာဘာသာ နှစ်မျိုးလုံးဖြင့် သင်ယူပြီး ယုံကြည်မှု တည်ဆောက်ကာ နောင်တွင် ကြင်နာတတ်သော ခေါင်းဆောင်များ ဖြစ်လာစေရန် ပြုစုပေးပါသည်။",
-  },
   home_welcome_title: {
     en: "Welcome to Our School",
     my: "ကျောင်းမှ ကြိုဆိုပါသည်",
@@ -248,10 +236,18 @@ export const FALLBACK_CONTACT: ContactContent = {
 };
 
 /**
- * Defaults for the Home hero extras (buttons + images), edited from the
- * admin portal. Empty image URLs mean "use the built-in /Bunner/01.jpg".
+ * Defaults for the Home hero (badge/title/subtitle + buttons + images),
+ * edited from the admin portal. Mirrors messages/en.json + messages/my.json.
  */
 export const FALLBACK_HOME_HERO: HomeHero = {
+  badge_en: "Hope International School",
+  badge_my: "Hope အပြည်ပြည်ဆိုင်ရာ ကျောင်း",
+  title_en: "Nurturing Global Citizens, One Student at a Time",
+  title_my: "ကမ္ဘာ့နိုင်ငံသားကောင်းများကို ပြုစုပျိုးထောင်ခြင်း",
+  subtitle_en:
+    "A world-class international education in Myanmar — from Early Years to High School, where students learn in English and Burmese, grow in confidence, and become caring leaders of tomorrow.",
+  subtitle_my:
+    "မြန်မာနိုင်ငံရှိ ကမ္ဘာ့အဆင့်မီ နိုင်ငံတကာပညာရေး — မူကြိုမှ အထက်တန်းအထိ၊ အင်္ဂလိပ်နှင့် မြန်မာဘာသာ နှစ်မျိုးလုံးဖြင့် သင်ယူပြီး ယုံကြည်မှု တည်ဆောက်ကာ နောင်တွင် ကြင်နာတတ်သော ခေါင်းဆောင်များ ဖြစ်လာစေရန် ပြုစုပေးပါသည်။",
   buttons: [
     { label_en: "Apply for Admission", label_my: "ဝင်ခွင့် လျှောက်ထားရန်", href: "/admissions" },
     { label_en: "Explore Academics", label_my: "ပညာရေး စနစ်ကို ကြည့်ရှုရန်", href: "/academics" },

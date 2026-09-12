@@ -288,11 +288,18 @@ export interface HomeHeroButton {
 }
 
 /**
- * Home hero extras stored as JSON in the `home_hero` site_content row:
- * the call-to-action buttons and the two page images. Empty image URLs
- * mean "use the built-in default" (/Bunner/01.jpg).
+ * Home hero block stored as JSON in the `home_hero` site_content row:
+ * the badge/title/subtitle, the call-to-action buttons and the two page
+ * images. Empty image URLs mean "use the built-in default" (/Bunner/01.jpg);
+ * empty text fields mean "use the built-in message-catalog default".
  */
 export interface HomeHero {
+  badge_en?: string;
+  badge_my?: string;
+  title_en?: string;
+  title_my?: string;
+  subtitle_en?: string;
+  subtitle_my?: string;
   buttons: HomeHeroButton[];
   hero_image_url: string;
   welcome_image_url: string;

@@ -82,11 +82,10 @@ create index if not exists gallery_created_at_idx on gallery(created_at desc);
 -- Kept byte-identical to the Supabase seed so both schemas stay in sync until
 -- the Supabase project is retired. `on conflict do nothing` never overwrites
 -- text staff have already edited.
+-- (home_hero_badge/title/subtitle were folded into the editable `home_hero`
+-- JSON block — Admin → Home → Hero edits all of it in one place.)
 -- ============================================================================
 insert into site_content (key, value_en, value_my) values
-  ('home_hero_badge', 'Hope International School', 'Hope အပြည်ပြည်ဆိုင်ရာ ကျောင်း'),
-  ('home_hero_title', 'Nurturing Global Citizens, One Student at a Time', 'ကမ္ဘာ့နိုင်ငံသားကောင်းများကို ပြုစုပျိုးထောင်ခြင်း'),
-  ('home_hero_subtitle', 'A world-class international education in Myanmar — from Early Years to High School, where students learn in English and Burmese, grow in confidence, and become caring leaders of tomorrow.', 'မြန်မာနိုင်ငံရှိ ကမ္ဘာ့အဆင့်မီ နိုင်ငံတကာပညာရေး — မူကြိုမှ အထက်တန်းအထိ၊ အင်္ဂလိပ်နှင့် မြန်မာဘာသာ နှစ်မျိုးလုံးဖြင့် သင်ယူပြီး ယုံကြည်မှု တည်ဆောက်ကာ နောင်တွင် ကြင်နာတတ်သော ခေါင်းဆောင်များ ဖြစ်လာစေရန် ပြုစုပေးပါသည်။'),
   ('home_welcome_title', 'Welcome to Our School', 'ကျောင်းမှ ကြိုဆိုပါသည်'),
   ('home_welcome_text', 'At Hope International School, we believe every child is unique. Our caring teachers, modern facilities and a balanced international curriculum help each student discover their strengths, think critically and act with kindness.', 'Hope အပြည်ပြည်ဆိုင်ရာကျောင်းတွင် ကလေးတိုင်းသည် ထူးခြားသည်ဟု ကျွန်ုပ်တို့ ယုံကြည်ပါသည်။ ဂရုစိုက်တတ်သော ဆရာ ဆရာမများ၊ ခေတ်မီသော သင်ကြားရေးအဆောက်အအုံများနှင့် မျှတသော နိုင်ငံတကာ သင်ရိုးညွှန်းတမ်းသည် ကျောင်းသားတိုင်း မိမိ၏ အရည်အချင်းများကို ရှာဖွေတွေ့ရှိနိုင်ရန် ကူညီပေးပါသည်။'),
   ('about_intro', 'Hope International School is a vibrant learning community in Myanmar where international standards meet local values.', 'Hope အပြည်ပြည်ဆိုင်ရာကျောင်းသည် နိုင်ငံတကာ စံနှုန်းများနှင့် ဒေသဆိုင်ရာ တန်ဖိုးများ ပေါင်းစပ်ထားသော မြန်မာနိုင်ငံရှိ တက်ကြွသော သင်ယူမှု အသိုင်းအဝိုင်းတစ်ခုဖြစ်သည်။'),

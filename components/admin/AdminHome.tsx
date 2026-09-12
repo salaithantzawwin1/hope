@@ -155,8 +155,7 @@ export default function AdminHome() {
 
       <p className="text-sm text-slate-500">
         These sections appear on the Home page. Leave the Burmese field empty
-        to fall back to English. Save to publish immediately. The hero banner
-        and welcome text are edited from the Site Text tab.
+        to fall back to English. Save to publish immediately.
       </p>
 
       <SubTabs
@@ -170,10 +169,33 @@ export default function AdminHome() {
           <div>
             <p className="text-sm font-bold text-slate-900">Hero Banner</p>
             <p className="text-xs text-slate-500">
-              The buttons and the two pictures on the Home page. The hero title
-              and subtitle are edited from the Site Text tab.
+              The badge, title, subtitle, buttons and pictures at the top of
+              the Home page.
             </p>
           </div>
+
+          <LangRow
+            label="Badge (small text above the title)"
+            en={hero.badge_en ?? ""}
+            my={hero.badge_my ?? ""}
+            onEn={(v) => setHero({ ...hero, badge_en: v })}
+            onMy={(v) => setHero({ ...hero, badge_my: v })}
+          />
+          <LangRow
+            label="Hero title"
+            en={hero.title_en ?? ""}
+            my={hero.title_my ?? ""}
+            onEn={(v) => setHero({ ...hero, title_en: v })}
+            onMy={(v) => setHero({ ...hero, title_my: v })}
+          />
+          <LangRow
+            label="Hero subtitle"
+            en={hero.subtitle_en ?? ""}
+            my={hero.subtitle_my ?? ""}
+            textarea
+            onEn={(v) => setHero({ ...hero, subtitle_en: v })}
+            onMy={(v) => setHero({ ...hero, subtitle_my: v })}
+          />
 
           <div>
             <p className="text-xs font-bold uppercase tracking-wide text-slate-500">

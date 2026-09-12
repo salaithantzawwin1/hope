@@ -44,6 +44,45 @@ function useBlock<T>(key: string, fallback: T): T {
  */
 
 /**
+ * The hero badge, title and subtitle. Part of the same `home_hero` JSON
+ * block the admin portal edits (AdminHome → Hero tab); empty fields fall
+ * back to the message-catalog defaults passed as props.
+ */
+export function HomeHeroText({
+  fallbackBadge,
+  fallbackTitle,
+  fallbackSubtitle,
+}: {
+  fallbackBadge: string;
+  fallbackTitle: string;
+  fallbackSubtitle: string;
+}) {
+  const locale = useLocale();
+  const data = useBlock<HomeHero>("home_hero", {
+    buttons: [],
+    hero_image_url: "",
+    welcome_image_url: "",
+  });
+  const isMy = locale === "my";
+  const pick = (fallback: string, saved?: string) =>
+    saved && saved.trim() ? saved : fallback;
+
+  return (
+    <>
+      <p className="inline-block rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-accent">
+        {pick(fallbackBadge, isMy ? data.badge_my : data.badge_en)}
+      </p>
+      <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-balance sm:text-5xl">
+        {pick(fallbackTitle, isMy ? data.title_my : data.title_en)}
+      </h1>
+      <p className="mt-5 max-w-2xl text-lg leading-relaxed text-slate-200">
+        {pick(fallbackSubtitle, isMy ? data.subtitle_my : data.subtitle_en)}
+      </p>
+    </>
+  );
+}
+
+/**
  * The call-to-action buttons under the hero banner. Stored in the same
  * `home_hero` JSON block the admin portal edits (AdminHome → Hero tab).
  */

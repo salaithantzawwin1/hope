@@ -1,7 +1,14 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import SiteText from "@/components/SiteText";
-import { HomeCta, HomeHeroButtons, HomeHeroImage, HomePrograms, HomeStats } from "@/components/HomeContent";
+import {
+  HomeCta,
+  HomeHeroButtons,
+  HomeHeroImage,
+  HomeHeroText,
+  HomePrograms,
+  HomeStats,
+} from "@/components/HomeContent";
 import NewsEventsHome from "@/components/NewsEventsHome";
 import FeaturedEvent from "@/components/FeaturedEvent";
 
@@ -38,26 +45,10 @@ export default async function HomePage({
         />
         <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6 sm:py-16">
           <div className="max-w-3xl">
-            <SiteText
-              k="home_hero_badge"
-              en={t("heroBadge")}
-              my={t("heroBadge")}
-              as="p"
-              className="inline-block rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-accent"
-            />
-            <SiteText
-              k="home_hero_title"
-              en={t("heroTitle")}
-              my={t("heroTitle")}
-              as="h1"
-              className="mt-5 text-4xl font-bold leading-tight tracking-tight text-balance sm:text-5xl"
-            />
-            <SiteText
-              k="home_hero_subtitle"
-              en={t("heroSubtitle")}
-              my={t("heroSubtitle")}
-              as="p"
-              className="mt-5 max-w-2xl text-lg leading-relaxed text-slate-200"
+            <HomeHeroText
+              fallbackBadge={t("heroBadge")}
+              fallbackTitle={t("heroTitle")}
+              fallbackSubtitle={t("heroSubtitle")}
             />
             <HomeHeroButtons
               fallback={[
