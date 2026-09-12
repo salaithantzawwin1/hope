@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiSiteContent, contentApi } from "@/lib/api";
 import { FALLBACK_SITE_CONTENT } from "@/lib/fallback-data";
-import { Button, Card, Field, Notice, SubTabs, TextArea } from "./ui";
+import { Button, Card, Field, SaveStatus, SubTabs, TextArea } from "./ui";
 
 const LABELS: Record<string, string> = {
   home_welcome_title: "Home — welcome title",
@@ -81,8 +81,7 @@ export default function AdminSiteContent() {
 
   return (
     <div className="space-y-6">
-      {error && <Notice kind="error">{error}</Notice>}
-      {savedKey && <Notice kind="info">{savedKey} ✓</Notice>}
+      <SaveStatus error={error} saved={savedKey !== null} />
 
       <p className="text-sm text-slate-500">
         These texts appear on the public site. Leave the Burmese field empty to

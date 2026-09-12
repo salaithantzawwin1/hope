@@ -5,7 +5,7 @@ import { apiSiteContent, contentApi } from "@/lib/api";
 import { FALLBACK_FOOTER } from "@/lib/fallback-data";
 import type { FooterContent } from "@/lib/types";
 import { LangRow } from "./bilingual";
-import { Button, Card, Notice } from "./ui";
+import { Button, Card, SaveStatus } from "./ui";
 
 const FOOTER_KEY = "footer_content";
 
@@ -72,8 +72,7 @@ export default function AdminFooter() {
 
   return (
     <div className="space-y-6">
-      {error && <Notice kind="error">{error}</Notice>}
-      {saved && <Notice kind="info">All changes saved ✓</Notice>}
+      <SaveStatus error={error} saved={saved} />
 
       <p className="text-sm text-slate-500">
         These details appear in the footer on every page. Leave the Burmese

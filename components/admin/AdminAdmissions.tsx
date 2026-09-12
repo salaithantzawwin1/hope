@@ -9,7 +9,7 @@ import type {
   AdmissionStep,
 } from "@/lib/types";
 import { LangRow } from "./bilingual";
-import { Button, Card, Field, Notice, SubTabs, TextArea, TextInput } from "./ui";
+import { Button, Card, SaveStatus, SubTabs, TextInput } from "./ui";
 
 const KEY = "admissions_content";
 
@@ -105,8 +105,9 @@ export default function AdminAdmissions() {
 
   return (
     <div className="space-y-6">
-      {error && <Notice kind="error">{error}</Notice>}
-      {saved && <Notice kind="info">All changes saved ✓</Notice>}      <p className="text-sm text-slate-500">
+      <SaveStatus error={error} saved={saved} />
+
+      <p className="text-sm text-slate-500">
         The Admissions page: intro, &quot;How to Apply&quot; steps, required
         documents and the fees table — organised into tabs. Leave the Burmese
         field empty to fall back to English. Save to publish immediately

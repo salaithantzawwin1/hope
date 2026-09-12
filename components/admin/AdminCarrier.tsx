@@ -11,7 +11,7 @@ import {
   Button,
   Card,
   Field,
-  Notice,
+  SaveStatus,
   SubTabs,
   TextArea,
   TextInput,
@@ -210,8 +210,7 @@ export default function AdminCarrier() {
 
   return (
     <div className="space-y-6">
-      {error && <Notice kind="error">{error}</Notice>}
-      {saved && <Notice kind="info">All changes saved ✓</Notice>}
+      <SaveStatus error={error} saved={saved} />
 
       <p className="text-sm text-slate-500">
         Edit the Carrier (We Are Hiring) page content. Each job has its own tab

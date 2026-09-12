@@ -21,7 +21,7 @@ import type {
   WhyChooseItem,
 } from "@/lib/types";
 import { LangRow } from "./bilingual";
-import { Button, Card, Field, Notice, SubTabs, TextInput } from "./ui";
+import { Button, Card, Field, SaveStatus, SubTabs, TextInput } from "./ui";
 
 const MISSION_VISION_KEY = "about_mission_vision";
 const VALUES_KEY = "about_values";
@@ -161,8 +161,7 @@ export default function AdminAbout() {
 
   return (
     <div className="space-y-6">
-      {error && <Notice kind="error">{error}</Notice>}
-      {saved && <Notice kind="info">All changes saved ✓</Notice>}
+      <SaveStatus error={error} saved={saved} />
 
       <p className="text-sm text-slate-500">
         These sections appear on the About page. Leave the Burmese field empty

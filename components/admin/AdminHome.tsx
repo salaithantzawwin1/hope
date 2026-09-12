@@ -19,7 +19,7 @@ import type {
   HomeStats,
 } from "@/lib/types";
 import { LangRow } from "./bilingual";
-import { Button, Card, Field, Notice, SubTabs, TextInput } from "./ui";
+import { Button, Card, Field, SaveStatus, SubTabs, TextInput } from "./ui";
 
 const STATS_KEY = "home_stats";
 const PROGRAMS_KEY = "home_programs";
@@ -150,8 +150,7 @@ export default function AdminHome() {
 
   return (
     <div className="space-y-6">
-      {error && <Notice kind="error">{error}</Notice>}
-      {saved && <Notice kind="info">All changes saved ✓</Notice>}
+      <SaveStatus error={error} saved={saved} />
 
       <p className="text-sm text-slate-500">
         These sections appear on the Home page. Leave the Burmese field empty

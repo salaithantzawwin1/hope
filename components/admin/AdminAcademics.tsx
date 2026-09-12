@@ -15,7 +15,7 @@ import type {
   AcademicsPrograms,
 } from "@/lib/types";
 import { LangRow, PointsEditor } from "./bilingual";
-import { Button, Card, Notice, SubTabs } from "./ui";
+import { Button, Card, SaveStatus, SubTabs } from "./ui";
 
 const CURRICULUM_KEY = "academics_curriculum";
 const LEVELS_KEY = "academics_levels";
@@ -110,8 +110,7 @@ export default function AdminAcademics() {
 
   return (
     <div className="space-y-6">
-      {error && <Notice kind="error">{error}</Notice>}
-      {saved && <Notice kind="info">All changes saved ✓</Notice>}
+      <SaveStatus error={error} saved={saved} />
 
       <p className="text-sm text-slate-500">
         These sections appear on the Academics page. Leave the Burmese field

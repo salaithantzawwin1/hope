@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { apiGallery, galleryApi } from "@/lib/api";
 import { uploadImage } from "@/lib/upload";
 import type { GalleryImage } from "@/lib/types";
-import { Button, Card, Field, Notice, Select, SubTabs, TextInput } from "./ui";
+import { Button, Card, Field, SaveStatus, Select, SubTabs, TextInput } from "./ui";
 
 /** Writable album fields for the album-level editor. */
 interface AlbumEdit {
@@ -318,7 +318,7 @@ export default function AdminGallery() {
 
   return (
     <div className="space-y-6">
-      {error && <Notice kind="error">{error}</Notice>}
+      <SaveStatus error={error} saved={savedId !== null} />
 
       <SubTabs
         tabs={GALLERY_SECTIONS}

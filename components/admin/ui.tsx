@@ -123,3 +123,45 @@ export function Notice({ kind, children }: { kind: "error" | "info"; children: R
     <div className={`rounded-lg border px-4 py-3 text-sm ${styles}`}>{children}</div>
   );
 }
+
+/**
+ * Bilingual save feedback shared by every admin section.
+ *
+ * Success → green confirmation (English + Burmese).
+ * Failure → red alert (English + Burmese). Nothing in the form is cleared
+ * until the API confirms, so on failure staff keep every edit and can
+ * simply fix the problem and press Save again.
+ */
+export function SaveStatus({
+  error,
+  saved,
+}: {
+  error?: string | null;
+  saved?: boolean;
+}) {
+  if (error) {
+    return (
+      <div
+        role="alert"
+        className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+      >
+        <p className="font-semibold">
+          သိမ်းဆည်းမှု မအောင်မြင်ပါ — {error}
+        </p>
+        <p className="mt-1">Failed to save — {error}</p>
+        <p className="mt-1 text-red-600">
+          ဖောင်ကို မပိတ်ပါနဲ့ — ရေးထားသမျှ အချက်အလက်တွေ အားလုံး မပျက်မဆုံး ရှိနေပါတယ်။ ပြင်ဆင်ပြီး “Save” ကို ထပ်နှိပ်ပါ။
+        </p>
+      </div>
+    );
+  }
+  if (!saved) return null;
+  return (
+    <div
+      role="status"
+      className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700"
+    >
+      All changes saved ✓ · အားလုံး သိမ်းဆည်းပြီးပါပြီ ✓
+    </div>
+  );
+}

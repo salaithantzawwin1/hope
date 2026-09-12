@@ -5,7 +5,7 @@ import { apiSiteContent, contentApi } from "@/lib/api";
 import { FALLBACK_HEADER } from "@/lib/fallback-data";
 import type { HeaderContent } from "@/lib/types";
 import { LinksEditor } from "./bilingual";
-import { Button, Card, Field, Notice, TextInput } from "./ui";
+import { Button, Card, Field, SaveStatus, TextInput } from "./ui";
 
 const HEADER_KEY = "header_content";
 
@@ -73,8 +73,7 @@ export default function AdminHeader() {
 
   return (
     <div className="space-y-6">
-      {error && <Notice kind="error">{error}</Notice>}
-      {saved && <Notice kind="info">All changes saved ✓</Notice>}
+      <SaveStatus error={error} saved={saved} />
 
       <p className="text-sm text-slate-500">
         These appear in the header on every page. Leave a label empty to fall

@@ -5,7 +5,7 @@ import { apiSiteContent, contentApi } from "@/lib/api";
 import { FALLBACK_CONTACT } from "@/lib/fallback-data";
 import type { ContactContent, SocialLink } from "@/lib/types";
 import { LangRow } from "./bilingual";
-import { Button, Card, Field, Notice, Select, SubTabs, TextInput } from "./ui";
+import { Button, Card, Field, SaveStatus, Select, SubTabs, TextInput } from "./ui";
 
 const CONTACT_KEY = "contact_content";
 
@@ -94,8 +94,7 @@ export default function AdminContact() {
 
   return (
     <div className="space-y-6">
-      {error && <Notice kind="error">{error}</Notice>}
-      {saved && <Notice kind="info">All changes saved ✓</Notice>}
+      <SaveStatus error={error} saved={saved} />
 
       <p className="text-sm text-slate-500">
         Everything on the Contact page — headings, contact details, social

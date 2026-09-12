@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { apiNews, newsApi, type NewsInput } from "@/lib/api";
 import { uploadImage } from "@/lib/upload";
 import type { NewsItem } from "@/lib/types";
-import { Button, Card, Field, Notice, SubTabs, TextArea, TextInput } from "./ui";
+import { Button, Card, Field, SaveStatus, SubTabs, TextArea, TextInput } from "./ui";
 
 interface FormState {
   id: string | null;
@@ -138,7 +138,7 @@ export default function AdminNews() {
 
   return (
     <div className="space-y-6">
-      {error && <Notice kind="error">{error}</Notice>}
+      <SaveStatus error={error} />
 
       <SubTabs
         tabs={sectionTabs}
