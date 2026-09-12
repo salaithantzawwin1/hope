@@ -11,6 +11,7 @@ import {
 } from "@/components/HomeContent";
 import NewsEventsHome from "@/components/NewsEventsHome";
 import FeaturedEvent from "@/components/FeaturedEvent";
+import { fetchEvents, fetchNews } from "@/lib/db";
 
 export default async function HomePage({
   params,
@@ -20,6 +21,9 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "home" });
+  // Build-time fetch so the exported home page ships real news/events —
+  // no "No news posts yet" flash while the browser fetches the API.
+  const [news, events] = await Promise.all([fetchNews(), fetchEvents()]);
 
   return (
     <>
@@ -159,8 +163,8 @@ export default async function HomePage({
         }}
       />
 
-      {/* News & events */}
-      <NewsEventsHome />
+      {/* News & events (prerendered; refreshed client-side after load) */}
+      <NewsEventsHome initialNews={news.slice(0, 3)} initialEvents={events.slice(0, 3)} />
 
       {/* CTA (editable) */}
       <HomeCta

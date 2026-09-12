@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import NewsEventsPage from "@/components/NewsEventsPage";
+import { fetchEvents, fetchNews } from "@/lib/db";
 
 export async function generateMetadata({
   params,
@@ -19,5 +20,8 @@ export default async function NewsPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <NewsEventsPage />;
+  // Fetched at build time so the exported HTML already contains the posts —
+  // visitors see content instantly; the client refetches for freshness.
+  const [news, events] = await Promise.all([fetchNews(), fetchEvents()]);
+  return <NewsEventsPage initialNews={news} initialEvents={events} />;
 }

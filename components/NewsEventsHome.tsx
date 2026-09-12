@@ -8,15 +8,26 @@ import type { EventItem, NewsItem } from "@/lib/types";
 import EventsList from "./EventsList";
 import NewsCard from "./NewsCard";
 
-export default function NewsEventsHome() {
+export default function NewsEventsHome({
+  initialNews,
+  initialEvents,
+}: {
+  /** Prerendered news (up to 3) — shown instantly, no "No news" flash. */
+  initialNews?: NewsItem[];
+  /** Prerendered events (up to 3) — shown instantly, no "No events" flash. */
+  initialEvents?: EventItem[];
+}) {
   const t = useTranslations("home");
   const newsT = useTranslations("news");
   const common = useTranslations("common");
   const locale = useLocale();
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [events, setEvents] = useState<EventItem[]>([]);
+  // Null = still loading → skeleton instead of a premature "No news" flash.
+  const [news, setNews] = useState<NewsItem[] | null>(initialNews ?? null);
+  const [events, setEvents] = useState<EventItem[] | null>(initialEvents ?? null);
 
   useEffect(() => {
+    // Always refresh in the background so posts added after the last build
+    // still appear (stale-while-revalidate over the prerendered data).
     let active = true;
     Promise.all([fetchNews(), fetchEvents()]).then(([n, e]) => {
       if (!active) return;
@@ -27,6 +38,30 @@ export default function NewsEventsHome() {
       active = false;
     };
   }, []);
+
+  if (news === null || events === null) {
+    return (
+      <section className="bg-cream" aria-hidden>
+        <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6 sm:py-16">
+          <div className="grid gap-10 lg:grid-cols-5">
+            <div className="space-y-5 lg:col-span-3">
+              <div className="h-8 w-2/3 animate-pulse rounded-lg bg-slate-200/70" />
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div className="h-44 animate-pulse rounded-2xl bg-slate-200/70" />
+                <div className="h-44 animate-pulse rounded-2xl bg-slate-200/70" />
+              </div>
+            </div>
+            <div className="space-y-3 lg:col-span-2">
+              <div className="h-8 w-1/2 animate-pulse rounded-lg bg-slate-200/70" />
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-24 animate-pulse rounded-2xl bg-slate-200/70" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="bg-cream">
@@ -84,7 +119,7 @@ export default function NewsEventsHome() {
               <p className="mt-1 text-slate-500">{t("eventsSubtitle")}</p>
             </div>
             <div className="mt-6">
-              <EventsList events={events} />
+              <EventsList events={events} loading={events === null} />
             </div>
           </div>
         </div>

@@ -24,6 +24,26 @@ import type {
 
 class ApiError extends Error {}
 
+/**
+ * Absolute base URL used only while prerendering ("next build"): the static
+ * export bakes live API data into the HTML, and a relative fetch would fail
+ * with no origin. In the browser this stays empty → relative path +
+ * same-origin cookies work normally (and keep working under any future
+ * custom domain). Override with NEXT_PUBLIC_SITE_URL when the domain changes.
+ */
+const API_BASE_URL =
+  typeof window === "undefined"
+    ? (
+        process.env.CF_PAGES_URL ??
+        process.env.NEXT_PUBLIC_SITE_URL ??
+        "https://hope.iyfmyanmar-admin.workers.dev"
+      ).replace(/\/+$/, "")
+    : "";
+
+function apiUrl(path: string): string {
+  return API_BASE_URL ? `${API_BASE_URL}${path}` : path;
+}
+
 async function parseError(response: Response): Promise<never> {
   const message = await response
     .json()
@@ -38,7 +58,7 @@ async function requestJson<T>(response: Response): Promise<T> {
 }
 
 async function getJson<T>(path: string): Promise<T> {
-  return requestJson<T>(await fetch(path, { credentials: "same-origin" }));
+  return requestJson<T>(await fetch(apiUrl(path), { credentials: "same-origin" }));
 }
 
 /** JSON write with cookie auth; throws ApiError with the server message. */

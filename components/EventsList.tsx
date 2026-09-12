@@ -8,15 +8,37 @@ import { localized, type EventItem } from "@/lib/types";
 export default function EventsList({
   events,
   onDetails,
+  loading = false,
 }: {
   events: EventItem[];
   /** When given, events with a description/flyer get a "Read More" button. */
   onDetails?: (event: EventItem) => void;
+  /** True while the list is being fetched — shows a skeleton, not "No events". */
+  loading?: boolean;
 }) {
   const locale = useLocale();
   const t = useTranslations("nav");
   const news = useTranslations("news");
   const common = useTranslations("common");
+
+  if (loading) {
+    return (
+      <ul className="space-y-3" aria-hidden>
+        {[0, 1, 2].map((i) => (
+          <li
+            key={i}
+            className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+          >
+            <div className="h-14 w-14 shrink-0 animate-pulse rounded-xl bg-slate-200/70" />
+            <div className="flex-1 space-y-2 py-1">
+              <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200/70" />
+              <div className="h-3 w-1/2 animate-pulse rounded bg-slate-200/70" />
+            </div>
+          </li>
+        ))}
+      </ul>
+    );
+  }
 
   if (events.length === 0) {
     return (

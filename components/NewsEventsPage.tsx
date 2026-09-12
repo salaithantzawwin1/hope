@@ -12,18 +12,55 @@ import PageHeader from "./PageHeader";
 
 type Tab = "all" | "news" | "events";
 
-export default function NewsEventsPage() {
+/**
+ * Placeholder blocks shown only while news/events load (when no prerendered
+ * data was passed in) — never a premature "No news" empty state.
+ */
+function ListSkeleton() {
+  return (
+    <div className="mt-8 grid gap-10 lg:grid-cols-5" aria-hidden>
+      <div className="space-y-5 lg:col-span-3">
+        <div className="h-56 animate-pulse rounded-3xl bg-slate-200/70 sm:h-72" />
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="h-40 animate-pulse rounded-2xl bg-slate-200/70" />
+          <div className="h-40 animate-pulse rounded-2xl bg-slate-200/70" />
+        </div>
+      </div>
+      <div className="space-y-3 lg:col-span-2">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="h-24 animate-pulse rounded-2xl bg-slate-200/70" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function NewsEventsPage({
+  initialNews,
+  initialEvents,
+}: {
+  /** Prerendered news (server component) — the page shows it instantly. */
+  initialNews?: NewsItem[];
+  /** Prerendered events (server component) — the page shows it instantly. */
+  initialEvents?: EventItem[];
+}) {
   const t = useTranslations("news");
   const common = useTranslations("common");
   const nav = useTranslations("nav");
   const locale = useLocale();
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [events, setEvents] = useState<EventItem[]>([]);
+  // Null = still loading → renders a skeleton (never a premature "No news").
+  // Starts with the prerendered data when the server passed some in.
+  const [news, setNews] = useState<NewsItem[] | null>(initialNews ?? null);
+  const [events, setEvents] = useState<EventItem[] | null>(initialEvents ?? null);
   const [selected, setSelected] = useState<NewsItem | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [tab, setTab] = useState<Tab>("all");
 
+  const loading = news === null || events === null;
+
   useEffect(() => {
+    // Always refresh in the background so posts added after the last build
+    // still appear (stale-while-revalidate: prerendered data shows instantly).
     let active = true;
     Promise.all([fetchNews(), fetchEvents()]).then(([n, e]) => {
       if (!active) return;
@@ -39,6 +76,7 @@ export default function NewsEventsPage() {
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const close = useCallback(() => setSelected(null), []);
@@ -64,14 +102,14 @@ export default function NewsEventsPage() {
 
   // Featured layout: the most recent post becomes the hero card; the rest
   // flow into the grid below it.
-  const featured = news[0] ?? null;
-  const restNews = news.slice(1);
-  const gridNews = featured ? restNews : news;
+  const featured = news?.[0] ?? null;
+  const restNews = news ? news.slice(1) : [];
+  const gridNews = featured ? restNews : news ?? [];
 
   const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: "all", label: t("tabAll"), count: news.length + events.length },
-    { key: "news", label: t("tabNews"), count: news.length },
-    { key: "events", label: t("tabEvents"), count: events.length },
+    { key: "all", label: t("tabAll"), count: (news?.length ?? 0) + (events?.length ?? 0) },
+    { key: "news", label: t("tabNews"), count: news?.length ?? 0 },
+    { key: "events", label: t("tabEvents"), count: events?.length ?? 0 },
   ];
 
   const newsHeading = (
@@ -124,6 +162,10 @@ export default function NewsEventsPage() {
           ))}
         </div>
 
+        {loading ? (
+          <ListSkeleton />
+        ) : (
+          <>
         {/* Featured hero card — newest post, shown on All and News tabs */}
         {(tab === "all" || tab === "news") && featured && (
           <article className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-lg">
@@ -174,14 +216,14 @@ export default function NewsEventsPage() {
         {tab === "all" && (
           <div
             className={`mt-10 grid gap-10 ${
-              gridNews.length > 0 && events.length > 0 ? "lg:grid-cols-5" : ""
+              gridNews.length > 0 && events!.length > 0 ? "lg:grid-cols-5" : ""
             }`}
           >
-            {(gridNews.length > 0 || news.length === 0) && (
+            {(gridNews.length > 0 || news!.length === 0) && (
               <div
                 className={
                   gridNews.length > 0
-                    ? events.length > 0
+                    ? events!.length > 0
                       ? "lg:col-span-3"
                       : ""
                     : "mx-auto w-full max-w-3xl"
@@ -192,7 +234,7 @@ export default function NewsEventsPage() {
                     {newsHeading}
                     <div
                       className={`mt-5 grid gap-5 sm:grid-cols-2 ${
-                        events.length > 0 ? "" : "xl:grid-cols-3"
+                        events!.length > 0 ? "" : "xl:grid-cols-3"
                       }`}
                     >
                       {gridNews.map((item) => (
@@ -207,7 +249,7 @@ export default function NewsEventsPage() {
                 )}
               </div>
             )}
-            {events.length > 0 && (
+            {events!.length > 0 && (
               <div
                 className={
                   gridNews.length > 0
@@ -218,7 +260,7 @@ export default function NewsEventsPage() {
                 {eventsHeading}
                 <div className="mt-5">
                   <EventsList
-                    events={events}
+                    events={events!}
                     onDetails={(ev) => setSelectedEvent(ev)}
                   />
                 </div>
@@ -253,11 +295,13 @@ export default function NewsEventsPage() {
             {eventsHeading}
             <div className="mt-5">
               <EventsList
-                events={events}
+                events={events!}
                 onDetails={(ev) => setSelectedEvent(ev)}
               />
             </div>
           </div>
+        )}
+          </>
         )}
 
         {/* Event details modal */}
