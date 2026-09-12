@@ -73,6 +73,10 @@ create table if not exists gallery (
   album_my text,
   album_desc_en text,
   album_desc_my text,
+  -- Optional display date ('YYYY-MM-DD') staff set per photo/album; albums
+  -- and photo grids sort by it when set, falling back to created_at.
+  -- Databases created before 2026-09 need a one-time migration:
+  --   alter table gallery add column photo_date text;
   created_at text not null default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
 );
 create index if not exists gallery_created_at_idx on gallery(created_at desc);

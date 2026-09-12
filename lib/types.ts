@@ -118,6 +118,8 @@ export interface GalleryImage {
   /** Short album description shown on the cover card and album page. */
   album_desc_en: string | null;
   album_desc_my: string | null;
+  /** Optional display date ('YYYY-MM-DD'); albums sort by it, falling back to created_at. */
+  photo_date: string | null;
   created_at: string;
 }
 

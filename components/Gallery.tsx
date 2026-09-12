@@ -4,12 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { fetchGallery } from "@/lib/db";
 import { FALLBACK_GALLERY } from "@/lib/fallback-data";
+import { formatDate } from "@/lib/format";
 import { localized, type GalleryImage } from "@/lib/types";
 
 interface GalleryTile {
   id: string;
   imageUrl: string | null;
   caption: string;
+  /** Sort key from photo_date/created_at — newest first within the album. */
+  sortKey: string;
 }
 
 interface AlbumGroup {
@@ -20,8 +23,14 @@ interface AlbumGroup {
   descEn: string;
   descMy: string;
   newestAt: string;
+  /** Album display date: a member photo's photo_date, if any is dated. */
+  albumDate: string;
   items: GalleryTile[];
 }
+
+/** Sort key: dated photos come before undated ones, then newest first. */
+const dateKey = (photoDate: string | null, createdAt: string) =>
+  photoDate ? `1${photoDate}` : `0${createdAt}`;
 
 const PLACEHOLDER_EMOJI = ["🎨", "🔬", "⚽", "📚", "🎭", "🏛️"];
 
@@ -201,10 +210,12 @@ export default function Gallery() {
             descEn: "",
             descMy: "",
             newestAt: "",
+            albumDate: "",
             items: FALLBACK_GALLERY.map((g, i) => ({
               id: `fallback-${i}`,
               imageUrl: null,
               caption: locale === "my" ? g.caption_my : g.caption_en,
+              sortKey: `0${i}`,
             })),
           },
         ]);
@@ -224,6 +235,7 @@ export default function Gallery() {
             descEn: row.album_desc_en ?? "",
             descMy: row.album_desc_my ?? "",
             newestAt: row.created_at,
+            albumDate: "",
             items: [],
           };
           groups.set(key, group);
@@ -232,13 +244,32 @@ export default function Gallery() {
           id: row.id,
           imageUrl: row.image_url,
           caption: localized(row, locale, "caption_en", "caption_my"),
+          sortKey: dateKey(row.photo_date, row.created_at),
         });
         if (row.created_at > group.newestAt) group.newestAt = row.created_at;
       }
+      // Staff-set photo dates first (album date = any member's photo_date),
+      // then undated albums by their newest photo.
       setAlbums(
-        Array.from(groups.values()).sort((a, b) =>
-          b.newestAt.localeCompare(a.newestAt),
-        ),
+        Array.from(groups.values())
+          .map((g) => {
+            const dated = rows.find(
+              (r) =>
+                r.photo_date &&
+                `${r.album_en ?? ""}\u0000${r.album_my ?? ""}` === g.key,
+            );
+            return {
+              ...g,
+              albumDate: dated?.photo_date ?? "",
+              items: [...g.items].sort((a, b) => b.sortKey.localeCompare(a.sortKey)),
+            };
+          })
+          .sort((a, b) => {
+            if (a.albumDate && b.albumDate) return b.albumDate.localeCompare(a.albumDate);
+            if (a.albumDate) return -1;
+            if (b.albumDate) return 1;
+            return b.newestAt.localeCompare(a.newestAt);
+          }),
       );
     });
     return () => {
@@ -319,6 +350,10 @@ export default function Gallery() {
           ? a.descMy
           : a.descEn;
 
+  /** Human album date: the staff-set date, formatted for the locale. */
+  const albumDate = (a: AlbumGroup) =>
+    a.albumDate ? formatDate(a.albumDate, locale) : "";
+
   let body;
   if (!hasTitledAlbums) {
     // No named albums — show the plain photo grid.
@@ -396,6 +431,11 @@ export default function Gallery() {
                   </p>
                 )}
                 <p className="mt-1 text-xs text-slate-500">
+                  {albumDate(album) && (
+                    <span className="mr-1.5 font-medium text-slate-600">
+                      {albumDate(album)} ·
+                    </span>
+                  )}
                   {t("photoCount", { count: album.items.length })}
                 </p>
               </div>

@@ -55,6 +55,12 @@ function optStr(value: unknown): string | null {
   return s ? s : null;
 }
 
+/** Accepts a 'YYYY-MM-DD' date; keeps null for empty/malformed input. */
+function optDate(value: unknown): string | null {
+  const s = optStr(value);
+  return s && /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : null;
+}
+
 function nowIso(): string {
   return new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 }
@@ -279,7 +285,7 @@ export async function handleGallery(
     const id = crypto.randomUUID();
     await db
       .prepare(
-        "insert into gallery (id, image_url, caption_en, caption_my, album_en, album_my, album_desc_en, album_desc_my) values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+        "insert into gallery (id, image_url, caption_en, caption_my, album_en, album_my, album_desc_en, album_desc_my, photo_date) values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
       )
       .bind(
         id,
@@ -290,6 +296,7 @@ export async function handleGallery(
         optStr(body.album_my),
         optStr(body.album_desc_en),
         optStr(body.album_desc_my),
+        optDate(body.photo_date),
       )
       .run();
     return json({ id }, 201);
@@ -310,10 +317,11 @@ export async function handleGallery(
       "album_my",
       "album_desc_en",
       "album_desc_my",
+      "photo_date",
     ] as const) {
       if (field in body) {
         sets.push(`${field}=?`);
-        values.push(optStr(body[field]));
+        values.push(field === "photo_date" ? optDate(body[field]) : optStr(body[field]));
       }
     }
     if (sets.length === 0) return badRequest("No fields to update");

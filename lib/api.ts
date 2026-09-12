@@ -186,6 +186,7 @@ export interface GalleryInput {
   album_my: string | null;
   album_desc_en: string | null;
   album_desc_my: string | null;
+  photo_date: string | null;
 }
 
 export const galleryApi = {
@@ -195,7 +196,7 @@ export const galleryApi = {
   update: (
     ids: string | string[],
     fields: Partial<
-      Pick<GalleryInput, "caption_en" | "caption_my" | "album_en" | "album_my" | "album_desc_en" | "album_desc_my">
+      Pick<GalleryInput, "caption_en" | "caption_my" | "album_en" | "album_my" | "album_desc_en" | "album_desc_my" | "photo_date">
     >,
   ) =>
     apiWrite<{ updated: number }>(

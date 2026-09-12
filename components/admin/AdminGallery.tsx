@@ -12,6 +12,7 @@ interface AlbumEdit {
   titleMy: string;
   descEn: string;
   descMy: string;
+  date: string;
 }
 
 /** Small input style for the per-photo edit fields. */
@@ -58,12 +59,17 @@ const GALLERY_SECTIONS: { id: GallerySection; label: string }[] = [
   { id: "photos", label: "Manage Photos" },
 ];
 
+/** Sort key: photos with a display date beat ones without, then by date. */
+const dateKey = (i: GalleryImage) =>
+  i.photo_date ? `1${i.photo_date}` : `0${i.created_at}`;
+
 export default function AdminGallery() {
   const [section, setSection] = useState<GallerySection>("upload");
   const [items, setItems] = useState<GalleryImage[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [captionEn, setCaptionEn] = useState("");
   const [captionMy, setCaptionMy] = useState("");
+  const [photoDate, setPhotoDate] = useState("");
   const [albumEn, setAlbumEn] = useState("");
   const [albumMy, setAlbumMy] = useState("");
   const [albumDescEn, setAlbumDescEn] = useState("");
@@ -77,10 +83,15 @@ export default function AdminGallery() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [batchAlbumEn, setBatchAlbumEn] = useState("");
   const [batchAlbumMy, setBatchAlbumMy] = useState("");
+  const [batchDate, setBatchDate] = useState("");
 
   // Filter / search
   const [filterAlbum, setFilterAlbum] = useState("");
   const [search, setSearch] = useState("");
+
+  // Upload tab: an existing album picked from the dropdown (pre-fills the
+  // album name/description fields so new photos land in the same album).
+  const [uploadTarget, setUploadTarget] = useState("");
 
   const load = async (): Promise<GalleryImage[]> => {
     try {
@@ -99,7 +110,6 @@ export default function AdminGallery() {
     return () => {
       active = false;
     };
-     
   }, []);
 
   const upload = async () => {
@@ -120,16 +130,26 @@ export default function AdminGallery() {
           album_my: albumMy.trim() || null,
           album_desc_en: albumDescEn.trim() || null,
           album_desc_my: albumDescMy.trim() || null,
+          photo_date: photoDate || null,
         });
       }
+      // Success: clear the whole form — file picker, previews and every text
+      // box — so the next batch starts fresh (staff request).
       setFiles([]);
       setCaptionEn("");
       setCaptionMy("");
+      setPhotoDate("");
       setAlbumEn("");
       setAlbumMy("");
       setAlbumDescEn("");
       setAlbumDescMy("");
+      setUploadTarget("");
+      const picker = document.querySelector<HTMLInputElement>(
+        'input[type="file"][multiple]',
+      );
+      if (picker) picker.value = "";
       setItems(await load());
+      setSavedId("upload");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
     } finally {
@@ -144,6 +164,7 @@ export default function AdminGallery() {
         caption_my: item.caption_my?.trim() || null,
         album_en: item.album_en?.trim() || null,
         album_my: item.album_my?.trim() || null,
+        photo_date: item.photo_date?.trim() || null,
       });
       setError("");
       setSavedId(item.id);
@@ -177,11 +198,13 @@ export default function AdminGallery() {
       await galleryApi.update(Array.from(selected), {
         album_en: batchAlbumEn.trim() || null,
         album_my: batchAlbumMy.trim() || null,
+        ...(batchDate ? { photo_date: batchDate } : {}),
       });
       setError("");
       setSelected(new Set());
       setBatchAlbumEn("");
       setBatchAlbumMy("");
+      setBatchDate("");
       setItems(await load());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to move");
@@ -229,7 +252,9 @@ export default function AdminGallery() {
     setItems(await load());
   };
 
-  // Group the loaded photos into titled albums for the album-level editor.
+  // Group the loaded photos into titled albums for the album-level editor,
+  // sorted by album date (a member photo's date, or the newest photo) —
+  // newest first; undated albums sink to the bottom.
   const albumGroups = Array.from(
     new Map(
       items
@@ -239,7 +264,28 @@ export default function AdminGallery() {
           return [key, { key, count: 0, item: i }] as const;
         }),
     ).values(),
-  ).map((g) => ({ ...g, count: items.filter((i) => `${i.album_en ?? ""}\u0000${i.album_my ?? ""}` === g.key).length }));
+  )
+    .map((g) => {
+      const members = items.filter(
+        (i) => `${i.album_en ?? ""}\u0000${i.album_my ?? ""}` === g.key,
+      );
+      const newest = members.reduce(
+        (acc, i) => (dateKey(i) > dateKey(acc) ? i : acc),
+        members[0],
+      );
+      return {
+        ...g,
+        count: members.length,
+        albumDate: newest.photo_date ?? "",
+        latest: newest,
+      };
+    })
+    .sort((a, b) => {
+      if (a.albumDate && b.albumDate) return b.albumDate.localeCompare(a.albumDate);
+      if (a.albumDate) return -1;
+      if (b.albumDate) return 1;
+      return dateKey(b.latest).localeCompare(dateKey(a.latest));
+    });
 
   /** Current edit value for an album (draft if present, otherwise first photo). */
   const albumValue = (key: string, item: GalleryImage): AlbumEdit =>
@@ -248,13 +294,32 @@ export default function AdminGallery() {
       titleMy: item.album_my ?? "",
       descEn: item.album_desc_en ?? "",
       descMy: item.album_desc_my ?? "",
+      date: item.photo_date ?? "",
     };
 
   const setAlbumValue = (key: string, field: keyof AlbumEdit, value: string) =>
-    setAlbumEdits((prev) => ({
-      ...prev,
-      [key]: { ...(prev[key] ?? { titleEn: "", titleMy: "", descEn: "", descMy: "" }), [field]: value },
-    }));
+    setAlbumEdits((prev) => {
+      const existing = prev[key];
+      if (existing) {
+        return { ...prev, [key]: { ...existing, [field]: value } };
+      }
+      // Seed the draft from the album's current values — never from empty
+      // strings, or applying a single-field edit would wipe the rest.
+      const member = items.find(
+        (i) => `${i.album_en ?? ""}\u0000${i.album_my ?? ""}` === key,
+      );
+      return {
+        ...prev,
+        [key]: {
+          titleEn: member?.album_en ?? "",
+          titleMy: member?.album_my ?? "",
+          descEn: member?.album_desc_en ?? "",
+          descMy: member?.album_desc_my ?? "",
+          date: member?.photo_date ?? "",
+          [field]: value,
+        },
+      };
+    });
 
   const saveAlbum = async (key: string) => {
     const edit = albumEdits[key];
@@ -268,6 +333,7 @@ export default function AdminGallery() {
         album_my: edit.titleMy.trim() || null,
         album_desc_en: edit.descEn.trim() || null,
         album_desc_my: edit.descMy.trim() || null,
+        ...(edit.date ? { photo_date: edit.date } : {}),
       });
       setError("");
       setItems(await load());
@@ -282,7 +348,7 @@ export default function AdminGallery() {
     }
   };
 
-  // Unique albums for the filter dropdown (from the loaded photos).
+  // Unique albums for the filter/upload-target dropdowns (from the loaded photos).
   const albumOptions = Array.from(
     new Map(
       items
@@ -315,6 +381,27 @@ export default function AdminGallery() {
     filtered.length > 0 && filtered.every((i) => selected.has(i.id));
   const toggleSelectAll = () =>
     setSelected(allFilteredSelected ? new Set() : new Set(filtered.map((i) => i.id)));
+
+  /**
+   * Pick an existing album from the dropdown; pre-fills its fields.
+   * Takes the option index — album keys contain \u0000, which the DOM
+   * truncates in option values, so keys must never ride on the value.
+   */
+  const pickTarget = (index: string) => {
+    const group = albumGroups[Number(index)];
+    setUploadTarget(group ? index : "");
+    if (group) {
+      setAlbumEn(group.item.album_en ?? "");
+      setAlbumMy(group.item.album_my ?? "");
+      setAlbumDescEn(group.item.album_desc_en ?? "");
+      setAlbumDescMy(group.item.album_desc_my ?? "");
+    } else {
+      setAlbumEn("");
+      setAlbumMy("");
+      setAlbumDescEn("");
+      setAlbumDescMy("");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -353,7 +440,14 @@ export default function AdminGallery() {
             </div>
           </div>
         )}
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Field label="Photo date" hint="Optional — sorts albums by date.">
+            <TextInput
+              type="date"
+              value={photoDate}
+              onChange={(e) => setPhotoDate(e.target.value)}
+            />
+          </Field>
           <Field label="Caption (English)">
             <TextInput
               value={captionEn}
@@ -369,7 +463,7 @@ export default function AdminGallery() {
             />
           </Field>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-3">
           <Field label="Album (English)" hint="Leave empty for uncategorized.">
             <TextInput
               value={albumEn}
@@ -383,6 +477,24 @@ export default function AdminGallery() {
               onChange={(e) => setAlbumMy(e.target.value)}
               placeholder="ဥပမာ — အားကစားနေ့"
             />
+          </Field>
+          <Field
+            label="Add to existing album"
+            hint="Pre-fills the album fields above."
+          >
+            <Select
+              value={uploadTarget}
+              onChange={(e) => pickTarget(e.target.value)}
+            >
+              <option value="">— new album / type manually —</option>
+              {albumGroups.map((g, idx) => (
+                <option key={g.key} value={String(idx)}>
+                  {[g.item.album_en, g.item.album_my]
+                    .filter((v) => v && v.trim())
+                    .join(" / ")}
+                </option>
+              ))}
+            </Select>
           </Field>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -417,21 +529,26 @@ export default function AdminGallery() {
           <div>
             <h3 className="font-bold text-slate-900">Edit Albums</h3>
             <p className="text-xs text-slate-500">
-              Title and description changes apply to every photo in the album.
+              Title, description and date changes apply to every photo in the
+              album. Albums are listed by date, newest first.
             </p>
           </div>
-          {albumGroups.map(({ key, count, item }) => {
+          {albumGroups.map(({ key, count, item, albumDate }) => {
             const edit = albumValue(key, item);
             const dirty =
               edit.titleEn !== (item.album_en ?? "") ||
               edit.titleMy !== (item.album_my ?? "") ||
               edit.descEn !== (item.album_desc_en ?? "") ||
-              edit.descMy !== (item.album_desc_my ?? "");
+              edit.descMy !== (item.album_desc_my ?? "") ||
+              (edit.date !== "" && edit.date !== albumDate);
             return (
               <div key={key} className="rounded-xl border border-slate-200 p-4">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
                   {[edit.titleEn, edit.titleMy].filter(Boolean).join(" / ") || "Untitled album"}{" "}
                   <span className="font-normal normal-case">({count} photo{count === 1 ? "" : "s"})</span>
+                  {albumDate && (
+                    <span className="font-normal normal-case"> · {albumDate}</span>
+                  )}
                 </p>
                 <div className="grid gap-2 sm:grid-cols-2">
                   <input
@@ -456,6 +573,13 @@ export default function AdminGallery() {
                     value={edit.descMy}
                     onChange={(e) => setAlbumValue(key, "descMy", e.target.value)}
                     placeholder="Description (MY)"
+                    className={inputSm}
+                  />
+                  <input
+                    type="date"
+                    value={edit.date || albumDate}
+                    onChange={(e) => setAlbumValue(key, "date", e.target.value)}
+                    title="Album date — sorts the album list"
                     className={inputSm}
                   />
                 </div>
@@ -494,12 +618,25 @@ export default function AdminGallery() {
           <div className="w-52">
             <Field label="Album">
               <Select
-                value={filterAlbum}
-                onChange={(e) => setFilterAlbum(e.target.value)}
+                value={
+                  filterAlbum
+                    ? String(
+                        albumOptions.findIndex(([key]) => key === filterAlbum),
+                      )
+                    : ""
+                }
+                onChange={(e) => {
+                  const idx = Number(e.target.value);
+                  setFilterAlbum(
+                    Number.isInteger(idx) && albumOptions[idx]
+                      ? albumOptions[idx][0]
+                      : "",
+                  );
+                }}
               >
-                <option value="">All albums</option>
-                {albumOptions.map(([key, label]) => (
-                  <option key={key} value={key}>
+                <option value="-1">All albums</option>
+                {albumOptions.map(([key, label], idx) => (
+                  <option key={key} value={String(idx)}>
                     {label}
                   </option>
                 ))}
@@ -567,6 +704,15 @@ export default function AdminGallery() {
                 />
               </Field>
             </div>
+            <div className="w-36">
+              <Field label="Set date" hint="Optional">
+                <TextInput
+                  type="date"
+                  value={batchDate}
+                  onChange={(e) => setBatchDate(e.target.value)}
+                />
+              </Field>
+            </div>
             <Button onClick={moveSelected}>Move selected</Button>
             <Button variant="danger" onClick={deleteSelected}>
               Delete selected
@@ -576,7 +722,9 @@ export default function AdminGallery() {
       )}
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        {filtered.map((item) => (
+        {[...filtered]
+          .sort((a, b) => dateKey(b).localeCompare(dateKey(a)))
+          .map((item) => (
           <figure
             key={item.id}
             className={`relative overflow-hidden rounded-xl border ${
@@ -660,6 +808,19 @@ export default function AdminGallery() {
                     )
                   }
                   placeholder="Album (MY)"
+                  className={inputSm}
+                />
+                <input
+                  type="date"
+                  value={item.photo_date ?? ""}
+                  onChange={(e) =>
+                    setItems(
+                      items.map((i) =>
+                        i.id === item.id ? { ...i, photo_date: e.target.value } : i,
+                      ),
+                    )
+                  }
+                  title="Photo date — sorts albums and grids"
                   className={inputSm}
                 />
               </div>
