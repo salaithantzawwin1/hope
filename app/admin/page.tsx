@@ -69,6 +69,20 @@ const GROUPS: {
   },
 ];
 
+const TAB_IDS = new Set(GROUPS.flatMap((g) => g.tabs.map((t) => t.id)));
+
+/**
+ * Reads the active section from the URL hash (#gallery, #about, …) so a
+ * browser refresh lands back where the user was instead of resetting to
+ * News. Falls back to the News section for unknown/absent hashes. The
+ * window access is deferred so the static prerender never touches it.
+ */
+function tabFromHash(): Tab {
+  if (typeof window === "undefined") return "news";
+  const id = window.location.hash.replace(/^#/, "") as Tab;
+  return TAB_IDS.has(id) ? id : "news";
+}
+
 function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const [passphrase, setPassphrase] = useState("");
   const [busy, setBusy] = useState(false);
@@ -134,7 +148,27 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [checking, setChecking] = useState(true);
-  const [tab, setTab] = useState<Tab>("news");
+  const [tab, setTab] = useState<Tab>(tabFromHash);
+
+  /** Switch sections and mirror the choice into the URL hash. */
+  const selectTab = (id: Tab) => {
+    setTab(id);
+    // replaceState (not pushState): section switches stay out of the back
+    // button's history; the hash is only a bookmark for refreshes.
+    history.replaceState(
+      null,
+      "",
+      id === "news" ? window.location.pathname : `#${id}`,
+    );
+  };
+
+  // Follow manual hash edits (e.g. a bookmarked #contact link opened in
+  // this same tab).
+  useEffect(() => {
+    const sync = () => setTab(tabFromHash());
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -212,7 +246,7 @@ export default function AdminPage() {
                       <button
                         key={t.id}
                         type="button"
-                        onClick={() => setTab(t.id)}
+                        onClick={() => selectTab(t.id)}
                         className={`whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-semibold transition-colors ${
                           tab === t.id
                             ? "bg-brand text-white"
