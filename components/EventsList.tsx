@@ -1,9 +1,45 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatDateShort, monthShort } from "@/lib/format";
 import { localized, type EventItem } from "@/lib/types";
+
+/** Thumbnail that removes itself from view if the image fails to load. */
+function EventThumb({ src, title }: { src: string; title: string }) {
+  const [failed, setFailed] = useState(false);
+  const ref = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const img = ref.current;
+    // Images may already have failed in the prerendered HTML, before React
+    // attached the onError handler — catch those on mount.
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, []);
+
+  if (failed) return null;
+
+  return (
+    <a
+      href={src}
+      target="_blank"
+      rel="noreferrer"
+      className="shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 shadow-sm transition-transform hover:scale-105"
+      aria-label={title}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        ref={ref}
+        src={src}
+        alt={title}
+        loading="lazy"
+        className="h-20 w-16 object-cover"
+        onError={() => setFailed(true)}
+      />
+    </a>
+  );
+}
 
 export default function EventsList({
   events,
@@ -68,16 +104,16 @@ export default function EventsList({
         return (
           <li
             key={event.id}
-            className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+            className="group flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ring-1 ring-slate-900/5 transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-md"
           >
-            <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-brand text-white">
+            <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-brand text-white shadow-sm">
               <span className="text-lg font-bold leading-none">{day}</span>
-              <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide">
+              <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/85">
                 {month}
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <h4 className="font-semibold leading-snug text-slate-900">
+              <h4 className="font-semibold leading-snug text-slate-900 transition-colors group-hover:text-brand">
                 {title}
               </h4>
               <p className="mt-1 text-sm text-slate-600">
@@ -87,39 +123,31 @@ export default function EventsList({
               {location && (
                 <p className="mt-0.5 text-sm text-slate-500">📍 {location}</p>
               )}
-              <Link
-                href={`/register?event=${event.id}`}
-                className="mt-2 inline-block rounded-lg border border-brand px-3 py-1.5 text-xs font-semibold text-brand transition-colors hover:bg-brand hover:text-white"
-              >
-                {t("register")}
-              </Link>
-              {onDetails && hasMore && (
-                <button
-                  type="button"
-                  onClick={() => onDetails(event)}
-                  className="mt-1.5 block text-sm font-semibold text-brand transition-colors hover:text-brand-dark hover:underline"
+              <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                <Link
+                  href={`/register?event=${event.id}`}
+                  className="rounded-lg border border-brand px-3 py-1.5 text-xs font-semibold text-brand transition-colors hover:bg-brand hover:text-white"
                 >
-                  {common("readMore")} →
-                </button>
-              )}
+                  {t("register")}
+                </Link>
+                {onDetails && hasMore && (
+                  <button
+                    type="button"
+                    onClick={() => onDetails(event)}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-brand transition-colors hover:text-brand-dark"
+                  >
+                    {common("readMore")}
+                    <span
+                      aria-hidden
+                      className="transition-transform group-hover:translate-x-0.5"
+                    >
+                      →
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
-            {event.image_url && (
-              <a
-                href={event.image_url}
-                target="_blank"
-                rel="noreferrer"
-                className="shrink-0 overflow-hidden rounded-lg border border-slate-200 shadow-sm transition-transform hover:scale-105"
-                aria-label={title}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={event.image_url}
-                  alt={title}
-                  loading="lazy"
-                  className="h-20 w-16 object-cover"
-                />
-              </a>
-            )}
+            {event.image_url && <EventThumb src={event.image_url} title={title} />}
           </li>
         );
       })}

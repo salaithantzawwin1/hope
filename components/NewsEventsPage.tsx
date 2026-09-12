@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { fetchEvents, fetchNews } from "@/lib/db";
 import { formatDate, formatDateShort } from "@/lib/format";
@@ -10,7 +10,61 @@ import EventsList from "./EventsList";
 import NewsCard from "./NewsCard";
 import PageHeader from "./PageHeader";
 
+/** Brand gradient + monogram shown when a cover image is missing or fails. */
+function CoverFallback({ label, className = "" }: { label: string; className?: string }) {
+  return (
+    <div
+      className={`flex items-center justify-center bg-gradient-to-br from-brand via-brand to-brand-light ${className}`}
+      aria-hidden
+    >
+      <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 text-2xl font-black text-white/90 backdrop-blur-sm">
+        {label.slice(0, 1).toUpperCase()}
+      </span>
+    </div>
+  );
+}
+
 type Tab = "all" | "news" | "events";
+
+/**
+ * Cover image that falls back to the brand block when the file is missing
+ * (deleted from R2) or fails to load — including the prerendered-HTML case:
+ * a static <img> may already have failed before React attaches onError, so
+ * after mount we check complete/naturalWidth and flip to the fallback.
+ */
+function SafeCover({
+  src,
+  label,
+  className = "",
+  imgClassName = "",
+}: {
+  src: string;
+  label: string;
+  className?: string;
+  imgClassName?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+  const ref = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const img = ref.current;
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, []);
+
+  if (failed) return <CoverFallback label={label} className={className} />;
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={ref}
+      src={src}
+      alt={label}
+      loading="lazy"
+      className={imgClassName}
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 /**
  * Placeholder blocks shown only while news/events load (when no prerendered
@@ -113,15 +167,15 @@ export default function NewsEventsPage({
   ];
 
   const newsHeading = (
-    <h2 className="flex items-center gap-2.5 text-xl font-bold text-slate-900">
-      <span aria-hidden className="h-6 w-1.5 rounded-full bg-brand" />
+    <h2 className="flex items-center gap-2.5 text-lg font-bold uppercase tracking-wide text-slate-900">
+      <span aria-hidden className="h-5 w-1 rounded-full bg-brand" />
       {t("newsTitle")}
     </h2>
   );
 
   const eventsHeading = (
-    <h2 className="flex items-center gap-2.5 text-xl font-bold text-slate-900">
-      <span aria-hidden className="h-6 w-1.5 rounded-full bg-accent" />
+    <h2 className="flex items-center gap-2.5 text-lg font-bold uppercase tracking-wide text-slate-900">
+      <span aria-hidden className="h-5 w-1 rounded-full bg-accent" />
       {t("eventsTitle")}
     </h2>
   );
@@ -133,24 +187,24 @@ export default function NewsEventsPage({
           {t("subtitle")}
         </p>
       </PageHeader>
-      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 pb-16 sm:px-6">
         {/* Filter tabs */}
-        <div className="flex flex-wrap gap-2" role="group" aria-label={t("title")}>
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t("title")}>
           {tabs.map(({ key, label, count }) => (
             <button
               key={key}
               type="button"
               aria-pressed={tab === key}
               onClick={() => setTab(key)}
-              className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                 tab === key
-                  ? "bg-brand text-white shadow-sm"
+                  ? "bg-brand text-white shadow-md shadow-brand/25"
                   : "border border-slate-200 bg-white text-slate-600 hover:border-brand/40 hover:text-brand"
               }`}
             >
               {label}
               <span
-                className={`ml-2 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                   tab === key
                     ? "bg-white/20 text-white"
                     : "bg-slate-100 text-slate-500"
@@ -168,30 +222,26 @@ export default function NewsEventsPage({
           <>
         {/* Featured hero card — newest post, shown on All and News tabs */}
         {(tab === "all" || tab === "news") && featured && (
-          <article className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-lg">
-            <div className="grid md:grid-cols-2">
-              <div className="relative min-h-[240px] md:min-h-[300px]">
-                {featured.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={featured.image_url}
-                    alt={localized(featured, locale, "title_en", "title_my")}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-brand to-brand-light text-7xl">
-                    <span aria-hidden>🏫</span>
-                  </div>
-                )}
-                <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand shadow">
+          <article className="group mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-xl">
+            <div className="grid md:grid-cols-5">
+              <div className="relative min-h-[220px] bg-slate-100 md:col-span-3 md:min-h-[300px]">
+                <SafeCover
+                  src={featured.image_url as string}
+                  label={localized(featured, locale, "title_en", "title_my")}
+                  className="absolute inset-0 h-full w-full"
+                  imgClassName="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                />
+                <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-brand px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white shadow-lg">
+                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-accent" />
                   {t("latestBadge")}
                 </span>
               </div>
-              <div className="flex flex-col justify-center p-6 sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-wider text-accent-dark">
+              <div className="flex flex-col justify-center border-t border-slate-100 p-6 sm:p-8 md:col-span-2 md:border-l md:border-t-0">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-accent-dark">
+                  <span aria-hidden className="h-px w-6 bg-accent-dark/60" />
                   {formatDate(featured.published_at, locale)}
                 </p>
-                <h2 className="mt-2 text-2xl font-bold leading-snug text-slate-900 sm:text-3xl">
+                <h2 className="mt-3 text-xl font-bold leading-snug text-slate-900 sm:text-2xl">
                   {localized(featured, locale, "title_en", "title_my")}
                 </h2>
                 <p className="mt-3 line-clamp-3 text-[15px] leading-relaxed text-slate-600">
@@ -200,9 +250,12 @@ export default function NewsEventsPage({
                 <button
                   type="button"
                   onClick={() => setSelected(featured)}
-                  className="mt-5 self-start rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-dark"
+                  className="mt-6 inline-flex items-center gap-2 self-start rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-dark hover:shadow-md"
                 >
-                  {common("readMore")} →
+                  {common("readMore")}
+                  <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
+                    →
+                  </span>
                 </button>
               </div>
             </div>
@@ -318,16 +371,17 @@ export default function NewsEventsPage({
               aria-label={localized(selectedEvent, locale, "title_en", "title_my")}
             >
               {selectedEvent.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <SafeCover
                   src={selectedEvent.image_url}
-                  alt={localized(selectedEvent, locale, "title_en", "title_my")}
-                  className="max-h-72 w-full object-contain"
+                  label={localized(selectedEvent, locale, "title_en", "title_my")}
+                  className="h-36 w-full"
+                  imgClassName="max-h-72 w-full bg-slate-100 object-contain"
                 />
               ) : (
-                <div className="flex h-36 w-full items-center justify-center bg-gradient-to-br from-brand to-brand-light text-6xl">
-                  <span aria-hidden>📅</span>
-                </div>
+                <CoverFallback
+                  label={localized(selectedEvent, locale, "title_en", "title_my")}
+                  className="h-36 w-full"
+                />
               )}
               <div className="p-6 sm:p-8">
                 <p className="text-xs font-semibold uppercase tracking-wider text-accent-dark">
@@ -379,16 +433,14 @@ export default function NewsEventsPage({
               aria-label={selectedTitle}
             >
               {selected.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <SafeCover
                   src={selected.image_url}
-                  alt={selectedTitle}
-                  className="h-60 w-full object-cover"
+                  label={selectedTitle}
+                  className="h-40 w-full"
+                  imgClassName="h-60 w-full bg-slate-100 object-cover"
                 />
               ) : (
-                <div className="flex h-40 w-full items-center justify-center bg-gradient-to-br from-brand to-brand-light text-7xl">
-                  <span aria-hidden>🏫</span>
-                </div>
+                <CoverFallback label={selectedTitle} className="h-40 w-full" />
               )}
               <div className="p-6 sm:p-8">
                 <p className="text-xs font-semibold uppercase tracking-wider text-accent-dark">
