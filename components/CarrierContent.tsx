@@ -60,18 +60,19 @@ export default function CarrierPageContent() {
 
   return (
     <>
-      {/* Hero */}
+      {/* Hero — compact, matching the shared PageHeader scale used by the
+          other inner pages, so the positions list reaches the fold sooner. */}
       <section className="relative overflow-hidden bg-brand-dark text-white">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-dark via-brand to-brand-light opacity-90" />
-        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-16 sm:px-6 sm:py-20">
+        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-8 sm:px-6 sm:py-10">
           <div className="max-w-3xl">
-            <span className="inline-block rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-accent">
+            <span className="inline-block rounded-full border border-white/20 bg-white/10 px-3 py-0.5 text-xs font-medium text-accent">
               Hope International School
             </span>
-            <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-balance sm:text-5xl">
+            <h1 className="mt-3 text-2xl font-bold leading-tight tracking-tight text-balance sm:text-3xl">
               {pick(data.hero_title_en, data.hero_title_my)}
             </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-slate-200">
+            <p className="mt-2.5 max-w-2xl text-sm leading-relaxed text-slate-200 sm:text-base">
               {pick(data.hero_subtitle_en, data.hero_subtitle_my)}
             </p>
           </div>
