@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { fetchEvents, GRADE_LEVELS } from "@/lib/db";
+import { errorId, invalidProps } from "@/lib/form-a11y";
 import { localized, type EventItem } from "@/lib/types";
 import {
   REGISTRATION_EMAIL,
@@ -67,6 +68,13 @@ export default function RegistrationForm() {
     };
   }, [locale]);
 
+  // Success replaces the whole form, so a live region would mount already
+  // filled in and go unannounced — move focus to the panel instead.
+  const successRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (status === "success") successRef.current?.focus();
+  }, [status]);
+
   const validate = (): Errors => {
     const next: Errors = {};
     if (!parentName.trim()) next.parentName = f("validationName");
@@ -125,7 +133,12 @@ export default function RegistrationForm() {
 
   if (status === "success") {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm sm:p-12">
+      <div
+        ref={successRef}
+        role="status"
+        tabIndex={-1}
+        className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm outline-none sm:p-12"
+      >
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-2xl">
           ✅
         </div>
@@ -156,13 +169,20 @@ export default function RegistrationForm() {
             <input
               id="reg-parent-name"
               type="text"
+              required
               value={parentName}
               onChange={(e) => setParentName(e.target.value)}
               placeholder={f("parentNamePlaceholder")}
               className={inputClass(errors.parentName)}
+              {...invalidProps("reg", "parentName", errors)}
             />
             {errors.parentName && (
-              <p className="mt-1 text-xs text-red-600">{errors.parentName}</p>
+              <p
+                id={errorId("reg", "parentName")}
+                className="mt-1 text-xs text-red-600"
+              >
+                {errors.parentName}
+              </p>
             )}
           </div>
           <div>
@@ -175,13 +195,17 @@ export default function RegistrationForm() {
             <input
               id="reg-email"
               type="email"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={f("emailPlaceholder")}
               className={inputClass(errors.email)}
+              {...invalidProps("reg", "email", errors)}
             />
             {errors.email && (
-              <p className="mt-1 text-xs text-red-600">{errors.email}</p>
+              <p id={errorId("reg", "email")} className="mt-1 text-xs text-red-600">
+                {errors.email}
+              </p>
             )}
           </div>
         </div>
@@ -197,13 +221,17 @@ export default function RegistrationForm() {
             <input
               id="reg-phone"
               type="tel"
+              required
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder={f("phonePlaceholder")}
               className={inputClass(errors.phone)}
+              {...invalidProps("reg", "phone", errors)}
             />
             {errors.phone && (
-              <p className="mt-1 text-xs text-red-600">{errors.phone}</p>
+              <p id={errorId("reg", "phone")} className="mt-1 text-xs text-red-600">
+                {errors.phone}
+              </p>
             )}
           </div>
           <div>
@@ -255,10 +283,12 @@ export default function RegistrationForm() {
             </label>
             <select
               id="reg-program"
+              required
               value={program}
               onChange={(e) => setProgram(e.target.value)}
               disabled={lockedEvent}
               className={inputClass(errors.program)}
+              {...invalidProps("reg", "program", errors)}
             >
               <option value="">{f("programPlaceholder")}</option>
               {events.map((event) => (
@@ -272,7 +302,12 @@ export default function RegistrationForm() {
               <p className="mt-1 text-xs text-slate-500">🔒 {f("lockedNote")}</p>
             )}
             {errors.program && (
-              <p className="mt-1 text-xs text-red-600">{errors.program}</p>
+              <p
+                id={errorId("reg", "program")}
+                className="mt-1 text-xs text-red-600"
+              >
+                {errors.program}
+              </p>
             )}
           </div>
         </div>
@@ -295,7 +330,7 @@ export default function RegistrationForm() {
         </div>
 
         {status === "error" && errorKind === "notConfigured" && (
-          <div className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div role="alert" className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
             <p>{f("notConfigured")}</p>
             <a
               href={`mailto:${REGISTRATION_EMAIL}`}
@@ -305,8 +340,10 @@ export default function RegistrationForm() {
             </a>
           </div>
         )}
+        {/* role="alert" implies aria-live="assertive", so the summary is read
+            out as soon as validation fails or delivery breaks. */}
         {status === "error" && errorKind !== "notConfigured" && (
-          <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
             <p>
               <strong>{f("errorTitle")}</strong> — {f("errorText")}
             </p>

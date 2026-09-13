@@ -307,7 +307,8 @@
       "validationEmail": "Please enter a valid email address.",
       "validationPosition": "Please choose a position.",
       "validationCv": "Please attach your CV.",
-      "validationCvSize": "That file is too large — please attach a CV under {size}."
+      "validationCvSize": "That file is too large — please attach a CV under {size}.",
+      "validationSummary": "Please fix the highlighted fields and try again."
     }
   },
   "footer": {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { fetchSiteContent } from "@/lib/db";
 import { FALLBACK_FOOTER } from "@/lib/fallback-data";
 import type { FooterContent } from "@/lib/types";
@@ -41,6 +42,12 @@ export default function Footer() {
     const value = isMy && my.trim() ? my : en;
     return value || en;
   };
+
+  // Quick links are edited from the Admin portal → Footer tab, same as the
+  // header nav: empty rows are dropped so a half-typed link never renders.
+  const links = (data.links ?? []).filter(
+    (l) => l.href.trim() && pick(l.label_en, l.label_my).trim(),
+  );
 
   return (
     <footer className="mt-auto bg-brand-dark text-slate-400">
@@ -96,6 +103,30 @@ export default function Footer() {
             </span>
           </div>
         </div>
+
+        {/* Tagline + quick links (both edited from the Admin portal → Footer). */}
+        {pick(data.tagline_en, data.tagline_my).trim() && (
+          <p className="mt-3 max-w-3xl text-xs leading-relaxed text-slate-400">
+            {pick(data.tagline_en, data.tagline_my)}
+          </p>
+        )}
+
+        {links.length > 0 && (
+          <nav
+            aria-label={t("quickLinks")}
+            className="mt-3 flex flex-wrap items-center gap-x-1 gap-y-0.5 border-t border-white/10 pt-2"
+          >
+            {links.map((link) => (
+              <FooterLink
+                key={link.href}
+                href={link.href.trim()}
+                className="inline-flex min-h-10 items-center rounded px-2 text-xs font-medium text-slate-400 transition-colors hover:text-white"
+              >
+                {pick(link.label_en, link.label_my)}
+              </FooterLink>
+            ))}
+          </nav>
+        )}
       </div>
 
       <div className="border-t border-white/10">
@@ -104,8 +135,46 @@ export default function Footer() {
             © {new Date().getFullYear()} Hope International School.{" "}
             {t("rights")}
           </p>
-        </div>
-      </div>
+        </div>      </div>
     </footer>
+  );
+}
+
+/**
+ * One footer quick link. Internal paths ("...", "/about") go through the
+ * locale-aware Link so they keep the visitor's language; anything absolute
+ * (https://, mailto:, tel:) is rendered as a plain anchor, opened in a new
+ * tab only for web links.
+ */
+function FooterLink({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className: string;
+  children: React.ReactNode;
+}) {
+  const isWeb = /^https?:\/\//i.test(href);
+  if (isWeb) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" className={className}>
+        {children}
+      </a>
+    );
+  }
+  if (/^(mailto:|tel:)/i.test(href)) {
+    return (
+      <a href={href} className={className}>
+        {children}
+      </a>
+    );
+  }
+  // Root-relative paths are passed through unchanged — the locale prefix is
+  // added by next-intl's Link.
+  return (
+    <Link href={href.startsWith("/") ? href : `/${href}`} className={className}>
+      {children}
+    </Link>
   );
 }

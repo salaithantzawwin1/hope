@@ -4,7 +4,14 @@ import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { fetchSiteContent } from "@/lib/db";
-import type { HomeCta, HomeHero, HomeHeroButton, HomePrograms, HomeStats } from "@/lib/types";
+import type {
+  HomeCta,
+  HomeHero,
+  HomeHeroButton,
+  HomePrograms,
+  HomeStat,
+  HomeStats,
+} from "@/lib/types";
 
 const PROGRAM_ICONS = ["A", "B", "C", "D"];
 
@@ -175,6 +182,50 @@ export function HomeStats({ fallback }: { fallback: HomeStats }) {
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+/** The stat the welcome-image badge mirrors, so the two can never disagree. */
+export const YEARS_STAT_ID = "years";
+
+/**
+ * Picks the stat behind the welcome badge. Stats are edited as a plain list in
+ * the admin portal, so they are matched by id; rows saved before stats carried
+ * an id keep the built-in order, which puts the school's age third. Returns
+ * null when that stat is gone, so the badge disappears rather than showing a
+ * number the hero no longer agrees with.
+ */
+export function pickYearsStat(stats: HomeStat[]): HomeStat | null {
+  const byId = stats.find((s) => s.id === YEARS_STAT_ID);
+  if (byId) return byId;
+  if (stats.some((s) => s.id)) return null;
+  return stats[2] ?? null;
+}
+
+/**
+ * The gold stat badge overlapping the welcome photo. Reads the same
+ * `home_stats` block as the hero, so changing the school's age in the admin
+ * portal updates both places at once (it used to be a hardcoded "+12").
+ */
+export function HomeYearsBadge({ fallback }: { fallback: HomeStats }) {
+  const locale = useLocale();
+  const data = useBlock<HomeStats>("home_stats", fallback);
+  const stat = pickYearsStat(data.stats);
+  if (!stat) return null;
+  const pick = (en: string, my: string) => {
+    const value = locale === "my" && my.trim() ? my : en;
+    return value || en;
+  };
+
+  return (
+    <div className="absolute -bottom-5 -left-5 hidden rounded-2xl bg-accent px-6 py-4 shadow-xl sm:block">
+      <div className="text-3xl font-bold text-brand-dark">
+        {pick(stat.number_en, stat.number_my)}
+      </div>
+      <div className="text-sm font-medium text-brand-dark/80">
+        {pick(stat.label_en, stat.label_my)}
+      </div>
     </div>
   );
 }

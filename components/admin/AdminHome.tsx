@@ -8,6 +8,7 @@ import {
   FALLBACK_HOME_PROGRAMS,
   FALLBACK_HOME_STATS,
 } from "@/lib/fallback-data";
+import { YEARS_STAT_ID } from "@/components/HomeContent";
 import { uploadImage } from "@/lib/upload";
 import type {
   HomeCta,
@@ -44,6 +45,20 @@ const HOME_SECTIONS: { id: HomeSection; label: string }[] = [
   { id: "cta", label: "CTA Banner" },
 ];
 
+/**
+ * Stats saved before the `id` field existed have no name for the welcome-photo
+ * badge to look up, so backfill it by position when a row is loaded. Saving
+ * then persists the ids and the editor can say which stat is mirrored.
+ */
+function withStatIds(block: HomeStats): HomeStats {
+  return {
+    ...block,
+    stats: block.stats.map((s, i) =>
+      s.id ? s : { ...s, id: FALLBACK_HOME_STATS.stats[i]?.id },
+    ),
+  };
+}
+
 export default function AdminHome() {
   const [section, setSection] = useState<HomeSection>("hero");
   const [hero, setHero] = useState<HomeHero>(FALLBACK_HOME_HERO);
@@ -68,7 +83,7 @@ export default function AdminHome() {
       const p = parseJson<HomePrograms>(map.get(PROGRAMS_KEY));
       const c = parseJson<HomeCta>(map.get(CTA_KEY));
       setHero({ ...FALLBACK_HOME_HERO, ...(h ?? {}) });
-      setStats(s ?? FALLBACK_HOME_STATS);
+      setStats(s ? withStatIds(s) : FALLBACK_HOME_STATS);
       setPrograms(p ?? FALLBACK_HOME_PROGRAMS);
       setCta(c ?? FALLBACK_HOME_CTA);
       setLoaded(true);
@@ -308,6 +323,11 @@ export default function AdminHome() {
               <div className="flex items-center justify-between">
                 <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
                   Stat {i + 1}
+                  {stat.id === YEARS_STAT_ID && (
+                    <span className="ml-2 rounded bg-accent/25 px-1.5 py-0.5 text-[10px] !normal-case font-semibold text-brand-dark">
+                      also shown over the welcome photo
+                    </span>
+                  )}
                 </p>
                 <Button
                   type="button"

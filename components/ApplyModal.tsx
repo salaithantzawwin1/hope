@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { errorId, invalidProps } from "@/lib/form-a11y";
 import {
   APPLICATION_EMAIL,
   MAX_CV_BYTES,
@@ -69,6 +70,13 @@ export default function ApplyModal({
       document.body.style.overflow = "";
     };
   }, [open, onClose]);
+
+  // Success swaps the form out for a panel, so focus it — a live region that
+  // mounts already filled in is not reliably announced.
+  const successRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (status === "success") successRef.current?.focus();
+  }, [status]);
 
   if (!open) return null;
 
@@ -174,7 +182,12 @@ export default function ApplyModal({
         </div>
 
         {status === "success" ? (
-          <div className="mt-8 mb-4 text-center">
+          <div
+            ref={successRef}
+            role="status"
+            tabIndex={-1}
+            className="mt-8 mb-4 text-center outline-none"
+          >
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-2xl">
               ✅
             </div>
@@ -204,13 +217,20 @@ export default function ApplyModal({
               <input
                 id="apply-name"
                 type="text"
+                required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={f("namePlaceholder")}
                 className={inputClass(errors.name)}
+                {...invalidProps("apply", "name", errors)}
               />
               {errors.name && (
-                <p className="mt-1 text-xs text-red-600">{errors.name}</p>
+                <p
+                  id={errorId("apply", "name")}
+                  className="mt-1 text-xs text-red-600"
+                >
+                  {errors.name}
+                </p>
               )}
             </div>
 
@@ -225,13 +245,20 @@ export default function ApplyModal({
                 <input
                   id="apply-phone"
                   type="tel"
+                  required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder={f("phonePlaceholder")}
                   className={inputClass(errors.phone)}
+                  {...invalidProps("apply", "phone", errors)}
                 />
                 {errors.phone && (
-                  <p className="mt-1 text-xs text-red-600">{errors.phone}</p>
+                  <p
+                    id={errorId("apply", "phone")}
+                    className="mt-1 text-xs text-red-600"
+                  >
+                    {errors.phone}
+                  </p>
                 )}
               </div>
               <div>
@@ -244,13 +271,20 @@ export default function ApplyModal({
                 <input
                   id="apply-email"
                   type="email"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={f("emailPlaceholder")}
                   className={inputClass(errors.email)}
+                  {...invalidProps("apply", "email", errors)}
                 />
                 {errors.email && (
-                  <p className="mt-1 text-xs text-red-600">{errors.email}</p>
+                  <p
+                    id={errorId("apply", "email")}
+                    className="mt-1 text-xs text-red-600"
+                  >
+                    {errors.email}
+                  </p>
                 )}
               </div>
             </div>
@@ -264,9 +298,11 @@ export default function ApplyModal({
               </label>
               <select
                 id="apply-position"
+                required
                 value={position}
                 onChange={(e) => setPosition(e.target.value)}
                 className={inputClass(errors.position)}
+                {...invalidProps("apply", "position", errors)}
               >
                 {positions.map((p) => (
                   <option key={p} value={p}>
@@ -275,7 +311,12 @@ export default function ApplyModal({
                 ))}
               </select>
               {errors.position && (
-                <p className="mt-1 text-xs text-red-600">{errors.position}</p>
+                <p
+                  id={errorId("apply", "position")}
+                  className="mt-1 text-xs text-red-600"
+                >
+                  {errors.position}
+                </p>
               )}
             </div>
 
@@ -306,9 +347,11 @@ export default function ApplyModal({
               <input
                 id="apply-cv"
                 type="file"
+                required
                 accept=".pdf,.doc,.docx,.rtf,image/*"
                 onChange={(e) => onFile(e.target.files?.[0] ?? null)}
                 className="w-full cursor-pointer rounded-lg border border-slate-300 bg-white text-sm text-slate-700 file:mr-3 file:cursor-pointer file:rounded-l-lg file:border-0 file:bg-brand/10 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-brand hover:file:bg-brand/20 focus:outline-none focus:ring-2 focus:border-brand focus:ring-brand/20"
+                {...invalidProps("apply", "cv", errors)}
               />
               <p className="mt-1.5 text-xs text-slate-400">
                 {f("cvHint", { size: MAX_CV_LABEL })}
@@ -319,12 +362,22 @@ export default function ApplyModal({
                 </p>
               )}
               {errors.cv && (
-                <p className="mt-1 text-xs text-red-600">{errors.cv}</p>
+                <p id={errorId("apply", "cv")} className="mt-1 text-xs text-red-600">
+                  {errors.cv}
+                </p>
               )}
             </div>
 
+            {/* Validation only marks individual fields, so a summary is needed
+                for the failure to be announced at all. */}
+            {Object.keys(errors).length > 0 && (
+              <div role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                {f("validationSummary")}
+              </div>
+            )}
+
             {status === "error" && errorKind === "notConfigured" && (
-              <div className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              <div role="alert" className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
                 <p>{f("notConfigured")}</p>
                 <a
                   href={`mailto:${APPLICATION_EMAIL}`}
@@ -335,7 +388,7 @@ export default function ApplyModal({
               </div>
             )}
             {status === "error" && errorKind !== "notConfigured" && (
-              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
                 <p>
                   <strong>{f("errorTitle")}</strong> — {f("errorText")}
                 </p>

@@ -34,6 +34,21 @@ body {
   }
 }
 
+/* Myanmar script stacks medials above and below the base letter, so the
+   Latin-tuned leading used across the site (leading-tight = 1.25 on the
+   hero h1, leading-snug on cards) crowds the lines together and makes the
+   stacked marks collide. Give Burmese headings room to breathe, and drop
+   the negative tracking that only makes sense for Latin.
+   These rules sit outside Tailwind's layers, so they win over the leading
+   and tracking utilities without touching the English design. */
+html[lang="my"] h1,
+html[lang="my"] h2,
+html[lang="my"] h3,
+html[lang="my"] h4 {
+  line-height: 1.55;
+  letter-spacing: normal;
+}
+
 ::selection {
   background: #f5b301;
   color: #172554;

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { GRADE_LEVELS } from "@/lib/db";
+import { errorId, invalidProps } from "@/lib/form-a11y";
 import { INQUIRY_EMAIL, submitInquiry } from "@/lib/inquiry";
 
 type Errors = { name?: string; email?: string; message?: string };
@@ -22,6 +23,13 @@ export default function InquiryForm() {
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  // The confirmation appears in place of nothing (the form stays put), so
+  // focus it: a fresh live region is not reliably announced.
+  const successRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (status === "success") successRef.current?.focus();
+  }, [status]);
 
   const validate = (): Errors => {
     const next: Errors = {};
@@ -107,13 +115,17 @@ export default function InquiryForm() {
             <input
               id="inq-name"
               type="text"
+              required
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={f("namePlaceholder")}
               className={inputClass(errors.name)}
+              {...invalidProps("inq", "name", errors)}
             />
             {errors.name && (
-              <p className="mt-1 text-xs text-red-600">{errors.name}</p>
+              <p id={errorId("inq", "name")} className="mt-1 text-xs text-red-600">
+                {errors.name}
+              </p>
             )}
           </div>
           <div>
@@ -123,13 +135,17 @@ export default function InquiryForm() {
             <input
               id="inq-email"
               type="email"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={f("emailPlaceholder")}
               className={inputClass(errors.email)}
+              {...invalidProps("inq", "email", errors)}
             />
             {errors.email && (
-              <p className="mt-1 text-xs text-red-600">{errors.email}</p>
+              <p id={errorId("inq", "email")} className="mt-1 text-xs text-red-600">
+                {errors.email}
+              </p>
             )}
           </div>
         </div>
@@ -174,25 +190,39 @@ export default function InquiryForm() {
           </label>
           <textarea
             id="inq-message"
+            required
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder={f("messagePlaceholder")}
             rows={5}
             className={inputClass(errors.message)}
+            {...invalidProps("inq", "message", errors)}
           />
           {errors.message && (
-            <p className="mt-1 text-xs text-red-600">{errors.message}</p>
+            <p
+              id={errorId("inq", "message")}
+              className="mt-1 text-xs text-red-600"
+            >
+              {errors.message}
+            </p>
           )}
         </div>
 
+        {/* role="alert" = assertive live region: field problems and delivery
+            failures are announced the moment they appear. */}
         {status === "error" && (
-          <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
             <strong>{f("errorTitle")}</strong> — {f("errorText")}
           </div>
         )}
 
         {status === "success" && (
-          <div className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">
+          <div
+            ref={successRef}
+            role="status"
+            tabIndex={-1}
+            className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800 outline-none"
+          >
             <strong>{f("successTitle")}</strong> {f("successText")}
           </div>
         )}

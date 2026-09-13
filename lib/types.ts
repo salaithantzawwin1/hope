@@ -207,6 +207,12 @@ export interface AboutValues {
 }
 
 export interface HomeStat {
+  /**
+   * Stable identifier for the stats the layout references by name — the
+   * welcome photo badge mirrors the "years" stat. Optional: rows saved
+   * before ids existed fall back to their position in the list.
+   */
+  id?: string;
   number_en: string;
   number_my: string;
   label_en: string;

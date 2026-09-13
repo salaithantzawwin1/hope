@@ -8,10 +8,12 @@ import {
   HomeHeroText,
   HomePrograms,
   HomeStats,
+  HomeYearsBadge,
 } from "@/components/HomeContent";
 import NewsEventsHome from "@/components/NewsEventsHome";
 import FeaturedEvent from "@/components/FeaturedEvent";
 import { fetchEvents, fetchNews } from "@/lib/db";
+import type { HomeStats as HomeStatsBlock } from "@/lib/types";
 
 export default async function HomePage({
   params,
@@ -24,6 +26,41 @@ export default async function HomePage({
   // Build-time fetch so the exported home page ships real news/events —
   // no "No news posts yet" flash while the browser fetches the API.
   const [news, events] = await Promise.all([fetchNews(), fetchEvents()]);
+
+  // Editable from Admin → Home → Hero Stats. The welcome-image badge below
+  // reads the same block, so the two always show the same number.
+  const statsFallback: HomeStatsBlock = {
+    stats: [
+      {
+        id: "students",
+        number_en: t("stats.students"),
+        number_my: t("stats.students"),
+        label_en: t("stats.studentsLabel"),
+        label_my: t("stats.studentsLabel"),
+      },
+      {
+        id: "teachers",
+        number_en: t("stats.teachers"),
+        number_my: t("stats.teachers"),
+        label_en: t("stats.teachersLabel"),
+        label_my: t("stats.teachersLabel"),
+      },
+      {
+        id: "years",
+        number_en: t("stats.years"),
+        number_my: t("stats.years"),
+        label_en: t("stats.yearsLabel"),
+        label_my: t("stats.yearsLabel"),
+      },
+      {
+        id: "ratio",
+        number_en: t("stats.ratio"),
+        number_my: t("stats.ratio"),
+        label_en: t("stats.ratioLabel"),
+        label_my: t("stats.ratioLabel"),
+      },
+    ],
+  };
 
   return (
     <>
@@ -63,36 +100,7 @@ export default async function HomePage({
           </div>
 
           {/* Stats (editable) */}
-          <HomeStats
-            fallback={{
-              stats: [
-                {
-                  number_en: t("stats.students"),
-                  number_my: t("stats.students"),
-                  label_en: t("stats.studentsLabel"),
-                  label_my: t("stats.studentsLabel"),
-                },
-                {
-                  number_en: t("stats.teachers"),
-                  number_my: t("stats.teachers"),
-                  label_en: t("stats.teachersLabel"),
-                  label_my: t("stats.teachersLabel"),
-                },
-                {
-                  number_en: t("stats.years"),
-                  number_my: t("stats.years"),
-                  label_en: t("stats.yearsLabel"),
-                  label_my: t("stats.yearsLabel"),
-                },
-                {
-                  number_en: t("stats.ratio"),
-                  number_my: t("stats.ratio"),
-                  label_en: t("stats.ratioLabel"),
-                  label_my: t("stats.ratioLabel"),
-                },
-              ],
-            }}
-          />
+          <HomeStats fallback={statsFallback} />
         </div>
       </section>
 
@@ -135,12 +143,8 @@ export default async function HomePage({
                   className="h-full w-full object-cover"
                 />
               </div>
-            <div className="absolute -bottom-5 -left-5 hidden rounded-2xl bg-accent px-6 py-4 shadow-xl sm:block">
-              <div className="text-3xl font-bold text-brand-dark">+12</div>
-              <div className="text-sm font-medium text-brand-dark/80">
-                {t("stats.yearsLabel")}
-              </div>
-            </div>
+            {/* Mirrors the editable "years" hero stat (was a hardcoded +12). */}
+            <HomeYearsBadge fallback={statsFallback} />
           </div>
         </div>
       </section>

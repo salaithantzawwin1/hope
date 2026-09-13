@@ -338,10 +338,11 @@ export const FALLBACK_ADMISSIONS: AdmissionsContent = {
 /** Defaults for the Home page sections, edited from the admin portal. */
 export const FALLBACK_HOME_STATS: HomeStats = {
   stats: [
-    { number_en: "500+", number_my: "၅၀၀+", label_en: "Students", label_my: "ကျောင်းသား ကျောင်းသူများ" },
-    { number_en: "40+", number_my: "၄၀+", label_en: "Qualified Teachers", label_my: "အရည်အချင်းပြည့်မီ ဆရာ ဆရာမများ" },
-    { number_en: "12", number_my: "၁၂", label_en: "Years of Excellence", label_my: "နှစ်ပေါင်း အတွေ့အကြုံ" },
-    { number_en: "1:15", number_my: "၁:၁၅", label_en: "Teacher–Student Ratio", label_my: "ဆရာ–ကျောင်းသား အချိုး" },
+    { id: "students", number_en: "500+", number_my: "၅၀၀+", label_en: "Students", label_my: "ကျောင်းသား ကျောင်းသူများ" },
+    { id: "teachers", number_en: "40+", number_my: "၄၀+", label_en: "Qualified Teachers", label_my: "အရည်အချင်းပြည့်မီ ဆရာ ဆရာမများ" },
+    // "years" also drives the badge over the welcome photo (HomeYearsBadge).
+    { id: "years", number_en: "12", number_my: "၁၂", label_en: "Years of Excellence", label_my: "နှစ်ပေါင်း အတွေ့အကြုံ" },
+    { id: "ratio", number_en: "1:15", number_my: "၁:၁၅", label_en: "Teacher–Student Ratio", label_my: "ဆရာ–ကျောင်းသား အချိုး" },
   ],
 };
 

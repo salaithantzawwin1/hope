@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { apiSiteContent, contentApi } from "@/lib/api";
 import { FALLBACK_FOOTER } from "@/lib/fallback-data";
 import type { FooterContent } from "@/lib/types";
-import { LangRow } from "./bilingual";
+import { LangRow, LinksEditor } from "./bilingual";
 import { Button, Card, SaveStatus } from "./ui";
 
 const FOOTER_KEY = "footer_content";
@@ -109,13 +109,28 @@ export default function AdminFooter() {
           my={footer.email_my}
           onEn={(v) => update({ email_en: v })}
           onMy={(v) => update({ email_my: v })}
-        />
-        <LangRow
-          label="Opening hours"
-          en={footer.hours_en}
-          my={footer.hours_my}
-          onEn={(v) => update({ hours_en: v })}
-          onMy={(v) => update({ hours_my: v })}
+        />          <LangRow
+            label="Opening hours"
+            en={footer.hours_en}
+            my={footer.hours_my}
+            onEn={(v) => update({ hours_en: v })}
+            onMy={(v) => update({ hours_my: v })}
+          />
+        </Card>
+
+      <Card className="space-y-4 p-5">
+        <div>
+          <h3 className="font-bold text-slate-900">Quick links</h3>
+          <p className="text-xs text-slate-500">
+            Shown as a row of links in the footer on every page. Use a path
+            like /admissions for pages on this site, or a full https:// address
+            for an external page. Remove every link to hide the row.
+          </p>
+        </div>
+        <LinksEditor
+          links={footer.links}
+          onChange={(links) => update({ links })}
+          addLabel="+ Add footer link"
         />
       </Card>
 
