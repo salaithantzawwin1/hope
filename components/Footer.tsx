@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { fetchSiteContent } from "@/lib/db";
 import { FALLBACK_FOOTER } from "@/lib/fallback-data";
+import { isUnknownInternalPath } from "@/lib/routes";
 import type { FooterContent } from "@/lib/types";
 
 function parseJson<T>(raw: string | undefined): T | null {
@@ -33,9 +34,26 @@ export default function Footer() {
   }, []);
 
   // The tagline, contact details and quick links are edited from the Admin
-  // portal → Footer tab. Until a row exists — or for fields missing from an
-  // older saved row — the fallback defaults are shown.
-  const data = { ...FALLBACK_FOOTER, ...(db ?? {}) };
+  // portal → Footer tab. A saved row wins, but a field left blank inside it
+  // does not: rows saved before a field existed store "" for it, and a plain
+  // spread would then hide the built-in default (the tagline shipped empty on
+  // the live site for exactly that reason). Links are the exception — an
+  // empty list is a deliberate "hide this row".
+  const saved = (value: string | undefined, fallback: string) =>
+    value?.trim() ? value : fallback;
+  const data: FooterContent = {
+    tagline_en: saved(db?.tagline_en, FALLBACK_FOOTER.tagline_en),
+    tagline_my: saved(db?.tagline_my, FALLBACK_FOOTER.tagline_my),
+    address_en: saved(db?.address_en, FALLBACK_FOOTER.address_en),
+    address_my: saved(db?.address_my, FALLBACK_FOOTER.address_my),
+    phone_en: saved(db?.phone_en, FALLBACK_FOOTER.phone_en),
+    phone_my: saved(db?.phone_my, FALLBACK_FOOTER.phone_my),
+    email_en: saved(db?.email_en, FALLBACK_FOOTER.email_en),
+    email_my: saved(db?.email_my, FALLBACK_FOOTER.email_my),
+    hours_en: saved(db?.hours_en, FALLBACK_FOOTER.hours_en),
+    hours_my: saved(db?.hours_my, FALLBACK_FOOTER.hours_my),
+    links: db?.links ?? FALLBACK_FOOTER.links,
+  };
   const isMy = locale === "my";
   // Empty fields fall back to the English value (same rule as elsewhere).
   const pick = (en: string, my: string) => {
@@ -44,9 +62,13 @@ export default function Footer() {
   };
 
   // Quick links are edited from the Admin portal → Footer tab, same as the
-  // header nav: empty rows are dropped so a half-typed link never renders.
+  // header nav: empty rows and paths with no page behind them are dropped, so
+  // a half-typed or stale link never renders (or 404s).
   const links = (data.links ?? []).filter(
-    (l) => l.href.trim() && pick(l.label_en, l.label_my).trim(),
+    (l) =>
+      l.href.trim() &&
+      pick(l.label_en, l.label_my).trim() &&
+      !isUnknownInternalPath(l.href),
   );
 
   return (

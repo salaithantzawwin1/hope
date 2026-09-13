@@ -1,3 +1,4 @@
+import { REGISTRATION_EMAIL } from "./registration";
 import type {
   AboutCustomSection,
   AboutFacts,
@@ -18,6 +19,7 @@ import type {
   HomePrograms,
   HomeStats,
   NewsItem,
+  RegisterContent,
 } from "./types";
 
 function daysFromNow(days: number): string {
@@ -344,6 +346,47 @@ export const FALLBACK_HOME_STATS: HomeStats = {
     { id: "years", number_en: "12", number_my: "၁၂", label_en: "Years of Excellence", label_my: "နှစ်ပေါင်း အတွေ့အကြုံ" },
     { id: "ratio", number_en: "1:15", number_my: "၁:၁၅", label_en: "Teacher–Student Ratio", label_my: "ဆရာ–ကျောင်းသား အချိုး" },
   ],
+};
+
+/**
+ * Defaults for the Register page, edited from the admin portal (Register
+ * tab). Mirrors the `register` message catalog, which is what the page shows
+ * until the first save.
+ */
+export const FALLBACK_REGISTER: RegisterContent = {
+  intro_en:
+    "Register online for our events and programmes — Open House, campus tours and more. Your registration is sent straight to our admissions office.",
+  intro_my:
+    "ကျွန်ုပ်တို့၏ အစီအစဉ်များနှင့် ပွဲများအတွက် အွန်လိုင်းမှ စာရင်းသွင်းပါ — Open House၊ ကျောင်းဝင်း လေ့လာခြင်းနှင့် အခြားအရာများ။ သင့်စာရင်းသွင်းမှုကို ကျွန်ုပ်တို့၏ ဝင်ခွင့်ရုံးသို့ တိုက်ရိုက် ပေးပို့ပါသည်။",
+  steps_title_en: "What happens next?",
+  steps_title_my: "နောက်ထပ် ဘာဖြစ်မလဲ?",
+  steps: [
+    {
+      title_en: "Submit the form",
+      title_my: "ပုံစံ တင်သွင်းပါ",
+      desc_en: "Fill in your details below — it takes less than a minute.",
+      desc_my: "အောက်တွင် သင့်အချက်အလက်များ ဖြည့်စွက်ပါ — တစ်မိနစ်မပြည့်ပါ။",
+    },
+    {
+      title_en: "We receive your registration",
+      title_my: "ကျွန်ုပ်တို့ စာရင်းသွင်းမှုကို လက်ခံရရှိသည်",
+      desc_en: "Your entry is added to our registration list automatically.",
+      desc_my: "သင့်စာရင်းကို ကျွန်ုပ်တို့၏ စာရင်းသွင်းမှုစာရင်းထဲ အလိုအလျောက် ထည့်သွင်းပါသည်။",
+    },
+    {
+      title_en: "We confirm by email or phone",
+      title_my: "အီးမေးလ် သို့မဟုတ် ဖုန်းဖြင့် အတည်ပြုသည်",
+      desc_en: "Our team contacts you to confirm your place and answer any questions.",
+      desc_my: "ကျွန်ုပ်တို့၏ အဖွဲ့က သင့်နေရာကို အတည်ပြုရန်နှင့် မေးခွန်းများကို ဖြေရန် ဆက်သွယ်ပါသည်။",
+    },
+  ],
+  questions_title_en: "Questions?",
+  questions_title_my: "မေးခွန်းများရှိပါသလား?",
+  questions_text_en: "Contact our office or give us a call — we are happy to help.",
+  questions_text_my:
+    "ကျွန်ုပ်တို့၏ရုံးကို ဆက်သွယ်ပါ သို့မဟုတ် ဖုန်းခေါ်ဆိုပါ — ကူညီရန် ဝမ်းသာပါသည်။",
+  // Kept in sync with REGISTRATION_EMAIL so the default never drifts.
+  contact_email: REGISTRATION_EMAIL,
 };
 
 export const FALLBACK_HOME_PROGRAMS: HomePrograms = {

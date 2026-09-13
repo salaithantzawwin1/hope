@@ -5,11 +5,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { fetchEvents, GRADE_LEVELS } from "@/lib/db";
 import { errorId, invalidProps } from "@/lib/form-a11y";
 import { localized, type EventItem } from "@/lib/types";
-import {
-  REGISTRATION_EMAIL,
-  submitRegistration,
-  type RegistrationPayload,
-} from "@/lib/registration";
+import { submitRegistration, type RegistrationPayload } from "@/lib/registration";
+import { useRegisterEmail } from "./RegisterEditable";
 
 type Errors = {
   parentName?: string;
@@ -25,6 +22,10 @@ export default function RegistrationForm() {
   const t = useTranslations("register");
   const f = (key: string) => t(`form.${key}`);
   const locale = useLocale();
+
+  // The admin-editable address (Admin → Register → Questions box); the
+  // built-in default applies until staff save their own.
+  const contactEmail = useRegisterEmail();
 
   const [parentName, setParentName] = useState("");
   const [email, setEmail] = useState("");
@@ -333,10 +334,10 @@ export default function RegistrationForm() {
           <div role="alert" className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
             <p>{f("notConfigured")}</p>
             <a
-              href={`mailto:${REGISTRATION_EMAIL}`}
+              href={`mailto:${contactEmail}`}
               className="mt-1 inline-block font-semibold underline"
             >
-              {REGISTRATION_EMAIL}
+              {contactEmail}
             </a>
           </div>
         )}
@@ -348,10 +349,10 @@ export default function RegistrationForm() {
               <strong>{f("errorTitle")}</strong> — {f("errorText")}
             </p>
             <a
-              href={`mailto:${REGISTRATION_EMAIL}`}
+              href={`mailto:${contactEmail}`}
               className="mt-1 inline-block font-semibold underline"
             >
-              {REGISTRATION_EMAIL}
+              {contactEmail}
             </a>
           </div>
         )}

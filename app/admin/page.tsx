@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { checkAuth, login, logout } from "@/lib/api";
 import AdminEvents from "@/components/admin/AdminEvents";
 import AdminAdmissions from "@/components/admin/AdminAdmissions";
+import AdminRegister from "@/components/admin/AdminRegister";
 import AdminGallery from "@/components/admin/AdminGallery";
 import AdminNews from "@/components/admin/AdminNews";
 import AdminHome from "@/components/admin/AdminHome";
@@ -21,6 +22,7 @@ type Tab =
   | "events"
   | "site"
   | "admissions"
+  | "register"
   | "home"
   | "about"
   | "academics"
@@ -56,6 +58,7 @@ const GROUPS: {
       { id: "about", label: "About" },
       { id: "academics", label: "Academics" },
       { id: "admissions", label: "Admissions" },
+      { id: "register", label: "Register" },
       { id: "site", label: "Site Text" },
     ],
   },
@@ -270,6 +273,7 @@ export default function AdminPage() {
             {tab === "about" && <AdminAbout />}
             {tab === "academics" && <AdminAcademics />}
             {tab === "admissions" && <AdminAdmissions />}
+            {tab === "register" && <AdminRegister />}
             {tab === "gallery" && <AdminGallery />}
             {tab === "carrier" && <AdminCarrier />}
             {tab === "contact" && <AdminContact />}

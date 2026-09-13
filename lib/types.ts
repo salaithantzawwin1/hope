@@ -288,6 +288,34 @@ export interface AdmissionsContent {
   fees: AdmissionFee[];
 }
 
+/** One step of the "What happens next?" list on the Register page. */
+export interface RegisterStep {
+  title_en: string;
+  title_my: string;
+  desc_en: string;
+  desc_my: string;
+}
+
+/**
+ * Register page content stored as JSON in the `register_content` site_content
+ * row and edited from the admin portal (Register tab). Before this existed the
+ * whole page came from the message catalogs, so staff could not change any of
+ * it — including the address shown when a registration fails to send.
+ */
+export interface RegisterContent {
+  intro_en: string;
+  intro_my: string;
+  steps_title_en: string;
+  steps_title_my: string;
+  steps: RegisterStep[];
+  questions_title_en: string;
+  questions_title_my: string;
+  questions_text_en: string;
+  questions_text_my: string;
+  /** Address in the "Questions?" box and the form's error notices. */
+  contact_email: string;
+}
+
 /** One of the large buttons under the hero banner. */
 export interface HomeHeroButton {
   label_en: string;

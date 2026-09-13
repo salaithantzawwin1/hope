@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import PageHeader from "@/components/PageHeader";
 import RegisterPageContent from "@/components/RegisterPageContent";
-import { REGISTRATION_EMAIL } from "@/lib/registration";
+import {
+  RegisterContactBox,
+  RegisterIntro,
+  RegisterSteps,
+} from "@/components/RegisterEditable";
+import { FALLBACK_REGISTER } from "@/lib/fallback-data";
+import type { RegisterContent } from "@/lib/types";
 
 export async function generateMetadata({
   params,
@@ -22,41 +28,39 @@ export default async function RegisterPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "register" });
-  const steps = t.raw("steps") as { title: string; desc: string }[];
+
+  // Everything below the page title is editable in the admin portal
+  // (Admin → Register). The message catalog is only the initial fallback, so
+  // it is read for the active locale and passed as both languages — the same
+  // rule the Home page uses; a saved block always wins.
+  const catalogSteps = t.raw("steps") as { title: string; desc: string }[];
+  const registerFallback: RegisterContent = {
+    ...FALLBACK_REGISTER,
+    intro_en: t("intro"),
+    intro_my: t("intro"),
+    steps_title_en: t("stepsTitle"),
+    steps_title_my: t("stepsTitle"),
+    steps: catalogSteps.map((step) => ({
+      title_en: step.title,
+      title_my: step.title,
+      desc_en: step.desc,
+      desc_my: step.desc,
+    })),
+    questions_title_en: t("questionsTitle"),
+    questions_title_my: t("questionsTitle"),
+    questions_text_en: t("questionsText"),
+    questions_text_my: t("questionsText"),
+  };
 
   return (
     <>
       {/* Page header */}
       <PageHeader title={t("title")}>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-200">
-          {t("intro")}
-        </p>
+        <RegisterIntro fallback={registerFallback} />
       </PageHeader>
 
       {/* Steps */}
-      <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
-        <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-          {t("stepsTitle")}
-        </h2>
-        <ol className="mt-8 grid gap-5 sm:grid-cols-3">
-          {steps.map((step, i) => (
-            <li
-              key={step.title}
-              className="relative rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-            >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-base font-bold text-white">
-                {i + 1}
-              </span>
-              <h3 className="mt-4 font-bold leading-snug text-slate-900">
-                {step.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                {step.desc}
-              </p>
-            </li>
-          ))}
-        </ol>
-      </section>
+      <RegisterSteps fallback={registerFallback} />
 
       {/* Form */}
       <section className="bg-cream">
@@ -66,20 +70,7 @@ export default async function RegisterPage({
           </div>
 
           {/* Contact box */}
-          <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <h3 className="text-lg font-bold text-slate-900">
-              {t("questionsTitle")}
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              {t("questionsText")}
-            </p>
-            <a
-              href={`mailto:${REGISTRATION_EMAIL}`}
-              className="mt-4 inline-block rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
-            >
-              {REGISTRATION_EMAIL}
-            </a>
-          </aside>
+          <RegisterContactBox fallback={registerFallback} />
         </div>
       </section>
     </>

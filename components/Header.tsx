@@ -5,7 +5,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { fetchSiteContent } from "@/lib/db";
 import { FALLBACK_HEADER } from "@/lib/fallback-data";
-import type { HeaderContent } from "@/lib/types";
+import { isUnknownInternalPath } from "@/lib/routes";
+import type { HeaderContent, NavLink } from "@/lib/types";
 
 function parseJson<T>(raw: string | undefined): T | null {
   if (!raw || !raw.trim()) return null;
@@ -35,16 +36,26 @@ export default function Header() {
   }, []);
 
   // The logo and nav menu items are edited from the Admin portal → Header
-  // tab. Until a row exists — or for fields missing from an older saved row
-  // — the fallback defaults are shown.
-  // Use FALLBACK order as source of truth; merge db overrides per-link.
-  const dbLinks = db?.links ?? [];
-  const dbLinkMap = new Map(dbLinks.map((l) => [l.href, l]));
-  const mergedLinks = FALLBACK_HEADER.links.map((fl) => dbLinkMap.get(fl.href) ?? fl);
-  const data = {
-    ...FALLBACK_HEADER,
-    ...(db ?? {}),
-    links: mergedLinks,
+  // tab.
+  //
+  // A saved menu is authoritative — add, relabel, reorder and remove all work
+  // from the portal. It used to be rebuilt from FALLBACK_HEADER.links, which
+  // meant a link staff added was dropped and a link they removed came back;
+  // only relabelling ever had an effect. The fallback menu is used when no row
+  // has been saved yet, and it also supplies the label for a saved link whose
+  // own labels were left blank.
+  const fallbackByHref = new Map(FALLBACK_HEADER.links.map((l) => [l.href, l]));
+  const savedLinks = db?.links?.length ? db.links : FALLBACK_HEADER.links;
+  const data: HeaderContent = {
+    logo_url: db?.logo_url?.trim() ? db.logo_url : FALLBACK_HEADER.logo_url,
+    links: savedLinks.map((l): NavLink => {
+      const known = fallbackByHref.get(l.href);
+      return {
+        href: l.href,
+        label_en: l.label_en.trim() || known?.label_en || "",
+        label_my: l.label_my.trim() || known?.label_my || "",
+      };
+    }),
   };
   const isMy = locale === "my";
   const pick = (en: string, my: string) => {
@@ -62,8 +73,13 @@ export default function Header() {
   // Admissions is not in the list: the prominent blue Admissions button on
   // the right (and the mobile menu CTA) already link there, so repeating it
   // in the nav only crowds the row — especially in Burmese.
+  // Empty rows, links with no label at all and paths with no page behind them
+  // are dropped rather than rendered as a dead end.
   const links = (data.links ?? FALLBACK_HEADER.links).filter(
-    (l) => l.href.trim() && pick(l.label_en, l.label_my).trim(),
+    (l) =>
+      l.href.trim() &&
+      pick(l.label_en, l.label_my).trim() &&
+      !isUnknownInternalPath(l.href),
   );
 
   const isActive = (href: string) =>
