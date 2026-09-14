@@ -22,6 +22,12 @@ const notoMyanmar = localFont({
   variable: "--font-noto-myanmar",
   weight: "100 900",
   display: "swap",
+  // The 150 KB Myanmar font is only actually used on /my pages, yet Next
+  // preload-listed it on every English page too — Chrome fetched it, left
+  // it unused, and logged "preloaded using link preload but not used" on
+  // every visit. Load it on demand instead (font-display: swap keeps the
+  // Burmese text visible while it arrives).
+  preload: false,
 });
 
 export function generateStaticParams() {
