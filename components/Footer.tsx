@@ -85,30 +85,31 @@ export default function Footer() {
   return (
     <footer className="mt-auto bg-brand-dark text-slate-400">
       <div className="mx-auto flex max-w-7xl 2xl:max-w-[1440px] flex-col items-center gap-2 px-4 py-5 text-center sm:px-6">
-        {/* Brand lockup — left-aligned within the footer's content width,
-            so the logo + school name anchor the footer like the header's
-            wordmark does. */}
-        <div className="flex w-full items-center gap-2.5 text-left">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={settings.footer_logo_url || "/Logo.jpg"}
-            alt={`${schoolName} ${schoolTagline} logo`}
-            className="h-8 w-8 shrink-0 rounded-lg object-contain"
-          />
-          <div className="leading-tight">
-            <div className="text-sm font-bold text-white">{schoolName}</div>
-            <div className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
-              {schoolTagline}
+        {/* Brand row — logo + school name anchor the left edge (like the
+            header wordmark), with the editable tagline as the right-hand
+            counterweight on the same baseline: a letterhead/masthead look.
+            Below md the tagline wraps to its own left-aligned line. */}
+        <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-1 text-left">
+          <div className="flex items-center gap-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={settings.footer_logo_url || "/Logo.jpg"}
+              alt={`${schoolName} ${schoolTagline} logo`}
+              className="h-8 w-8 shrink-0 rounded-lg object-contain"
+            />
+            <div className="leading-tight">
+              <div className="text-sm font-bold text-white">{schoolName}</div>
+              <div className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
+                {schoolTagline}
+              </div>
             </div>
           </div>
+          {pick(data.tagline_en, data.tagline_my).trim() && (
+            <p className="w-full text-xs leading-relaxed text-slate-400 md:ml-auto md:w-auto md:max-w-md md:text-right">
+              {pick(data.tagline_en, data.tagline_my)}
+            </p>
+          )}
         </div>
-
-        {/* Tagline (edited from the Admin portal → Footer). */}
-        {pick(data.tagline_en, data.tagline_my).trim() && (
-          <p className="max-w-2xl text-xs leading-relaxed text-slate-400">
-            {pick(data.tagline_en, data.tagline_my)}
-          </p>
-        )}
 
         {/* Quick links (edited from the Admin portal → Footer). */}
         {links.length > 0 && (
