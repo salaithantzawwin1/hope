@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
+import PageHeader from "@/components/PageHeader";
 import { fetchSiteContent } from "@/lib/db";
 import { FALLBACK_CONTACT } from "@/lib/fallback-data";
 import type { ContactContent } from "@/lib/types";
@@ -131,24 +132,17 @@ export default function ContactContent() {
 
   return (
     <>
-      {/* Hero — compact, matching the shared inner-page header scale (same
-          treatment as the Carrier hero) so content reaches the fold sooner. */}
-      <section className="relative overflow-hidden bg-brand-dark text-white">
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-dark via-brand to-brand-light opacity-90" />
-        <div className="relative mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-8 sm:px-6 sm:py-10">
-          <div className="max-w-3xl">
-            <span className="inline-block rounded-full border border-white/20 bg-white/10 px-3 py-0.5 text-xs font-medium text-accent">
-              {isMy ? "Hope အပြည်ပြည်ဆိုင်ရာ ကျောင်း" : "Hope International School"}
-            </span>
-            <h1 className="mt-3 text-2xl font-bold leading-tight tracking-tight text-balance sm:text-3xl">
-              {pick(data.hero_title_en, data.hero_title_my)}
-            </h1>
-            <p className="mt-2.5 max-w-2xl text-sm leading-relaxed text-slate-200 sm:text-base">
-              {pick(data.hero_subtitle_en, data.hero_subtitle_my)}
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Hero — the shared PageHeader band (identical size to the other inner
+          pages) with the eyebrow pill + gradient treatment this page keeps. */}
+      <PageHeader
+        eyebrow={isMy ? "Hope အပြည်ပြည်ဆိုင်ရာ ကျောင်း" : "Hope International School"}
+        title={pick(data.hero_title_en, data.hero_title_my)}
+        gradient
+      >
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200 sm:text-base">
+          {pick(data.hero_subtitle_en, data.hero_subtitle_my)}
+        </p>
+      </PageHeader>
 
       {/* Contact info cards */}
       <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6 sm:py-16">
