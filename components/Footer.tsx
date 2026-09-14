@@ -77,24 +77,27 @@ export default function Footer() {
       !isUnknownInternalPath(l.href),
   );
 
-  // Compact, fully centered layout: every row stacks in one centered column
-  // (brand → tagline → quick links → contact strip) with the copyright in its
+  // Compact, centered layout: tagline, quick links and the contact strip
+  // stack in one centered column, but the brand lockup keeps its own line,
+  // left-aligned like the wordmark in the header. The copyright sits in its
   // own slim band below. The old design was a left-aligned two-column grid
   // that stretched much taller, especially on phones.
   return (
     <footer className="mt-auto bg-brand-dark text-slate-400">
       <div className="mx-auto flex max-w-7xl 2xl:max-w-[1440px] flex-col items-center gap-2 px-4 py-5 text-center sm:px-6">
-        {/* Brand lockup */}
-        <div className="flex items-center gap-2">
+        {/* Brand lockup — left-aligned within the footer's content width,
+            so the logo + school name anchor the footer like the header's
+            wordmark does. */}
+        <div className="flex w-full items-center gap-2.5 text-left">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={settings.footer_logo_url || "/Logo.jpg"}
             alt={`${schoolName} ${schoolTagline} logo`}
-            className="h-7 w-7 shrink-0 rounded-lg object-contain"
+            className="h-8 w-8 shrink-0 rounded-lg object-contain"
           />
           <div className="leading-tight">
-            <div className="text-xs font-bold text-white">{schoolName}</div>
-            <div className="text-[9px] font-medium uppercase tracking-wider text-slate-500">
+            <div className="text-sm font-bold text-white">{schoolName}</div>
+            <div className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
               {schoolTagline}
             </div>
           </div>
