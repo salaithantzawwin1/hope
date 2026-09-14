@@ -77,99 +77,101 @@ export default function Footer() {
       !isUnknownInternalPath(l.href),
   );
 
+  // Compact, fully centered layout: every row stacks in one centered column
+  // (brand → tagline → quick links → contact strip) with the copyright in its
+  // own slim band below. The old design was a left-aligned two-column grid
+  // that stretched much taller, especially on phones.
   return (
     <footer className="mt-auto bg-brand-dark text-slate-400">
-      <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-5 sm:px-6">
-        {/* Row 1: brand (left) + contact strip (right). Stacked on phones,
-            inline from tablet up (the strip wraps between md and lg). */}
-        <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-between">
-          {/* Brand */}
-          <div className="flex shrink-0 items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={settings.footer_logo_url || "/Logo.jpg"}
-              alt={`${schoolName} ${schoolTagline} logo`}
-              className="h-7 w-7 shrink-0 rounded-lg object-contain"
-            />
-            <div className="leading-tight">
-              <div className="text-xs font-bold text-white">{schoolName}</div>
-              <div className="text-[9px] font-medium uppercase tracking-wider text-slate-500">
-                {schoolTagline}
-              </div>
+      <div className="mx-auto flex max-w-7xl 2xl:max-w-[1440px] flex-col items-center gap-2 px-4 py-5 text-center sm:px-6">
+        {/* Brand lockup */}
+        <div className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={settings.footer_logo_url || "/Logo.jpg"}
+            alt={`${schoolName} ${schoolTagline} logo`}
+            className="h-7 w-7 shrink-0 rounded-lg object-contain"
+          />
+          <div className="leading-tight">
+            <div className="text-xs font-bold text-white">{schoolName}</div>
+            <div className="text-[9px] font-medium uppercase tracking-wider text-slate-500">
+              {schoolTagline}
             </div>
-          </div>
-
-          {/* Contact strip: address + phone + email + hours inline.
-              A subtle separator keeps wrapped items readable. */}
-          <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-[11px] md:justify-end">
-            <span className="flex items-center gap-1.5">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-              {pick(data.address_en, data.address_my)}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
-              </svg>
-              {pick(data.phone_en, data.phone_my)}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
-                <rect width="20" height="16" x="2" y="4" rx="2" />
-                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-              </svg>
-              {pick(data.email_en, data.email_my)}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 6v6l4 2" />
-              </svg>
-              {pick(data.hours_en, data.hours_my)}
-            </span>
           </div>
         </div>
 
-        {/* Tagline + quick links (both edited from the Admin portal → Footer). */}
+        {/* Tagline (edited from the Admin portal → Footer). */}
         {pick(data.tagline_en, data.tagline_my).trim() && (
-          <p className="mt-3 max-w-3xl text-xs leading-relaxed text-slate-400">
+          <p className="max-w-2xl text-xs leading-relaxed text-slate-400">
             {pick(data.tagline_en, data.tagline_my)}
           </p>
         )}
 
+        {/* Quick links (edited from the Admin portal → Footer). */}
         {links.length > 0 && (
           <nav
             aria-label={t("quickLinks")}
-            className="mt-3 flex flex-wrap items-center gap-x-1 gap-y-0.5 border-t border-white/10 pt-2"
+            className="flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5"
           >
             {links.map((link) => (
               <FooterLink
                 key={link.href}
                 href={link.href.trim()}
-                className="inline-flex min-h-10 items-center rounded px-2 text-xs font-medium text-slate-400 transition-colors hover:text-white"
+                className="inline-flex min-h-9 items-center rounded px-2 text-xs font-medium text-slate-400 transition-colors hover:text-white"
               >
                 {pick(link.label_en, link.label_my)}
               </FooterLink>
             ))}
           </nav>
         )}
+
+        {/* Contact strip: address + phone + email + hours in one centered,
+            wrapping row — a subtle accent icon keeps each item scannable. */}
+        <div className="flex flex-wrap items-center justify-center gap-x-3.5 gap-y-1 text-[10px]">
+          <span className="flex items-center gap-1.5">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            {pick(data.address_en, data.address_my)}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+            {pick(data.phone_en, data.phone_my)}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
+              <rect width="20" height="16" x="2" y="4" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+            {pick(data.email_en, data.email_my)}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+            {pick(data.hours_en, data.hours_my)}
+          </span>
+        </div>
       </div>
 
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-7xl 2xl:max-w-[1440px] flex-col items-center justify-between gap-1 px-4 py-2 text-[10px] text-slate-500 sm:flex-row sm:px-6">
+        <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-2 text-center text-[10px] text-slate-500 sm:px-6">
           <p>
             © {new Date().getFullYear()} {schoolName} {schoolTagline}.{" "}
             {t("rights")}
           </p>
-        </div>      </div>
+        </div>
+      </div>
     </footer>
   );
 }
 
 /**
- * One footer quick link. Internal paths ("...", "/about") go through the
+ * One footer quick link. Internal paths ("/", "/about") go through the
  * locale-aware Link so they keep the visitor's language; anything absolute
  * (https://, mailto:, tel:) is rendered as a plain anchor, opened in a new
  * tab only for web links.
