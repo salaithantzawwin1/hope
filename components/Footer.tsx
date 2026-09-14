@@ -7,6 +7,7 @@ import { fetchSiteContent } from "@/lib/db";
 import { FALLBACK_FOOTER } from "@/lib/fallback-data";
 import { isUnknownInternalPath } from "@/lib/routes";
 import type { FooterContent } from "@/lib/types";
+import { useSettings } from "./useSettings";
 
 function parseJson<T>(raw: string | undefined): T | null {
   if (!raw || !raw.trim()) return null;
@@ -21,6 +22,12 @@ export default function Footer() {
   const t = useTranslations("footer");
   const locale = useLocale();
   const [db, setDb] = useState<FooterContent | null>(null);
+  // School wordmark + footer logo are editable in the admin Settings tab.
+  const settings = useSettings();
+  const isMy = locale === "my";
+  const schoolName = (isMy && settings.school_name_my.trim()) || settings.school_name_en;
+  const schoolTagline =
+    (isMy && settings.school_tagline_my.trim()) || settings.school_tagline_en;
 
   useEffect(() => {
     let active = true;
@@ -54,7 +61,6 @@ export default function Footer() {
     hours_my: saved(db?.hours_my, FALLBACK_FOOTER.hours_my),
     links: db?.links ?? FALLBACK_FOOTER.links,
   };
-  const isMy = locale === "my";
   // Empty fields fall back to the English value (same rule as elsewhere).
   const pick = (en: string, my: string) => {
     const value = isMy && my.trim() ? my : en;
@@ -81,14 +87,14 @@ export default function Footer() {
           <div className="flex shrink-0 items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/Logo.jpg"
-              alt="Hope International School logo"
+              src={settings.footer_logo_url || "/Logo.jpg"}
+              alt={`${schoolName} ${schoolTagline} logo`}
               className="h-7 w-7 shrink-0 rounded-lg object-contain"
             />
             <div className="leading-tight">
-              <div className="text-xs font-bold text-white">Hope</div>
+              <div className="text-xs font-bold text-white">{schoolName}</div>
               <div className="text-[9px] font-medium uppercase tracking-wider text-slate-500">
-                International School
+                {schoolTagline}
               </div>
             </div>
           </div>
@@ -154,7 +160,7 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl 2xl:max-w-[1440px] flex-col items-center justify-between gap-1 px-4 py-2 text-[10px] text-slate-500 sm:flex-row sm:px-6">
           <p>
-            © {new Date().getFullYear()} Hope International School.{" "}
+            © {new Date().getFullYear()} {schoolName} {schoolTagline}.{" "}
             {t("rights")}
           </p>
         </div>      </div>

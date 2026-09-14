@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatDateShort, monthShort } from "@/lib/format";
 import { localized, type EventItem } from "@/lib/types";
+import { pickHeading, usePageHeadings } from "./usePageHeadings";
 
 /** Thumbnail that removes itself from view if the image fails to load. */
 function EventThumb({ src, title }: { src: string; title: string }) {
@@ -56,6 +57,16 @@ export default function EventsList({
   const t = useTranslations("nav");
   const news = useTranslations("news");
   const common = useTranslations("common");
+  // Empty-state message is editable in the admin portal (Settings → Page
+  // Headings); the catalog value is the fallback.
+  const headings = usePageHeadings();
+  const emptyText = pickHeading(
+    headings,
+    locale,
+    "events_empty_en",
+    "events_empty_my",
+    news("noEvents"),
+  );
 
   if (loading) {
     return (
@@ -79,7 +90,7 @@ export default function EventsList({
   if (events.length === 0) {
     return (
       <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center text-sm text-slate-500">
-        {news("noEvents")}
+        {emptyText}
       </p>
     );
   }

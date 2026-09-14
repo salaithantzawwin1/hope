@@ -4,6 +4,7 @@ import type {
   AboutFacts,
   AboutMissionVision,
   AboutValues,
+  PageHeadings,
   WhyChoose,
   AcademicsCurriculum,
   AcademicsLevels,
@@ -571,6 +572,34 @@ export const FALLBACK_ABOUT_FACTS: AboutFacts = {
  * section is added. Stored as JSON in the `about_sections` site_content row.
  */
 export const FALLBACK_ABOUT_SECTIONS: AboutCustomSection[] = [];
+
+/**
+ * Defaults for the page-level headings (News & Events, Gallery, Academics
+ * CTA, Carrier empty state), edited from the admin portal (Settings → Page
+ * Headings). Empty strings mean "use the message-catalog default".
+ */
+export const FALLBACK_PAGE_HEADINGS: PageHeadings = {
+  news_title_en: "",
+  news_title_my: "",
+  news_subtitle_en: "",
+  news_subtitle_my: "",
+  news_empty_en: "",
+  news_empty_my: "",
+  events_empty_en: "",
+  events_empty_my: "",
+  gallery_title_en: "",
+  gallery_subtitle_en: "",
+  gallery_title_my: "",
+  gallery_subtitle_my: "",
+  academics_cta_title_en: "",
+  academics_cta_title_my: "",
+  academics_cta_text_en: "",
+  academics_cta_text_my: "",
+  academics_cta_button_en: "",
+  academics_cta_button_my: "",
+  carrier_empty_en: "",
+  carrier_empty_my: "",
+};
 
 /** Defaults for the Academics page sections, edited from the admin portal. */
 export const FALLBACK_ACADEMICS_CURRICULUM: AcademicsCurriculum = {

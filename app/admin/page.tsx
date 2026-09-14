@@ -15,6 +15,9 @@ import AdminFooter from "@/components/admin/AdminFooter";
 import AdminHeader from "@/components/admin/AdminHeader";
 import AdminCarrier from "@/components/admin/AdminCarrier";
 import AdminContact from "@/components/admin/AdminContact";
+import AdminSettings from "@/components/admin/AdminSettings";
+import AdminSubmissions from "@/components/admin/AdminSubmissions";
+import AdminPageHeadings from "@/components/admin/AdminPageHeadings";
 import { Button, Notice } from "@/components/admin/ui";
 
 type Tab =
@@ -30,9 +33,12 @@ type Tab =
   | "contact"
   | "gallery"
   | "header"
-  | "footer";
+  | "footer"
+  | "settings"
+  | "headings"
+  | "submissions";
 
-type Group = "content" | "pages" | "settings";
+type Group = "content" | "inbox" | "pages" | "settings";
 
 const GROUPS: {
   id: Group;
@@ -48,6 +54,13 @@ const GROUPS: {
       { id: "gallery", label: "Gallery" },
       { id: "carrier", label: "Carrier" },
       { id: "contact", label: "Contact" },
+    ],
+  },
+  {
+    id: "inbox",
+    label: "Inbox",
+    tabs: [
+      { id: "submissions", label: "Submissions" },
     ],
   },
   {
@@ -68,6 +81,8 @@ const GROUPS: {
     tabs: [
       { id: "header", label: "Header" },
       { id: "footer", label: "Footer" },
+      { id: "settings", label: "Site Settings" },
+      { id: "headings", label: "Page Headings" },
     ],
   },
 ];
@@ -279,6 +294,9 @@ export default function AdminPage() {
             {tab === "contact" && <AdminContact />}
             {tab === "header" && <AdminHeader />}
             {tab === "footer" && <AdminFooter />}
+            {tab === "settings" && <AdminSettings />}
+            {tab === "headings" && <AdminPageHeadings />}
+            {tab === "submissions" && <AdminSubmissions />}
           </main>
         </div>
       </div>

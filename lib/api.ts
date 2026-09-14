@@ -57,7 +57,11 @@ async function requestJson<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
-async function getJson<T>(path: string): Promise<T> {
+/**
+ * Same-origin GET returning parsed JSON (throws ApiError with the server
+ * message). Exported for the staff-side admin clients that only read.
+ */
+export async function getJson<T>(path: string): Promise<T> {
   return requestJson<T>(await fetch(apiUrl(path), { credentials: "same-origin" }));
 }
 

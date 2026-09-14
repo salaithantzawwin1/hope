@@ -52,6 +52,22 @@ create table if not exists events (
 );
 create index if not exists events_date_idx on events(date);
 
+-- ---------- Form submissions (inquiries / registrations / job applications) --
+-- Every public form POST lands here (plus the Google Sheet/JSON mirror, which
+-- is the long-term backup). Reads and deletes are staff-only; job
+-- applications keep their CV in the `cv/` folder of the IMAGES R2 bucket
+-- (staff-downloaded only, never publicly listed/served). There is no update
+-- path by design — submissions are an append-only inbox.
+create table if not exists submissions (
+  id text primary key,
+  kind text not null,                -- 'inquiry' | 'registration' | 'application'
+  data text not null default '{}',   -- JSON payload (form fields)
+  cv_key text,                       -- R2 object key (applications only)
+  ip text,                           -- short client fingerprint (abuse triage)
+  created_at text not null default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+);
+create index if not exists submissions_created_at_idx on submissions(kind, created_at desc);
+
 -- ---------- Editable site text ----------
 -- Plain key/value rows (seeded below) live here alongside JSON rows the admin
 -- portal creates on first save (home_stats, home_programs, home_cta,

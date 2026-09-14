@@ -4,11 +4,11 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { errorId, invalidProps } from "@/lib/form-a11y";
 import {
-  APPLICATION_EMAIL,
   MAX_CV_BYTES,
-  submitJobApplication,
   type JobApplicationResult,
 } from "@/lib/job-application";
+import { submitToInbox } from "@/lib/submissions";
+import { useSettings } from "@/components/useSettings";
 
 export type ApplyModalProps = {
   open: boolean;
@@ -40,6 +40,10 @@ export default function ApplyModal({
     key: string,
     values?: Record<string, string | number | Date>,
   ) => t(key, values);
+  // Admin-editable recipient (Settings tab) + Apps Script mirror endpoint.
+  const settings = useSettings();
+  const APPLICATION_EMAIL = settings.application_email;
+  const [honeypot, setHoneypot] = useState("");
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const [name, setName] = useState("");
@@ -120,7 +124,7 @@ export default function ApplyModal({
     for (let i = 0; i < bytes.length; i += chunk) {
       binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
     }
-    const result = await submitJobApplication({
+    const payload = {
       name: name.trim(),
       phone: phone.trim(),
       email: email.trim(),
@@ -131,13 +135,20 @@ export default function ApplyModal({
       cvBase64: btoa(binary),
       locale: document.documentElement.lang || "en",
       submittedAt: new Date().toISOString(),
-    });
+      // Honeypot rides along; the Worker drops bot submissions wholesale.
+      website: honeypot,
+    };
+    // Preferred path: the Worker inbox (D1 + CV in R2 + Apps Script mirror).
+    // Fallback: post straight to the Apps Script (same behavior as before).
+    const result = await submitToInbox("application", payload, settings.application_endpoint);
     if (result.ok) {
       setStatus("success");
       setErrorKind(null);
     } else {
       setStatus("error");
-      setErrorKind(result.error ?? "network");
+      setErrorKind(
+        result.error === "rate_limited" ? "server" : ((result.error as JobApplicationResult["error"]) ?? "network"),
+      );
     }
   };
 
@@ -207,6 +218,19 @@ export default function ApplyModal({
           </div>
         ) : (
           <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
+            {/* Honeypot — see InquiryForm. Bots that fill it are dropped. */}
+            <div aria-hidden className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden">
+              <label htmlFor="apply-website">Website</label>
+              <input
+                id="apply-website"
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+              />
+            </div>
             <div>
               <label
                 htmlFor="apply-name"

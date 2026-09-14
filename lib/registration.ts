@@ -1,10 +1,12 @@
 /**
  * Registration submission for the static site.
  *
- * The site has no server, so registrations are POSTed to a free Google Apps
- * Script Web App (see `registration-emailer/Code.gs`), which appends each
- * entry to a Google Sheet and emails the list as an .xlsx file to
- * REGISTRATION_EMAIL.
+ * Forms now POST to the Worker inbox first (see lib/submissions.ts), which
+ * stores the entry in D1 for the admin portal's Submissions tab and mirrors
+ * it to the Apps Script endpoint below (Sheet + email). The constants here
+ * remain the built-in defaults; staff can override the endpoint and the
+ * public address from the admin Settings tab without a rebuild.
+ * (Referenced by RegisterEditable's error notices and the admin editor.)
  */
 
 export type RegistrationPayload = {
@@ -42,6 +44,7 @@ export type RegistrationResult = {
   error?: "notConfigured" | "network" | "server";
 };
 
+/** Kept as the static-hosting fallback path (see lib/submissions.ts). */
 export async function submitRegistration(
   data: RegistrationPayload,
 ): Promise<RegistrationResult> {

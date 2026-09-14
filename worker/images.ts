@@ -71,6 +71,11 @@ export async function serveImage(
   if (!/^[a-z0-9-]+\/[\w.-]+$/.test(key)) {
     return new Response("Not found", { status: 404 });
   }
+  // Applicant CVs live under cv/ and are private: only the signed-in staff
+  // route (GET /api/submissions/cv/<id>) may hand them out.
+  if (key.startsWith("cv/")) {
+    return new Response("Not found", { status: 404 });
+  }
   const object = await env.IMAGES.get(key);
   if (!object) return new Response("Not found", { status: 404 });
 

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import Gallery from "@/components/Gallery";
-import PageHeader from "@/components/PageHeader";
+import GalleryPageContent from "@/components/GalleryPageContent";
 
 export async function generateMetadata({
   params,
@@ -20,21 +19,6 @@ export default async function GalleryPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations({ locale, namespace: "gallery" });
 
-  return (
-    <>
-      {/* Page header */}
-      <PageHeader title={t("title")}>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-200">
-          {t("subtitle")}
-        </p>
-      </PageHeader>
-
-      {/* Albums (each photo album renders as its own titled section) */}
-      <section className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 sm:px-6">
-        <Gallery />
-      </section>
-    </>
-  );
+  return <GalleryPageContent />;
 }

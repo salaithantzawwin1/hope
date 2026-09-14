@@ -32,12 +32,14 @@ export default function AdminHeader() {
       if (!active) return;
       const row = rows.find((r) => r.key === HEADER_KEY);
       const parsed = parseJson<HeaderContent>(row?.value_en);
-      // Merge with defaults so older saved rows still have every field.
       if (parsed) {
-        // Merge links using fallback order as source of truth
-        const dbLinkMap = new Map((parsed.links ?? []).map((l) => [l.href, l]));
-        const mergedLinks = FALLBACK_HEADER.links.map((fl) => dbLinkMap.get(fl.href) ?? fl);
-        setHeader({ ...FALLBACK_HEADER, ...parsed, links: mergedLinks });
+        // The saved menu is authoritative — exactly what the public Header
+        // does. (Re-merging with FALLBACK_HEADER here used to resurrect
+        // deleted links and hide added ones in the editor, so the next save
+        // silently re-published the removed links.) The fallback still
+        // supplies defaults for a first-time editor and fills blank labels
+        // for known hrefs.
+        setHeader({ ...FALLBACK_HEADER, ...parsed });
       }
       setLoaded(true);
     })().catch(() => {

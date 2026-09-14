@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import AcademicsContent from "@/components/AcademicsContent";
+import AcademicsCta from "@/components/AcademicsCta";
 import PageHeader from "@/components/PageHeader";
 import SiteText from "@/components/SiteText";
-import { Link } from "@/i18n/navigation";
 
 export async function generateMetadata({
   params,
@@ -79,21 +79,8 @@ export default async function AcademicsPage({
         }}
       />
 
-      {/* CTA */}
-      <section className="mx-4 mb-12 overflow-hidden rounded-3xl bg-brand-light text-white sm:mx-6">
-        <div className="mx-auto flex max-w-7xl 2xl:max-w-[1440px] flex-col items-start justify-between gap-5 px-4 py-10 sm:px-6 sm:py-12 md:flex-row md:items-center">
-          <div className="max-w-xl">
-            <h2 className="text-2xl font-bold sm:text-3xl">{t("ctaTitle")}</h2>
-            <p className="mt-1.5 text-sm text-slate-100">{t("ctaText")}</p>
-          </div>
-          <Link
-            href="/admissions"
-            className="shrink-0 rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-brand-dark shadow transition-colors hover:bg-accent-dark"
-          >
-            {t("ctaButton")}
-          </Link>
-        </div>
-      </section>
+      {/* CTA (editable via Settings → Page Headings) */}
+      <AcademicsCta />
     </>
   );
 }

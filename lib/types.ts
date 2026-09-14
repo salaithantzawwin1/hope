@@ -32,6 +32,35 @@ export interface SiteContentRow {
   value_my: string;
 }
 
+/**
+ * Page-level headings and empty-state lines (News & Events page, Gallery
+ * page, Academics CTA band, Carrier "no positions" note). Edited from the
+ * admin portal (Settings → Page Headings); empty values fall back to the
+ * message catalogs, same rule as every other editable block.
+ */
+export interface PageHeadings {
+  news_title_en: string;
+  news_title_my: string;
+  news_subtitle_en: string;
+  news_subtitle_my: string;
+  news_empty_en: string;
+  news_empty_my: string;
+  events_empty_en: string;
+  events_empty_my: string;
+  gallery_title_en: string;
+  gallery_title_my: string;
+  gallery_subtitle_en: string;
+  gallery_subtitle_my: string;
+  academics_cta_title_en: string;
+  academics_cta_title_my: string;
+  academics_cta_text_en: string;
+  academics_cta_text_my: string;
+  academics_cta_button_en: string;
+  academics_cta_button_my: string;
+  carrier_empty_en: string;
+  carrier_empty_my: string;
+}
+
 /** A navigation link (href + bilingual label), used in the header and footer. */
 export interface NavLink {
   href: string;

@@ -9,6 +9,7 @@ import { localized, type EventItem, type NewsItem } from "@/lib/types";
 import EventsList from "./EventsList";
 import NewsCard from "./NewsCard";
 import PageHeader from "./PageHeader";
+import { pickHeading, usePageHeadings } from "./usePageHeadings";
 
 /** Brand gradient + monogram shown when a cover image is missing or fails. */
 function CoverFallback({ label, className = "" }: { label: string; className?: string }) {
@@ -102,6 +103,12 @@ export default function NewsEventsPage({
   const common = useTranslations("common");
   const nav = useTranslations("nav");
   const locale = useLocale();
+  // Page title/subtitle + empty-state lines are editable in the admin
+  // portal (Settings → Page Headings); the catalog values are the fallback.
+  const headings = usePageHeadings();
+  const pageTitle = pickHeading(headings, locale, "news_title_en", "news_title_my", t("title"));
+  const pageSubtitle = pickHeading(headings, locale, "news_subtitle_en", "news_subtitle_my", t("subtitle"));
+  const emptyNews = pickHeading(headings, locale, "news_empty_en", "news_empty_my", t("noNews"));
   // Null = still loading → renders a skeleton (never a premature "No news").
   // Starts with the prerendered data when the server passed some in.
   const [news, setNews] = useState<NewsItem[] | null>(initialNews ?? null);
@@ -130,7 +137,6 @@ export default function NewsEventsPage({
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const close = useCallback(() => setSelected(null), []);
@@ -182,9 +188,9 @@ export default function NewsEventsPage({
 
   return (
     <>
-      <PageHeader title={t("title")}>
+      <PageHeader title={pageTitle}>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-200">
-          {t("subtitle")}
+          {pageSubtitle}
         </p>
       </PageHeader>
       <div className="mx-auto max-w-7xl 2xl:max-w-[1440px] px-4 py-12 pb-16 sm:px-6">
@@ -297,7 +303,7 @@ export default function NewsEventsPage({
                   </>
                 ) : (
                   <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center text-sm text-slate-500">
-                    {t("noNews")}
+                    {emptyNews}
                   </p>
                 )}
               </div>
@@ -336,7 +342,7 @@ export default function NewsEventsPage({
               </>
             ) : (
               <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center text-sm text-slate-500">
-                {t("noNews")}
+                {emptyNews}
               </p>
             )}
           </div>

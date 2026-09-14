@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { fetchEvents, GRADE_LEVELS } from "@/lib/db";
+import { fetchEvents } from "@/lib/db";
 import { errorId, invalidProps } from "@/lib/form-a11y";
 import { localized, type EventItem } from "@/lib/types";
-import { submitRegistration, type RegistrationPayload } from "@/lib/registration";
+import type { RegistrationPayload } from "@/lib/registration";
+import { submitToInbox } from "@/lib/submissions";
 import { useRegisterEmail } from "./RegisterEditable";
+import { useSettings } from "./useSettings";
 
 type Errors = {
   parentName?: string;
@@ -23,9 +25,13 @@ export default function RegistrationForm() {
   const f = (key: string) => t(`form.${key}`);
   const locale = useLocale();
 
-  // The admin-editable address (Admin → Register → Questions box); the
-  // built-in default applies until staff save their own.
+  // Admin-editable address (Admin → Register → Questions box); the built-in
+  // default applies until staff change it. Grade options come from the
+  // Settings tab too.
   const contactEmail = useRegisterEmail();
+  const settings = useSettings();
+  const gradeLevels = settings.grade_levels;
+  const [honeypot, setHoneypot] = useState("");
 
   const [parentName, setParentName] = useState("");
   const [email, setEmail] = useState("");
@@ -115,13 +121,15 @@ export default function RegistrationForm() {
       locale,
       submittedAt: new Date().toISOString(),
     };
-    const result = await submitRegistration(payload);
+    // Preferred path: the Worker inbox (D1 + Apps Script mirror). Fallback:
+    // the Apps Script directly (last resort stays the mailto error notice).
+    const result = await submitToInbox("registration", { ...payload, website: honeypot }, settings.registration_endpoint);
     if (result.ok) {
       setStatus("success");
       setErrorKind(null);
     } else {
       setStatus("error");
-      setErrorKind(result.error ?? "network");
+      setErrorKind(result.error === "rate_limited" ? "server" : (result.error ?? "network"));
     }
   };
 
@@ -159,6 +167,19 @@ export default function RegistrationForm() {
       <p className="mt-1.5 text-sm text-slate-500">{t("formSubtitle")}</p>
 
       <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
+        {/* Honeypot — see InquiryForm. Bots that fill it are dropped silently. */}
+        <div aria-hidden className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden">
+          <label htmlFor="reg-website">Website</label>
+          <input
+            id="reg-website"
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+          />
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label
@@ -268,7 +289,7 @@ export default function RegistrationForm() {
               className={inputClass()}
             >
               <option value="">—</option>
-              {GRADE_LEVELS.map((g) => (
+              {gradeLevels.map((g) => (
                 <option key={g} value={g}>
                   {g}
                 </option>

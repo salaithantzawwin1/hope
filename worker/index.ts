@@ -11,6 +11,8 @@
  *   /api/events   — D1 CRUD
  *   /api/gallery  — D1 CRUD + batch album ops
  *   /api/content  — site_content key/value CRUD
+ *   /api/submissions — public form inbox (inquiry/registration/application)
+ *                      + staff-only list/edit/delete and CV downloads
  *
  * `run_worker_first: ["/api/*"]` keeps every other request on static assets,
  * so page rendering is unchanged. Auth details in worker/auth.ts.
@@ -23,6 +25,10 @@ import {
 } from "./auth";
 import { handleContent, handleEvents, handleGallery, handleNews } from "./data";
 import { handleImages, serveImage } from "./images";
+import {
+  handleSubmissionCv,
+  handleSubmissions,
+} from "./submissions";
 
 export interface Env {
   /** D1 database (news, events, site_content, gallery) — schema: worker/schema.sql */
@@ -41,6 +47,16 @@ export interface Env {
    * Optional: when unset, PUT /api/images returns the bare R2 key.
    */
   IMAGE_PUBLIC_BASE_URL?: string;
+  /**
+   * Google Apps Script web-app endpoints the submission inbox mirrors to
+   * (Sheet + email). Optional: the admin Settings block takes precedence
+   * (Settings → Form Emails & Endpoints); these env vars are the fallback
+   * when no settings row has been saved. Set with `npx wrangler secret put
+   * INQUIRY_ENDPOINT` etc., or as [vars] in wrangler.jsonc.
+   */
+  INQUIRY_ENDPOINT?: string;
+  REGISTRATION_ENDPOINT?: string;
+  APPLICATION_ENDPOINT?: string;
 }
 
 const json = (data: unknown, status = 200): Response =>
@@ -58,6 +74,14 @@ export default {
     if (pathname === "/api/auth/check") return handleAuthCheck(request, env);
 
     if (pathname === "/api/images") return handleImages(request, env);
+    if (pathname === "/api/submissions") return handleSubmissions(request, env);
+    if (pathname.startsWith("/api/submissions/cv/")) {
+      return handleSubmissionCv(
+        request,
+        env,
+        decodeURIComponent(pathname.slice("/api/submissions/cv/".length)),
+      );
+    }
     if (pathname.startsWith("/api/img/")) {
       return serveImage(request, env, pathname.slice("/api/img/".length));
     }

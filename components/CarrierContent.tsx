@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import ApplyModal from "@/components/ApplyModal";
 import { fetchSiteContent } from "@/lib/db";
 import { FALLBACK_CARRIER, normalizeCarrier } from "@/lib/fallback-data";
+import { pickHeading, usePageHeadings } from "@/components/usePageHeadings";
 import type { CarrierContent } from "@/lib/types";
 
 function parseJson<T>(raw: string | undefined): T | null {
@@ -24,6 +25,15 @@ function parseJson<T>(raw: string | undefined): T | null {
 export default function CarrierPageContent() {
   const locale = useLocale();
   const [db, setDb] = useState<CarrierContent | null>(null);
+  // "No open positions" note is editable (Settings → Page Headings).
+  const headings = usePageHeadings();
+  const emptyPositions = pickHeading(
+    headings,
+    locale,
+    "carrier_empty_en",
+    "carrier_empty_my",
+    "No open positions at this time.",
+  );
 
   useEffect(() => {
     let active = true;
@@ -144,7 +154,7 @@ export default function CarrierPageContent() {
             })}
             {activePositions.length === 0 && (
               <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-500">
-                No open positions at this time.
+                {emptyPositions}
               </div>
             )}
           </div>

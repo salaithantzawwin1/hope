@@ -23,7 +23,15 @@ portal appear on the public site immediately — no rebuild or re-upload.
   a Google Map — all editable from the portal.
 - ✍️ **Editable site text**: hero, welcome and about intro editable from the
   portal.
-- 🔐 **Admin portal** at `/admin` (staff passphrase login, signed session cookie).
+- 📥 **Submissions inbox**: inquiries, event registrations and job
+  applications are stored in D1 and listed in the admin portal (with CV
+  downloads), mirrored to the Google Sheets + email pipeline as before —
+  protected by a honeypot + rate limiting, no external service needed.
+- ⚙️ **Admin Settings tab**: school name/wordmark, footer logo, form
+  recipient addresses + Apps Script endpoints and the grade-level list —
+  editable without a rebuild.
+- 🔐 **Admin portal** at `/admin` (staff passphrase login, signed session
+  cookie, login rate limiting).
 - 📦 **Static export**: pages are plain static assets; the Worker serves the
   `/api/*` backend. Without D1/R2 configured the site still shows sample content.
 
@@ -200,6 +208,53 @@ The snapshot also contains `create table` statements — run
 11. **Header** — edit the logo image URL and the nav menu items (each with a
     URL and a bilingual label). The blue Admissions button is fixed. Shown
     on every page.
+12. **Submissions** (Inbox group) — every inquiry, event registration and
+    job application submitted on the public site lands here, newest first:
+    read the full entry, search all fields, **Download CV** for job
+    applications, and delete spam. Entries are also mirrored to the Google
+    Sheets + email as before — the inbox is the day-to-day view, the Sheets
+    are the long-term backup. One-time step: apply
+    `worker/migrate-submissions.sql` to the remote database (see below).
+13. **Site Settings** (Settings group) — the school name & wordmark shown
+    in the header/footer, the footer logo, the recipient addresses and
+    Google Apps Script endpoints for the three forms, and the grade-level
+    list used by the inquiry/registration dropdowns. Empty fields keep the
+    built-in defaults, so an accidental blank never breaks anything.
+14. **Page Headings** (Settings group) — the News & Events page title,
+    subtitle and empty-state messages, the Gallery page title/subtitle, the
+    Academics bottom CTA band, and the Carrier "no open positions" note —
+    in both languages. Empty fields keep the built-in text.
+
+### Applying database migrations
+
+When a release adds new tables (e.g. `worker/migrate-submissions.sql` for
+the Submissions inbox), apply it once to the remote database:
+
+```bash
+npx wrangler d1 execute hope-db --remote --file worker/migrate-submissions.sql
+```
+
+Every migration in `worker/*.sql` is idempotent — safe to run again.
+
+### Form submissions: how delivery works
+
+All three public forms (inquiry, registration, job application) POST to the
+same-origin Worker `/api/submissions` route:
+
+1. The entry is stored in the **`submissions` D1 table** → it appears in the
+   admin portal's **Submissions** tab.
+2. The Worker then **mirrors the entry to the Apps Script endpoint** saved in
+   the admin Settings tab (falling back to `INQUIRY_ENDPOINT` etc. on the
+   Worker), so the Google Sheet + email pipeline continues unchanged.
+3. Job applications additionally store the CV in the R2 bucket under `cv/` —
+   that prefix is **not** publicly served; staff download CVs from the
+   Submissions tab while signed in.
+
+Anti-spam: each form carries a hidden honeypot field (bots that fill it are
+silently dropped) and a per-client rate limit shared with the admin login.
+If the Worker route is unreachable (e.g. the static site is hosted without
+the Worker), the forms fall back to posting straight to the Apps Script
+endpoint — and the mailto fallback remains the last resort.
 
 ## Inquiry form
 
@@ -341,6 +396,7 @@ worker/               Worker entry, auth, /api routes, D1 schema
 messages/             en.json + my.json (all UI copy)
 registration-emailer/ Google Apps Script for the registration form
 application-emailer/  Google Apps Script for the job application form
+worker/*.sql          D1 schema + idempotent migrations (apply once)
 ```
 
 ## Troubleshooting

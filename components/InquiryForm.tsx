@@ -2,19 +2,23 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { GRADE_LEVELS } from "@/lib/db";
 import { errorId, invalidProps } from "@/lib/form-a11y";
-import { INQUIRY_EMAIL, submitInquiry } from "@/lib/inquiry";
+import { submitToInbox } from "@/lib/submissions";
+import { useSettings } from "@/components/useSettings";
 
 type Errors = { name?: string; email?: string; message?: string };
 
-/** The address the mailto fallback opens (kept in sync with lib/inquiry.ts). */
-const FALLBACK_EMAIL = INQUIRY_EMAIL;
+
 
 export default function InquiryForm() {
   const t = useTranslations("admissions");
   const locale = useLocale();
   const f = (key: string) => t(`form.${key}`);
+  // Admin-editable recipient (Settings tab) + Apps Script mirror endpoint.
+  const settings = useSettings();
+  const FALLBACK_EMAIL = settings.inquiry_email;
+  const gradeLevels = settings.grade_levels;
+  const [honeypot, setHoneypot] = useState("");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -57,10 +61,17 @@ export default function InquiryForm() {
       message: message.trim(),
       locale,
       submittedAt: new Date().toISOString(),
-    };    // Preferred path: automatic delivery via the Apps Script emailer
-    // (Sheet + email to INQUIRY_EMAIL). Fallback: open the visitor's mail
-    // app with a pre-filled message.
-    const result = await submitInquiry(payload);
+      // Honeypot rides along; the Worker drops bot submissions wholesale.
+      website: honeypot,
+    };
+    // Preferred path: the Worker inbox (D1 + mirror to the Apps Script
+    // emailer — Sheet + email). Fallback: the Apps Script directly; last
+    // resort: open the visitor's mail app with a pre-filled message.
+    const result = await submitToInbox("inquiry", payload, settings.inquiry_endpoint);
+    if (!result.ok && result.error === "rate_limited") {
+      setStatus("error");
+      return;
+    }
     if (result.ok) {
       setStatus("success");
       setName("");
@@ -68,10 +79,12 @@ export default function InquiryForm() {
       setPhone("");
       setGrade("");
       setMessage("");
+      setHoneypot("");
       return;
     }
-    // notConfigured (Apps Script not deployed yet) or network/server error →
-    // open the visitor's mail app as a dependable fallback.
+
+    // Worker and Apps Script both unreachable → open the visitor's mail
+    // app as a dependable last-resort fallback.
     const subject = encodeURIComponent(
       `[Inquiry] ${payload.name} — ${payload.grade || "General"}`,
     );
@@ -107,6 +120,20 @@ export default function InquiryForm() {
       <p className="mt-1.5 text-sm text-slate-500">{t("formSubtitle")}</p>
 
       <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
+        {/* The honeypot must be a controlled, settable input so a bot that
+            types into it trips the check — readOnly inputs are often skipped. */}
+        <div aria-hidden className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden">
+          <label htmlFor="inq-website">Website</label>
+          <input
+            id="inq-website"
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+          />
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="inq-name" className="mb-1.5 block text-sm font-medium text-slate-700">
@@ -175,7 +202,7 @@ export default function InquiryForm() {
               className={inputClass()}
             >
               <option value="">—</option>
-              {GRADE_LEVELS.map((g) => (
+              {gradeLevels.map((g) => (
                 <option key={g} value={g}>
                   {g}
                 </option>

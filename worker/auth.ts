@@ -19,8 +19,16 @@
  * verification — every route handler keeps calling `requireStaff`.
  */
 
+import { rateLimit } from "./ratelimit";
+
 const SESSION_COOKIE = "hope_session";
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+// Brute-force brake for the shared passphrase. Per-isolate (see ratelimit.ts)
+// but still raises the cost of guessing enormously: each isolate allows only
+// 5 guesses per 10 minutes per client IP.
+const LOGIN_WINDOW_MS = 10 * 60 * 1000;
+const LOGIN_MAX_ATTEMPTS = 5;
 
 interface SessionEnv {
   /** Secret used to sign session cookies (e.g. `openssl rand -hex 32`). */
@@ -142,6 +150,15 @@ export async function handleLogin(
 ): Promise<Response> {
   if (request.method !== "POST") {
     return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
+  }
+  // Same shape/message as a wrong passphrase so attackers learn nothing from
+  // the response itself (only the status code differs).
+  if (await rateLimit(request, env, "login", LOGIN_MAX_ATTEMPTS, LOGIN_WINDOW_MS)) {
+    return json(
+      { error: "rate_limited", message: "Too many attempts — try again later." },
+      429,
+      { "retry-after": "600" },
+    );
   }
   let passphrase = "";
   try {

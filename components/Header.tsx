@@ -7,6 +7,7 @@ import { fetchSiteContent } from "@/lib/db";
 import { FALLBACK_HEADER } from "@/lib/fallback-data";
 import { isUnknownInternalPath } from "@/lib/routes";
 import type { HeaderContent, NavLink } from "@/lib/types";
+import { useSettings } from "./useSettings";
 
 function parseJson<T>(raw: string | undefined): T | null {
   if (!raw || !raw.trim()) return null;
@@ -23,6 +24,13 @@ export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [db, setDb] = useState<HeaderContent | null>(null);
+  // School wordmark is editable in the admin Settings tab (defaults keep
+  // the built-in "Hope / International School" until staff change it).
+  const settings = useSettings();
+  const isMy = locale === "my";
+  const schoolName = (isMy && settings.school_name_my.trim()) || settings.school_name_en;
+  const schoolTagline =
+    (isMy && settings.school_tagline_my.trim()) || settings.school_tagline_en;
 
   useEffect(() => {
     let active = true;
@@ -57,7 +65,6 @@ export default function Header() {
       };
     }),
   };
-  const isMy = locale === "my";
   const pick = (en: string, my: string) => {
     const value = isMy && my.trim() ? my : en;
     return value || en;
@@ -98,10 +105,10 @@ export default function Header() {
           />
           <span className="leading-tight">
             <span className="block text-[15px] font-bold tracking-tight text-brand">
-              Hope
+              {schoolName}
             </span>
             <span className="block text-[11px] font-medium uppercase tracking-wider text-slate-500">
-              International School
+              {schoolTagline}
             </span>
           </span>
         </Link>
