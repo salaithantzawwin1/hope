@@ -49,6 +49,26 @@ html[lang="my"] h4 {
   letter-spacing: normal;
 }
 
+/* A slim, unobtrusive scrollbar for small scroll regions (the admin
+   sidebar). Keeps the native scrollbar (and full keyboard/wheel
+   accessibility) but halves its visual footprint; browsers without the
+   properties simply render their normal scrollbar. */
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(203 213 225) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgb(203 213 225);
+    border-radius: 9999px;
+  }
+}
+
 ::selection {
   background: #f5b301;
   color: #172554;

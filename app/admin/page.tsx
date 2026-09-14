@@ -251,9 +251,18 @@ export default function AdminPage() {
       <div className="mx-auto max-w-6xl px-4 py-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
           {/* Left sidebar navigation: a full-width scrollable strip on
-              mobile, a sticky vertical menu on desktop. */}
-          <nav className="w-full shrink-0 lg:sticky lg:top-8 lg:w-52 lg:self-start">
-            <div className="flex gap-8 overflow-x-auto pb-2 lg:flex-col lg:gap-6 lg:overflow-visible lg:pb-0">
+              mobile; on desktop a sticky menu that scrolls INTERNALLY
+              whenever the 17 items outgrow the viewport — common on small
+              laptops (a 768px-tall screen cuts the list off around
+              "Footer"), where a plain sticky menu would strand the Settings
+              entries below the fold. The height budget reserves the
+              sidebar's natural top offset (73px header + 32px section
+              padding ≈ 8.25rem − margin), so the whole box — last item
+              included — stays inside the viewport even before the page is
+              scrolled; once pinned by sticky (top-8) there is extra room.
+              min-w-0 guards against overflow from long labels. */}
+          <nav className="w-full shrink-0 lg:sticky lg:top-8 lg:w-52 lg:min-w-0 lg:self-start">
+            <div className="scrollbar-thin flex gap-8 overflow-x-auto pb-2 lg:max-h-[calc(100vh-8rem)] lg:flex-col lg:gap-6 lg:overflow-y-auto lg:overflow-x-visible lg:p-1.5 lg:pb-2">
               {GROUPS.map((group) => (
                 <div key={group.id} className="shrink-0">
                   <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-slate-400">
