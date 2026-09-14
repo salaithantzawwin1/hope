@@ -205,6 +205,25 @@ The snapshot also contains `create table` statements — run
 10. **Footer** — edit the footer tagline, contact details (address, phone,
     email, opening hours) and the quick links navigation, in English and
     Burmese. Shown on every page.
+
+### Keeping images fast (page-load performance)
+
+The site serves images byte-for-byte (static export, `images.unoptimized`),
+so large uploads directly slow the pages they appear on. Two rules keep
+pages quick:
+
+- **Files in `public/`** (hero banner, logo): run
+  `npm run optimize:images` after replacing them — it re-encodes to the
+  sizes the layout actually draws (safe to re-run).
+- **Photos uploaded through the admin portal** (News covers, Event flyers,
+  Gallery photos) are auto-resized at upload time. Keep originals reasonable
+  (≤ ~2000 px); a multi-megabyte phone photo can be selected, but the portal
+  already shrinks Gallery uploads to 1600 px JPEG.
+
+If a page feels slow, check its largest resource in the browser's Network
+tab — a multi-hundred-KB image is the usual culprit; re-upload a smaller
+version from the admin portal (News/Events) or re-run the optimizer
+(`public/` files).
 11. **Header** — edit the logo image URL and the nav menu items (each with a
     URL and a bilingual label). The blue Admissions button is fixed. Shown
     on every page.
