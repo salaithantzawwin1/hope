@@ -64,5 +64,13 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  // Public hostnames served by this Worker. Myanmar ISPs block the
+  // workers.dev hostname (SNI filtering), so visitors use the school domain —
+  // attaching it here as a Workers Custom Domain serves the exact same
+  // Worker/asset pipeline under www.mmgoodnewshr.online.
+  "routes": [
+    { "pattern": "www.mmgoodnewshr.online", "custom_domain": true },
+    { "pattern": "mmgoodnewshr.online", "custom_domain": true }
+  ]
 }
