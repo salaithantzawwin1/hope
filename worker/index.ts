@@ -67,7 +67,14 @@ const json = (data: unknown, status = 200): Response =>
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const { pathname } = new URL(request.url);
+    const { pathname: rawPathname } = new URL(request.url);
+    let pathname = rawPathname;
+    // Some reverse proxies (e.g. the Vercel mirror in mmgoodnews-vercel-proxy)
+    // normalize paths to a trailing slash before forwarding. Accept both
+    // spellings for /api/* so the API behaves identically on every domain.
+    if (pathname.startsWith("/api/") && pathname.endsWith("/")) {
+      pathname = pathname.replace(/\/+$/, "") || "/";
+    }
 
     if (pathname === "/api/auth/login") return handleLogin(request, env);
     if (pathname === "/api/auth/logout") return handleLogout(request);
